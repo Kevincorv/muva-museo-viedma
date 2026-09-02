@@ -36,7 +36,7 @@ export default function LoadingScreen() {
       <img
         src="/images/muva-logo-footer.png"
         alt="MUVA – Museo Viedma"
-        className="mt-8 h-24 w-auto md:h-32"
+        className="mt-8 h-16 w-auto md:h-20"
         width={800}
         height={319}
       />

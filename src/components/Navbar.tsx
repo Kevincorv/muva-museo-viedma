@@ -44,7 +44,7 @@ export default function Navbar() {
             <img
               src="/images/muva-logo.png"
               alt="MUVA – Museo Viedma"
-              className="h-14 w-auto transition-opacity duration-500 md:h-16 lg:h-20"
+              className="h-10 w-auto transition-opacity duration-500 md:h-12 lg:h-14"
               width={500}
               height={199}
             />
