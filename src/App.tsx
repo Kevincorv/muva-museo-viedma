@@ -7,7 +7,7 @@ import History from "./components/History";
 import CollectionPreview from "./components/CollectionPreview";
 import GuaraniExperience from "./components/GuaraniExperience";
 // import Exhibitions from "./components/Exhibitions";
-import News from "./components/News";
+// import News from "./components/News";
 import Visit from "./components/Visit";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
@@ -34,7 +34,7 @@ function HomePage() {
         <CollectionPreview />
         <GuaraniExperience />
         {/* <Exhibitions /> */}
-        <News />
+        {/* <News /> */}
         <Visit />
         <Contact />
       </main>
