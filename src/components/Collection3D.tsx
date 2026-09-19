@@ -1,6 +1,7 @@
 import {
   Suspense,
   useCallback,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -59,6 +60,7 @@ function EmbeddedModel({
 }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
+  const loadedRef = useRef(false);
 
   const cloned = useMemo(() => {
     const c = scene.clone(true);
@@ -72,8 +74,9 @@ function EmbeddedModel({
     return c;
   }, [scene]);
 
-  useMemo(() => {
-    if (!ref.current) return;
+  useEffect(() => {
+    if (!ref.current || loadedRef.current) return;
+    loadedRef.current = true;
     const box = new THREE.Box3().setFromObject(cloned);
     const size = new THREE.Vector3();
     const center = new THREE.Vector3();
@@ -116,16 +119,25 @@ function SculptureCanvas({
 
   const reset = () => orbitRef.current?.reset();
 
+  const handleLoaded = useCallback(() => setLoading(false), []);
+
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-muva-dark md:aspect-[3/4]">
       <Canvas
         shadows
-        dpr={[1, 1.5]}
+        dpr={[1, 1.2]}
         camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
-        gl={{ antialias: true, alpha: false }}
+        gl={{
+          antialias: true,
+          alpha: false,
+          powerPreference: "high-performance",
+          stencil: false,
+        }}
         onCreated={({ gl, scene }) => {
           gl.setClearColor(new THREE.Color(MUVA_BG));
           scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
+          gl.shadowMap.enabled = true;
+          gl.shadowMap.type = THREE.PCFSoftShadowMap;
         }}
       >
         <color attach="background" args={[MUVA_BG]} />
@@ -144,19 +156,12 @@ function SculptureCanvas({
           intensity={0.4}
           color="#c9b89a"
         />
-        <spotLight
-          position={[0, 6, 0]}
-          angle={0.6}
-          penumbra={0.7}
-          intensity={0.8}
-          color="#fdfaf3"
-        />
 
         <Suspense fallback={null}>
           <ModelErrorBoundary onError={onError}>
             <EmbeddedModel
               url={modelUrl}
-              onLoaded={() => setLoading(false)}
+              onLoaded={handleLoaded}
             />
             <ContactShadows
               position={[0, -1.2, 0]}
@@ -183,7 +188,7 @@ function SculptureCanvas({
       </Canvas>
 
       {loading && (
-        <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/40 backdrop-blur-[2px]">
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-muva-dark/40 backdrop-blur-[2px]">
           <Loader2
             size={28}
             className="animate-spin text-muva-sand"
@@ -195,55 +200,59 @@ function SculptureCanvas({
         </div>
       )}
 
-      <div className="pointer-events-none absolute bottom-3 right-3 z-20 flex flex-col gap-1.5 md:bottom-4 md:right-4">
-        <button
-          type="button"
-          onClick={() => {
-            if (!orbitRef.current) return;
-            const cam = orbitRef.current.object;
-            const target = orbitRef.current.target;
-            const dir = new THREE.Vector3()
-              .subVectors(cam.position, target)
-              .normalize();
-            cam.position.addScaledVector(dir, 0.5);
-            orbitRef.current.update();
-          }}
-          className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-          aria-label="Acercar"
-        >
-          <ZoomIn size={15} />
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            if (!orbitRef.current) return;
-            const cam = orbitRef.current.object;
-            const target = orbitRef.current.target;
-            const dir = new THREE.Vector3()
-              .subVectors(cam.position, target)
-              .normalize();
-            cam.position.addScaledVector(dir, -0.5);
-            orbitRef.current.update();
-          }}
-          className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-          aria-label="Alejar"
-        >
-          <ZoomOut size={15} />
-        </button>
-        <button
-          type="button"
-          onClick={reset}
-          className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-          aria-label="Restablecer vista"
-        >
-          <RotateCcw size={15} />
-        </button>
-      </div>
+      {!loading && (
+        <div className="pointer-events-none absolute bottom-3 right-3 z-20 flex flex-col gap-1.5 md:bottom-4 md:right-4">
+          <button
+            type="button"
+            onClick={() => {
+              if (!orbitRef.current) return;
+              const cam = orbitRef.current.object;
+              const target = orbitRef.current.target;
+              const dir = new THREE.Vector3()
+                .subVectors(cam.position, target)
+                .normalize();
+              cam.position.addScaledVector(dir, 0.5);
+              orbitRef.current.update();
+            }}
+            className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
+            aria-label="Acercar"
+          >
+            <ZoomIn size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (!orbitRef.current) return;
+              const cam = orbitRef.current.object;
+              const target = orbitRef.current.target;
+              const dir = new THREE.Vector3()
+                .subVectors(cam.position, target)
+                .normalize();
+              cam.position.addScaledVector(dir, -0.5);
+              orbitRef.current.update();
+            }}
+            className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
+            aria-label="Alejar"
+          >
+            <ZoomOut size={15} />
+          </button>
+          <button
+            type="button"
+            onClick={reset}
+            className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
+            aria-label="Restablecer vista"
+          >
+            <RotateCcw size={15} />
+          </button>
+        </div>
+      )}
 
-      <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden font-sans text-[9px] uppercase tracking-extra-wide text-muva-cream/50 md:bottom-4 md:left-4 md:flex md:items-center md:gap-1.5">
-        <Move size={10} />
-        Arrastrar · Scroll · Zoom
-      </div>
+      {!loading && (
+        <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden font-sans text-[9px] uppercase tracking-extra-wide text-muva-cream/50 md:bottom-4 md:left-4 md:flex md:items-center md:gap-1.5">
+          <Move size={10} />
+          Arrastrar · Scroll · Zoom
+        </div>
+      )}
     </div>
   );
 }
@@ -326,8 +335,6 @@ function SculptureUploadCard({
     [customModelUrl]
   );
 
-  const modelUrl = customModelUrl ?? sculpture.model;
-
   return (
     <article
       ref={reveal.ref}
@@ -335,10 +342,10 @@ function SculptureUploadCard({
         reveal.isVisible ? "is-visible" : ""
       }`}
     >
-      {viewerActive && !modelError ? (
+      {viewerActive && !modelError && customModelUrl ? (
         <div className="relative">
           <SculptureCanvas
-            modelUrl={modelUrl}
+            modelUrl={customModelUrl}
             onError={() => setModelError(true)}
           />
           <button
