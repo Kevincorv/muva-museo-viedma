@@ -23,7 +23,6 @@ import {
   ZoomOut,
   Move,
   AlertCircle,
-  Box,
 } from "lucide-react";
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
@@ -385,16 +384,6 @@ function SculptureUploadCard({
         </p>
 
         <div className="mt-5 flex flex-wrap gap-3">
-          {!viewerActive && !modelError && (
-            <button
-              type="button"
-              onClick={() => setViewerActive(true)}
-              className="group inline-flex items-center gap-2.5 border border-muva-earth/40 px-5 py-2.5 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark transition-all duration-300 hover:border-muva-earth hover:bg-muva-earth hover:text-muva-cream"
-            >
-              <Box size={14} />
-              Ver en 3D
-            </button>
-          )}
           <input
             ref={fileInputRef}
             type="file"
