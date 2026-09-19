@@ -1,6 +1,5 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { museum } from "../data/museum";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
 
