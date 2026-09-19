@@ -111,7 +111,7 @@ export default function GuaraniExperience() {
             </div>
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:aspect-auto md:h-full">
               <img
-                src="/images/experience/escultura.webp"
+                src="/images/experience/Esculturas  Obra de Viedma.jpeg"
                 alt="Escultura del recorrido"
                 className="h-full w-full object-cover"
                 loading="lazy"
