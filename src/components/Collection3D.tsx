@@ -107,12 +107,14 @@ function EmbeddedModel({
   );
 }
 
-function SculptureCanvas({
+export function SculptureCanvas({
   modelUrl,
   onError,
+  compact = false,
 }: {
   modelUrl: string;
   onError: () => void;
+  compact?: boolean;
 }) {
   const [loading, setLoading] = useState(true);
   const orbitRef = useRef<any>(null);
@@ -122,7 +124,7 @@ function SculptureCanvas({
   const handleLoaded = useCallback(() => setLoading(false), []);
 
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-sm bg-muva-dark md:aspect-[3/4]">
+    <div className={`relative w-full overflow-hidden rounded-sm bg-muva-dark ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
       <Canvas
         shadows
         dpr={[1, 1.2]}
@@ -201,7 +203,7 @@ function SculptureCanvas({
         </div>
       )}
 
-      {!loading && (
+      {!loading && !compact && (
         <div className="pointer-events-none absolute bottom-3 right-3 z-20 flex flex-col gap-1.5 md:bottom-4 md:right-4">
           <button
             type="button"
@@ -248,7 +250,7 @@ function SculptureCanvas({
         </div>
       )}
 
-      {!loading && (
+      {!loading && !compact && (
         <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden font-sans text-[9px] uppercase tracking-extra-wide text-muva-cream/50 md:bottom-4 md:left-4 md:flex md:items-center md:gap-1.5">
           <Move size={10} />
           {t("collection3d.arrastrar", locale)}
@@ -258,14 +260,16 @@ function SculptureCanvas({
   );
 }
 
-function ThumbnailFallback({
+export function ThumbnailFallback({
   sculpture,
+  compact = false,
 }: {
   sculpture: Sculpture;
+  compact?: boolean;
 }) {
   const { locale } = useLanguage();
   return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden bg-muva-sand md:aspect-[3/4]">
+    <div className={`relative w-full overflow-hidden bg-muva-sand ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
       <img
         src={sculpture.thumbnail}
         alt={sculpture.title}

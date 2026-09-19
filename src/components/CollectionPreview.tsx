@@ -1,9 +1,11 @@
+import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sculptures } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import { SculptureCanvas, ThumbnailFallback } from "./Collection3D";
 
 export default function CollectionPreview() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
@@ -60,7 +62,8 @@ export default function CollectionPreview() {
               size={16}
               className="transition-transform duration-500 group-hover:translate-x-1"
             />
-          </Link>        </div>
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -74,6 +77,7 @@ function PreviewCard({
   index: number;
 }) {
   const reveal = useScrollReveal<HTMLDivElement>();
+  const [modelError, setModelError] = useState(false);
 
   return (
     <article
@@ -81,25 +85,17 @@ function PreviewCard({
       className={`reveal-on-scroll ${reveal.isVisible ? "is-visible" : ""} group relative flex flex-col`}
       style={{ transitionDelay: `${index * 60}ms` }}
     >
-      <div className="relative aspect-[3/4] overflow-hidden bg-muva-sand">
-        <img
-          src={sculpture.thumbnail}
-          alt={sculpture.title}
-          className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-          loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).style.display = "none";
-          }}
-        />
-        <div
-          className="absolute inset-0 -z-10"
-          style={{
-            background:
-              "linear-gradient(150deg, #c9b89a 0%, #8a7560 50%, #3d2f22 100%)",
-          }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-muva-dark/60 via-transparent to-transparent opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
-        <div className="absolute left-4 top-4 bg-muva-ivory/95 px-3 py-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+      <div className="relative overflow-hidden">
+        {!modelError ? (
+          <SculptureCanvas
+            modelUrl={sculpture.model}
+            onError={() => setModelError(true)}
+            compact
+          />
+        ) : (
+          <ThumbnailFallback sculpture={sculpture} compact />
+        )}
+        <div className="absolute left-4 top-4 z-10 bg-muva-ivory/95 px-3 py-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
           {sculpture.inventoryNumber ?? "MUVA"}
         </div>
       </div>
