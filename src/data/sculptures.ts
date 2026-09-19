@@ -27,7 +27,7 @@ export const sculptures: Sculpture[] = [
     description:
       "Obra que fusiona la simbología de la Pasionaria o Mburukuja con la espiritualidad de San Ignacio, representando el encuentro entre la naturaleza misionera y la fe jesuítica.",
     thumbnail: "/images/sculptures/obra-01.webp",
-    model: "/models/sculptures/obra-01.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-02",

@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { museum } from "../data/museum";
 import { useScrolled } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
@@ -10,6 +12,15 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
   const isHome = location.pathname === "/";
+  const { locale } = useLanguage();
+
+  const navLabelMap: Record<string, string> = {
+    "Inicio": "nav.inicio",
+    "Museo": "nav.museo",
+    "Historia": "nav.historia",
+    "Colección": "nav.coleccion",
+    "Exposiciones": "nav.exposiciones",
+  };
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -65,7 +76,7 @@ export default function Navbar() {
                 }}
                 className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
               >
-                {link.label}
+                {t(navLabelMap[link.label] ?? link.label, locale)}
               </a>
             ))}
           </nav>
@@ -80,7 +91,7 @@ export default function Navbar() {
               }}
               className="hidden items-center gap-2 whitespace-nowrap border border-muva-dark px-4 py-2.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-dark transition-all duration-500 hover:bg-muva-dark hover:text-muva-cream lg:inline-flex xl:px-5 xl:text-[11px]"
             >
-              Visitar MUVA
+              {t("nav.visitar", locale)}
             </a>
             <button
               type="button"
@@ -138,7 +149,7 @@ export default function Navbar() {
                 }`}
                 style={{ transitionDelay: open ? `${i * 60 + 150}ms` : "0ms" }}
               >
-                {link.label}
+                {t(navLabelMap[link.label] ?? link.label, locale)}
               </a>
             ))}
             <div className="mt-6">
@@ -152,7 +163,7 @@ export default function Navbar() {
               }}
               className="btn-primary mt-6 w-full"
             >
-              Visitar MUVA
+              {t("nav.visitar", locale)}
             </a>
           </nav>
         </div>

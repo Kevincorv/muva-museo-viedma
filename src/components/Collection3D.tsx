@@ -7,7 +7,6 @@ import {
   useState,
   Component,
   type ReactNode,
-  type ChangeEvent,
 } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import {
@@ -17,7 +16,6 @@ import {
   useGLTF,
 } from "@react-three/drei";
 import {
-  Upload,
   Loader2,
   RotateCcw,
   ZoomIn,
@@ -28,6 +26,8 @@ import {
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 const MUVA_BG = "#2a2018";
 
@@ -116,9 +116,9 @@ function SculptureCanvas({
 }) {
   const [loading, setLoading] = useState(true);
   const orbitRef = useRef<any>(null);
+  const { locale } = useLanguage();
 
   const reset = () => orbitRef.current?.reset();
-
   const handleLoaded = useCallback(() => setLoading(false), []);
 
   return (
@@ -195,7 +195,7 @@ function SculptureCanvas({
             strokeWidth={1.2}
           />
           <div className="mt-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/80">
-            Cargando modelo 3D
+            {t("collection3d.cargando", locale)}
           </div>
         </div>
       )}
@@ -215,7 +215,7 @@ function SculptureCanvas({
               orbitRef.current.update();
             }}
             className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-            aria-label="Acercar"
+            aria-label={t("collection3d.acercar", locale)}
           >
             <ZoomIn size={15} />
           </button>
@@ -232,7 +232,7 @@ function SculptureCanvas({
               orbitRef.current.update();
             }}
             className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-            aria-label="Alejar"
+            aria-label={t("collection3d.alejar", locale)}
           >
             <ZoomOut size={15} />
           </button>
@@ -240,7 +240,7 @@ function SculptureCanvas({
             type="button"
             onClick={reset}
             className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
-            aria-label="Restablecer vista"
+            aria-label={t("collection3d.reset", locale)}
           >
             <RotateCcw size={15} />
           </button>
@@ -250,7 +250,7 @@ function SculptureCanvas({
       {!loading && (
         <div className="pointer-events-none absolute bottom-3 left-3 z-20 hidden font-sans text-[9px] uppercase tracking-extra-wide text-muva-cream/50 md:bottom-4 md:left-4 md:flex md:items-center md:gap-1.5">
           <Move size={10} />
-          Arrastrar · Scroll · Zoom
+          {t("collection3d.arrastrar", locale)}
         </div>
       )}
     </div>
@@ -262,6 +262,7 @@ function ThumbnailFallback({
 }: {
   sculpture: Sculpture;
 }) {
+  const { locale } = useLanguage();
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden bg-muva-sand md:aspect-[3/4]">
       <img
@@ -287,53 +288,23 @@ function ThumbnailFallback({
           strokeWidth={1.4}
         />
         <p className="mt-3 font-serif text-lg text-muva-cream">
-          Modelo 3D no disponible
-        </p>
-        <p className="mt-2 max-w-xs text-xs text-muva-cream/60">
-          Subí un archivo{" "}
-          <code className="text-muva-sand">.glb</code> para
-          activar la vista 3D interactiva.
+          {t("collection3d.noDisponible", locale)}
         </p>
       </div>
     </div>
   );
 }
 
-function SculptureUploadCard({
+function SculptureCard({
   sculpture,
   index,
 }: {
   sculpture: Sculpture;
   index: number;
 }) {
-  const [customModelUrl, setCustomModelUrl] = useState<string | null>(
-    null
-  );
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [viewerActive, setViewerActive] = useState(false);
   const [modelError, setModelError] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const reveal = useScrollReveal<HTMLDivElement>();
-
-  const handleUpload = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      if (!file.name.endsWith(".glb")) {
-        alert("Solo se aceptan archivos .glb");
-        return;
-      }
-      if (customModelUrl) {
-        URL.revokeObjectURL(customModelUrl);
-      }
-      const url = URL.createObjectURL(file);
-      setCustomModelUrl(url);
-      setFileName(file.name);
-      setModelError(false);
-      setViewerActive(true);
-    },
-    [customModelUrl]
-  );
+  const { locale } = useLanguage();
 
   return (
     <article
@@ -342,27 +313,18 @@ function SculptureUploadCard({
         reveal.isVisible ? "is-visible" : ""
       }`}
     >
-      {viewerActive && !modelError && customModelUrl ? (
-        <div className="relative">
-          <SculptureCanvas
-            modelUrl={customModelUrl}
-            onError={() => setModelError(true)}
-          />
-          <button
-            type="button"
-            onClick={() => setViewerActive(false)}
-            className="absolute left-3 top-3 z-20 flex items-center gap-2 border border-muva-cream/20 bg-muva-dark/60 px-3 py-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream hover:bg-muva-cream hover:text-muva-dark md:left-4 md:top-4"
-          >
-            Volver a imagen
-          </button>
-        </div>
+      {!modelError ? (
+        <SculptureCanvas
+          modelUrl={sculpture.model}
+          onError={() => setModelError(true)}
+        />
       ) : (
         <ThumbnailFallback sculpture={sculpture} />
       )}
 
       <div className="mt-5">
         <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-          Pieza · {String(index + 1).padStart(2, "0")}
+          {t("collection3d.pieza", locale)} {String(index + 1).padStart(2, "0")}
           {sculpture.inventoryNumber &&
             ` · ${sculpture.inventoryNumber}`}
         </div>
@@ -389,30 +351,6 @@ function SculptureUploadCard({
         <p className="mt-3 text-sm text-muva-brown text-pretty">
           {sculpture.description}
         </p>
-
-        <div className="mt-5 flex flex-wrap gap-3">
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".glb"
-            onChange={handleUpload}
-            className="hidden"
-            aria-label={`Subir modelo 3D para ${sculpture.title}`}
-          />
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="group inline-flex items-center gap-2.5 border border-muva-earth/40 px-5 py-2.5 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark transition-all duration-300 hover:border-muva-earth hover:bg-muva-earth hover:text-muva-cream"
-          >
-            <Upload
-              size={14}
-              className="transition-transform duration-300 group-hover:-translate-y-0.5"
-            />
-            {fileName
-              ? `Modelo: ${fileName}`
-              : "Subir modelo 3D (.glb)"}
-          </button>
-        </div>
       </div>
     </article>
   );
@@ -420,6 +358,7 @@ function SculptureUploadCard({
 
 export default function Collection3D() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
 
   return (
     <section
@@ -434,24 +373,18 @@ export default function Collection3D() {
             titleReveal.isVisible ? "is-visible" : ""
           } max-w-4xl`}
         >
-          <div className="eyebrow">Colección</div>
+          <div className="eyebrow">{t("collection3d.eyebrow", locale)}</div>
           <h2 className="mt-6 font-serif font-light text-muva-dark text-display-xl text-balance">
-            Explorá la colección
-            <br />
-            en tres dimensiones
+            {t("collection3d.heading", locale)}
           </h2>
           <p className="mt-8 max-w-2xl font-serif text-xl italic text-muva-brown text-pretty">
-            Recorré cada obra de Manuel Viedma en 360°. Girá,
-            acercá y alejá cada pieza para descubrir sus
-            detalles. Subí tus propios modelos{" "}
-            <code className="text-muva-earth">.glb</code> para
-            reemplazar o agregar esculturas.
+            {t("collection3d.description", locale)}
           </p>
         </div>
 
         <div className="mt-16 grid gap-12 sm:grid-cols-2 lg:grid-cols-3 md:mt-24 md:gap-10">
           {sculptures.map((sculpture, i) => (
-            <SculptureUploadCard
+            <SculptureCard
               key={sculpture.id}
               sculpture={sculpture}
               index={i}

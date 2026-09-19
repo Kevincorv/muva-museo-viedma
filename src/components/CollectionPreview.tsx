@@ -2,10 +2,13 @@ import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sculptures } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function CollectionPreview() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
   const featured = sculptures.slice(0, 3);
+  const { locale } = useLanguage();
 
   return (
     <section
@@ -19,19 +22,17 @@ export default function CollectionPreview() {
           className={`reveal-on-scroll ${titleReveal.isVisible ? "is-visible" : ""} flex flex-col items-start justify-between gap-10 md:flex-row md:items-end`}
         >
           <div className="max-w-2xl">
-            <div className="eyebrow">Colección</div>
+            <div className="eyebrow">{t("collection.eyebrow", locale)}</div>
             <h2 className="mt-6 font-serif font-light text-muva-dark text-display-lg text-balance">
-              Colección Viedma
+              {t("collection.heading", locale)}
             </h2>
             <p className="mt-8 font-serif text-xl italic text-muva-brown text-pretty">
-              Una selección curada de la obra de Manuel Viedma, presentada como
-              una exposición digital. Cada pieza dialoga con la historia, la
-              espiritualidad y la naturaleza que la inspiraron.
+              {t("collection.description", locale)}
             </p>
           </div>
           <div className="hidden text-right md:block">
             <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-              Piezas destacadas
+              {t("collection.destacadas", locale)}
             </div>
             <div className="mt-1 font-serif text-5xl text-muva-dark">
               {String(featured.length).padStart(2, "0")}
@@ -54,7 +55,7 @@ export default function CollectionPreview() {
             to="/colección"
             className="group inline-flex items-center gap-3 border border-muva-dark px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-dark transition-all duration-500 hover:bg-muva-dark hover:text-muva-cream"
           >
-            Ver colección completa
+            {t("collection.verCompleta", locale)}
             <ArrowRight
               size={16}
               className="transition-transform duration-500 group-hover:translate-x-1"
