@@ -45,7 +45,7 @@ export const sculptures: Sculpture[] = [
     description:
       "Grupo escultórico que representa a la Sagrada Familia como modelo de vida comunitaria y espiritual, reflejando los valores transmitidos por los misioneros jesuíticas a las comunidades guaraníes.",
     thumbnail: "/images/sculptures/obra-03.webp",
-    model: "/models/sculptures/obra-03.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-04",
@@ -54,7 +54,7 @@ export const sculptures: Sculpture[] = [
     description:
       "Obra que celebra la fusión de culturas entre los pueblos originarios guaraníes y los colonizadores europeos, simbolizando el nacimiento de una nueva identidad cultural en la región.",
     thumbnail: "/images/sculptures/obra-04.webp",
-    model: "/models/sculptures/obra-04.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-05",
@@ -65,7 +65,7 @@ export const sculptures: Sculpture[] = [
     historicalContext:
       "Este grupo escultórico rinde homenaje a la labor de los frailes franciscanos en la región de Caazapá, Villarrica y otras zonas de Paraguay, destacando su contribución a la evangelización y la cultura local.",
     thumbnail: "/images/sculptures/obra-05.webp",
-    model: "/models/sculptures/obra-05.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-06",
@@ -74,7 +74,7 @@ export const sculptures: Sculpture[] = [
     description:
       "Junto al primer lago, un grupo escultórico representa a la Virgen del Rosario rodeada por indígenas guaraníes de diversas edades y roles sociales, todos en actitud orante. La escena evoca la costumbre guaraní de rezar el Santo Rosario al atardecer, dirigidos por un sacerdote jesuita, como expresión de gratitud por la vida. Los orantes no solo recuerdan una tradición, sino que también interceden por aquellos que aún viven, buscando la recuperación y el reconocimiento del sacrificio que la comunidad guaraní realizó en la región de Paraquaria. La escena conjuga una práctica religiosa ancestral con un acto de memoria y reivindicación del legado guaraní.",
     thumbnail: "/images/sculptures/obra-06.webp",
-    model: "/models/sculptures/obra-06.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-07",
@@ -83,6 +83,6 @@ export const sculptures: Sculpture[] = [
     description:
       "Escultura que representa a Cristo resucitado como símbolo de esperanza y renovación, figure central de la fe católica transmitida a las comunidades guaraníes durante las reducciones jesuíticas.",
     thumbnail: "/images/sculptures/obra-07.webp",
-    model: "/models/sculptures/obra-07.glb",
+    model: "/models/sculptures/prueba.glb",
   },
 ];
