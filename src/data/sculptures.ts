@@ -22,92 +22,67 @@ export interface Sculpture {
 export const sculptures: Sculpture[] = [
   {
     id: "obra-01",
-    title: "La Pasionaria",
+    title: "La Pasionaria y San Ignacio",
     artist: "Manuel Viedma",
-    year: "1998",
-    material: "Bronce patinado",
-    dimensions: "180 × 90 × 70 cm",
-    inventoryNumber: "MVP-001",
     description:
-      "La Flor de la Pasionaria o Mburukuja es una de las piezas más emblemáticas del legado artístico de Manuel Viedma. La escultura interpreta, con un lenguaje contemporáneo, la espiritualidad guaraní y la simbología de las misiones jesuíticas, fusionando naturaleza, fe y memoria.",
-    historicalContext:
-      "La obra forma parte de la colección permanente y dialoga con la tradición iconográfica de las reducciones jesuíticas en Paraguay.",
+      "Obra que fusiona la simbología de la Pasionaria o Mburukuja con la espiritualidad de San Ignacio, representando el encuentro entre la naturaleza misionera y la fe jesuítica.",
     thumbnail: "/images/sculptures/obra-01.webp",
     model: "/models/sculptures/obra-01.glb",
   },
   {
     id: "obra-02",
-    title: "Guaraní en Oración",
+    title: "San Miguel Arcángel",
     artist: "Manuel Viedma",
-    year: "2005",
-    material: "Madera tallada y bronce",
-    dimensions: "210 × 80 × 60 cm",
-    inventoryNumber: "MVP-002",
     description:
-      "Figura humana en posición de recogimiento, que evoca el momento previo a la oración. La pieza traduce en volumen el silencio, la introspección y la profundidad espiritual del encuentro entre dos mundos.",
-    historicalContext:
-      "Inspirada en los testimonios visuales de las comunidades guaraníes que habitaron las misiones jesuíticas durante los siglos XVII y XVIII.",
+      "Representación del arcángel San Miguel como protector y guía espiritual, figure central de la tradición católica en las reducciones jesuíticas.",
     thumbnail: "/images/sculptures/obra-02.webp",
     model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-03",
-    title: "El Ángel Misionero",
+    title: "Sagrada Familia",
     artist: "Manuel Viedma",
-    year: "2012",
-    material: "Bronce",
-    dimensions: "195 × 110 × 90 cm",
-    inventoryNumber: "MVP-003",
     description:
-      "Una de las piezas más monumentales de la colección. Representa el espíritu de las reducciones, el cuidado del otro y la transmisión cultural. Sus texturas y pliegues invitan a un recorrido visual detenido.",
-    historicalContext:
-      "La escultura se ubica en el patio central del museo como punto de contemplación del recorrido guaraní–jesuítico.",
+      "Grupo escultórico que representa a la Sagrada Familia como modelo de vida comunitaria y espiritual, reflejando los valores transmitidos por los misioneros jesuíticas a las comunidades guaraníes.",
     thumbnail: "/images/sculptures/obra-03.webp",
     model: "/models/sculptures/obra-03.glb",
   },
   {
     id: "obra-04",
-    title: "Memoria de la Tierra",
+    title: "Raza Mestiza",
     artist: "Manuel Viedma",
-    year: "2018",
-    material: "Piedra y bronce",
-    dimensions: "150 × 100 × 100 cm",
-    inventoryNumber: "MVP-004",
     description:
-      "La obra celebra la conexión profunda entre el pueblo guaraní y la tierra que habitó. Una pieza de gran presencia, trabajada a partir de materiales que evocan la permanencia y el arraigo.",
-    historicalContext:
-      "Realizada en el marco del programa artístico de la Fundación Viedma Paoli.",
+      "Obra que celebra la fusión de culturas entre los pueblos originarios guaraníes y los colonizadores europeos, simbolizando el nacimiento de una nueva identidad cultural en la región.",
     thumbnail: "/images/sculptures/obra-04.webp",
     model: "/models/sculptures/obra-04.glb",
   },
   {
     id: "obra-05",
-    title: "Cantor de la Selva",
+    title: "Rincón Franciscano",
     artist: "Manuel Viedma",
-    year: "2020",
-    material: "Madera de cedro",
-    dimensions: "175 × 70 × 65 cm",
-    inventoryNumber: "MVP-005",
     description:
-      "Figura esbelta de expresión contemplativa, inspirada en los cantos litúrgicos de las misiones. La obra traduce el ritmo de la música barroca misional a la forma escultórica.",
+      "Grupo escultórico compuesto por diversas figuras que representan la labor franciscana en la evangelización guaraní. Incluye la réplica de «Tupasy María» (Virgen María del templo de Santa María de Fe), San Francisco de Asís, Santo Domingo de Guzmán, Santo Padre Pío, Fray Luis de Bolaños y Fray Juan Bernardo. Tres niños completan la escena: uno sostiene la imagen de Jesucristo, otro toca el tambor y el último escribe oraciones. El grupo es enmarcado por un gran rosario con remate en el Cristo crucificado, rodeando un pozo antiguo de más de 400 años con brocal de piedra jesuítico.",
     historicalContext:
-      "Forma parte de la muestra permanente y dialoga con los murales del recorrido Experiencia Guaraní – Jesuítica.",
+      "Este grupo escultórico rinde homenaje a la labor de los frailes franciscanos en la región de Caazapá, Villarrica y otras zonas de Paraguay, destacando su contribución a la evangelización y la cultura local.",
     thumbnail: "/images/sculptures/obra-05.webp",
     model: "/models/sculptures/obra-05.glb",
   },
   {
     id: "obra-06",
-    title: "Madre del Monte",
+    title: "Los Orantes",
     artist: "Manuel Viedma",
-    year: "2022",
-    material: "Bronce y pátinas naturales",
-    dimensions: "200 × 120 × 95 cm",
-    inventoryNumber: "MVP-006",
     description:
-      "Una figura femenina que emerge del monte como protectora del conocimiento ancestral. Su presencia sintetiza la espiritualidad, la fertilidad y la memoria viva del Paraguay profundo.",
-    historicalContext:
-      "Creada como pieza central de la exposición «Mujeres del Encuentro» en el MUVA.",
+      "Junto al primer lago, un grupo escultórico representa a la Virgen del Rosario rodeada por indígenas guaraníes de diversas edades y roles sociales, todos en actitud orante. La escena evoca la costumbre guaraní de rezar el Santo Rosario al atardecer, dirigidos por un sacerdote jesuita, como expresión de gratitud por la vida. Los orantes no solo recuerdan una tradición, sino que también interceden por aquellos que aún viven, buscando la recuperación y el reconocimiento del sacrificio que la comunidad guaraní realizó en la región de Paraquaria. La escena conjuga una práctica religiosa ancestral con un acto de memoria y reivindicación del legado guaraní.",
     thumbnail: "/images/sculptures/obra-06.webp",
     model: "/models/sculptures/obra-06.glb",
+  },
+  {
+    id: "obra-07",
+    title: "Cristo Resucitado",
+    artist: "Manuel Viedma",
+    description:
+      "Escultura que representa a Cristo resucitado como símbolo de esperanza y renovación, figure central de la fe católica transmitida a las comunidades guaraníes durante las reducciones jesuíticas.",
+    thumbnail: "/images/sculptures/obra-07.webp",
+    model: "/models/sculptures/obra-07.glb",
   },
 ];
