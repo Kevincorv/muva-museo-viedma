@@ -179,7 +179,8 @@ function SculptureCanvas({
           ref={orbitRef}
           enableDamping
           dampingFactor={0.08}
-          enablePan={false}
+          enablePan={true}
+          panSpeed={0.5}
           minDistance={2}
           maxDistance={9}
           autoRotate={false}
