@@ -98,6 +98,6 @@ export const museum = {
     { label: "Museo", href: "#museo" },
     { label: "Historia", href: "#historia" },
     { label: "Colección", href: "#coleccion" },
-    { label: "Exposiciones", href: "#exposiciones" },
+    // { label: "Exposiciones", href: "#exposiciones" },
   ],
 };

@@ -6,7 +6,7 @@ import AboutMuseum from "./components/AboutMuseum";
 import History from "./components/History";
 import CollectionPreview from "./components/CollectionPreview";
 import GuaraniExperience from "./components/GuaraniExperience";
-import Exhibitions from "./components/Exhibitions";
+// import Exhibitions from "./components/Exhibitions";
 import News from "./components/News";
 import Visit from "./components/Visit";
 import Contact from "./components/Contact";
@@ -33,7 +33,7 @@ function HomePage() {
         <History />
         <CollectionPreview />
         <GuaraniExperience />
-        <Exhibitions />
+        {/* <Exhibitions /> */}
         <News />
         <Visit />
         <Contact />
