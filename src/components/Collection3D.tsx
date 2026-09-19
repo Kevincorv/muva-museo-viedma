@@ -246,7 +246,6 @@ function SculptureUploadCard({
       }`}
     >
       <Sculpture3DViewer
-        sculpture={sculpture}
         modelUrl={modelUrl}
       />
 
