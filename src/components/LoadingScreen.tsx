@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { museum } from "../data/museum";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function LoadingScreen() {
   const [hidden, setHidden] = useState(false);
   const [progress, setProgress] = useState(0);
+  const { locale } = useLanguage();
 
   useEffect(() => {
     let frame = 0;
@@ -31,11 +34,11 @@ export default function LoadingScreen() {
       style={{ opacity: progress < 100 ? 1 : 0 }}
     >
       <div className="text-[10px] font-sans uppercase tracking-ultra-wide text-muva-sand/70">
-        Museo Viedma · Paraguay
+        {t("loading.museo", locale)}
       </div>
       <img
         src="/images/muva-logo-footer.png"
-        alt="MUVA – Museo Viedma"
+        alt={t("loading.alt", locale)}
         className="mt-8 h-16 w-auto md:h-20"
         width={800}
         height={319}
@@ -47,7 +50,7 @@ export default function LoadingScreen() {
         />
       </div>
       <div className="mt-4 text-[10px] font-sans uppercase tracking-extra-wide text-muva-sand/50">
-        {museum.tagline}
+        {museum.getTagline(locale)}
       </div>
     </div>
   );

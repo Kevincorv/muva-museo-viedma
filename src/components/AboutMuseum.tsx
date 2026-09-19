@@ -12,7 +12,7 @@ export default function AboutMuseum() {
     <section
       id="museo"
       className="relative overflow-hidden bg-muva-ivory py-28 md:py-40"
-      aria-label="El Museo"
+      aria-label={t("about.ariaSection", locale)}
     >
       <div className="container-muva">
         <div className="grid gap-16 md:gap-24 lg:grid-cols-12">
@@ -24,7 +24,7 @@ export default function AboutMuseum() {
             <div className="relative aspect-[4/5] w-full overflow-hidden bg-muva-beige">
               <img
                 src="/images/museum/interior.webp"
-                alt="Interior del MUVA – Museo Viedma"
+                alt={t("about.imgAlt", locale)}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 onError={(e) => {
@@ -63,7 +63,7 @@ export default function AboutMuseum() {
             </h2>
             <div className="mt-10 space-y-6 text-base leading-relaxed text-muva-brown md:text-lg">
               <p className="first-letter:font-serif first-letter:text-5xl first-letter:font-light first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:text-muva-earth first-letter:leading-none">
-                {museum.mission}
+                {museum.getMission(locale)}
               </p>
               <p>
                 {t("about.p1", locale)}

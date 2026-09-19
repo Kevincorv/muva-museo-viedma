@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "lucide-react";
 import type { Sculpture } from "../data/sculptures";
+import { useLanguage } from "../i18n/LanguageContext";
 
 interface SculptureCardProps {
   sculpture: Sculpture;
@@ -8,6 +9,7 @@ interface SculptureCardProps {
 }
 
 export default function SculptureCard({ sculpture, index, onOpen }: SculptureCardProps) {
+  const { locale } = useLanguage();
   return (
     <article
       className="group relative flex flex-col"
@@ -16,7 +18,7 @@ export default function SculptureCard({ sculpture, index, onOpen }: SculptureCar
       <div className="relative aspect-[3/4] overflow-hidden bg-muva-sand">
         <img
           src={sculpture.thumbnail}
-          alt={sculpture.title}
+          alt={sculpture.getTitle(locale)}
           className="h-full w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
           loading="lazy"
           onError={(e) => {
@@ -45,7 +47,7 @@ export default function SculptureCard({ sculpture, index, onOpen }: SculptureCar
           type="button"
           onClick={() => onOpen(sculpture.id)}
           className="absolute bottom-4 left-4 right-4 flex items-center justify-center gap-2 bg-muva-cream/95 px-5 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark opacity-0 backdrop-blur-sm transition-all duration-500 group-hover:opacity-100 hover:bg-muva-cream"
-          aria-label={`Explorar ${sculpture.title} en 3D`}
+          aria-label={`Explorar ${sculpture.getTitle(locale)} en 3D`}
         >
           Explorar en 3D
           <ArrowUpRight size={14} />
@@ -54,7 +56,7 @@ export default function SculptureCard({ sculpture, index, onOpen }: SculptureCar
 
       <div className="mt-6 flex flex-col">
         <h3 className="font-serif text-2xl text-muva-dark transition-colors duration-300 group-hover:text-muva-earth">
-          {sculpture.title}
+          {sculpture.getTitle(locale)}
         </h3>
         <div className="mt-2 font-serif text-base italic text-muva-brown">
           {sculpture.artist}

@@ -1,6 +1,7 @@
 import { ArrowUpRight } from "lucide-react";
 import { sculptures } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
 
 export default function Collection() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
@@ -68,6 +69,7 @@ function CollectionRow({
 }) {
   const reveal = useScrollReveal<HTMLDivElement>();
   const reverse = index % 2 === 1;
+  const { locale } = useLanguage();
 
   return (
     <article
@@ -80,7 +82,7 @@ function CollectionRow({
         <div className="group relative aspect-[4/5] overflow-hidden bg-muva-beige md:aspect-[5/4]">
           <img
             src={sculpture.thumbnail}
-            alt={sculpture.title}
+            alt={sculpture.getTitle(locale)}
             className="h-full w-full object-cover transition-transform duration-[1500ms] ease-out group-hover:scale-105"
             loading="lazy"
             onError={(e) => {
@@ -108,13 +110,13 @@ function CollectionRow({
           Pieza · {String(index + 1).padStart(2, "0")}
         </div>
         <h3 className="mt-4 font-serif text-4xl font-light text-muva-dark md:text-5xl">
-          {sculpture.title}
+          {sculpture.getTitle(locale)}
         </h3>
         <div className="mt-3 font-serif text-lg italic text-muva-brown">
           {sculpture.artist}
           {sculpture.year && <span className="not-italic text-muva-stone"> · {sculpture.year}</span>}
         </div>
-        <p className="mt-6 text-muva-brown text-pretty">{sculpture.description}</p>
+        <p className="mt-6 text-muva-brown text-pretty">{sculpture.getDescription(locale)}</p>
 
         <dl className="mt-8 grid grid-cols-2 gap-y-3 border-t border-muva-sand/50 pt-6 text-sm">
           {sculpture.material && (

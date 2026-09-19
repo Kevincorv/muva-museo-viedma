@@ -274,7 +274,7 @@ export function ThumbnailFallback({
     <div className={`relative w-full overflow-hidden bg-muva-sand ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
       <img
         src={sculpture.thumbnail}
-        alt={sculpture.title}
+        alt={sculpture.getTitle(locale)}
         className="h-full w-full object-cover"
         loading="lazy"
         onError={(e) => {
@@ -364,7 +364,7 @@ function SculptureCard({
             ` · ${sculpture.inventoryNumber}`}
         </div>
         <h3 className="mt-2 font-serif text-2xl text-muva-dark md:text-3xl">
-          {sculpture.title}
+          {sculpture.getTitle(locale)}
         </h3>
         <div className="mt-1 font-serif text-base italic text-muva-brown">
           {sculpture.artist}
@@ -384,7 +384,7 @@ function SculptureCard({
           </div>
         )}
         <p className="mt-3 text-sm text-muva-brown text-pretty">
-          {sculpture.description}
+          {sculpture.getDescription(locale)}
         </p>
       </div>
     </article>
@@ -399,7 +399,7 @@ export default function Collection3D() {
     <section
       id="coleccion"
       className="relative bg-muva-ivory py-28 md:py-40"
-      aria-label="Colección 3D"
+      aria-label={t("collection3d.ariaSection", locale)}
     >
       <div className="container-muva">
         <div

@@ -78,6 +78,7 @@ function PreviewCard({
 }) {
   const reveal = useScrollReveal<HTMLDivElement>();
   const [modelError, setModelError] = useState(false);
+  const { locale } = useLanguage();
 
   return (
     <article
@@ -102,7 +103,7 @@ function PreviewCard({
 
       <div className="mt-6 flex flex-col">
         <h3 className="font-serif text-2xl text-muva-dark transition-colors duration-300 group-hover:text-muva-earth">
-          {sculpture.title}
+          {sculpture.getTitle(locale)}
         </h3>
         <div className="mt-2 font-serif text-base italic text-muva-brown">
           {sculpture.artist}

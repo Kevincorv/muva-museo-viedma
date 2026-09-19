@@ -4,6 +4,7 @@ import { t } from "../i18n/translations";
 
 interface TimelineEntry {
   year: string;
+  yearKey?: string;
   titleEs: string;
   titleEn: string;
   titlePt: string;
@@ -41,6 +42,7 @@ const timeline: TimelineEntry[] = [
     descPt: "A Universidade Paraguai-Alemana nasce como uma ponte entre tradição, ciência e futuro para o país.",
   },
   {
+    yearKey: "history.mas40Anios",
     year: "+40 años",
     titleEs: "Desarrollo de la obra artística",
     titleEn: "Development of artistic work",
@@ -64,18 +66,24 @@ export default function History() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
   const { locale } = useLanguage();
 
-  const getLocalized = (entry: TimelineEntry, field: "title" | "desc") => {
+  const getLocalized = (entry: TimelineEntry, field: "title" | "desc" | "year") => {
     if (field === "title") {
       return locale === "en" ? entry.titleEn : locale === "pt" ? entry.titlePt : entry.titleEs;
     }
-    return locale === "en" ? entry.descEn : locale === "pt" ? entry.descPt : entry.descEs;
+    if (field === "desc") {
+      return locale === "en" ? entry.descEn : locale === "pt" ? entry.descPt : entry.descEs;
+    }
+    if (field === "year" && entry.yearKey) {
+      return t(entry.yearKey, locale);
+    }
+    return entry.year;
   };
 
   return (
     <section
       id="historia"
       className="relative overflow-hidden bg-muva-cream py-28 md:py-40"
-      aria-label="Historia"
+      aria-label={t("history.ariaSection", locale)}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -126,7 +134,7 @@ function TimelineItem({
 }: {
   entry: TimelineEntry;
   index: number;
-  getLocalized: (entry: TimelineEntry, field: "title" | "desc") => string;
+  getLocalized: (entry: TimelineEntry, field: "title" | "desc" | "year") => string;
 }) {
   const reveal = useScrollReveal<HTMLLIElement>();
   const isLeft = index % 2 === 0;
@@ -147,7 +155,7 @@ function TimelineItem({
       {/* Content */}
       <div className={isLeft ? "md:col-start-1 md:pr-12 md:text-right" : "md:col-start-2 md:pl-12"}>
         <div className="font-serif text-5xl font-light text-muva-earth md:text-6xl">
-          {entry.year}
+          {getLocalized(entry, "year")}
         </div>
         <h3 className="mt-4 font-serif text-2xl text-muva-dark md:text-3xl">
           {getLocalized(entry, "title")}

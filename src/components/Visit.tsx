@@ -16,7 +16,7 @@ export default function Visit() {
     <section
       id="visita"
       className="relative overflow-hidden bg-muva-dark py-28 text-muva-cream md:py-40"
-      aria-label="Planifica tu visita"
+      aria-label={t("visit.ariaSection", locale)}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.04]"
@@ -55,18 +55,19 @@ export default function Visit() {
             <dl className="mt-8 space-y-5">
               {museum.schedule.map((s) => (
                 <div
-                  key={s.days}
+                  key={s.daysKey}
                   className="flex items-baseline justify-between gap-4 border-b border-muva-cream/10 pb-4"
                 >
-                  <dt className="text-muva-cream/80">{s.days}</dt>
+                  <dt className="text-muva-cream/80">{t(s.daysKey, locale)}</dt>
                   <dd
                     className={`font-serif text-lg ${
-                      s.hours.includes("Cerrado")
-                        ? "text-muva-stone/70"
-                        : "text-muva-cream"
+                    s.hoursKey ? t(s.hoursKey, locale).includes(t("visit.cerrado", locale))
+                      ? "text-muva-stone/70"
+                      : "text-muva-cream"
+                      : "text-muva-cream"
                     }`}
                   >
-                    {s.hours}
+                    {s.hoursKey ? t(s.hoursKey, locale) : s.hours}
                   </dd>
                 </div>
               ))}
@@ -103,9 +104,7 @@ export default function Visit() {
                 {t("visit.comoLlegar", locale)}
               </a>
               <a
-                href={`https://wa.me/${museum.contact.whatsapp}?text=${encodeURIComponent(
-                  "Hola MUVA, quisiera consultar sobre entradas y horarios."
-                )}`}
+                href={`https://wa.me/${museum.contact.whatsapp}?text=${                  encodeURIComponent(t("visit.whatsappMsg", locale))}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group inline-flex items-center justify-center gap-2 bg-muva-sand px-5 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark transition-colors duration-300 hover:bg-muva-cream"
@@ -127,10 +126,10 @@ export default function Visit() {
             <ul className="mt-8 space-y-3">
               {museum.access.vehicles.map((v) => (
                 <li
-                  key={v.type}
+                  key={v.typeKey}
                   className="flex items-baseline justify-between gap-4 border-b border-muva-cream/10 pb-3 text-sm"
                 >
-                  <span className="text-muva-cream/80">{v.type}</span>
+                  <span className="text-muva-cream/80">{museum.getVehicleType(v, locale)}</span>
                   <span className="font-serif text-base text-muva-cream">{v.price}</span>
                 </li>
               ))}
@@ -152,16 +151,16 @@ export default function Visit() {
                   {t("visit.individuales", locale)}
                 </div>
                 <ul className="mt-3 space-y-3">
-                  {museum.access.individual.map((t) => (
-                    <li key={t.type} className="border-b border-muva-cream/10 pb-3 text-sm">
+                  {museum.access.individual.map((item) => (
+                    <li key={item.typeKey} className="border-b border-muva-cream/10 pb-3 text-sm">
                       <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-muva-cream/80">{t.type}</span>
+                        <span className="text-muva-cream/80">{museum.getAccessType(item, locale)}</span>
                         <span className="font-serif text-base text-muva-cream whitespace-nowrap">
-                          {t.price}
+                          {item.price}
                         </span>
                       </div>
-                      {t.note && (
-                        <div className="mt-1 text-xs text-muva-cream/50">{t.note}</div>
+                      {item.noteKey && (
+                        <div className="mt-1 text-xs text-muva-cream/50">{museum.getAccessNote(item, locale)}</div>
                       )}
                     </li>
                   ))}
@@ -173,16 +172,16 @@ export default function Visit() {
                   {t("visit.grupales", locale)}
                 </div>
                 <ul className="mt-3 space-y-3">
-                  {museum.access.groups.map((t) => (
-                    <li key={t.type} className="border-b border-muva-cream/10 pb-3 text-sm">
+                  {museum.access.groups.map((item) => (
+                    <li key={item.typeKey} className="border-b border-muva-cream/10 pb-3 text-sm">
                       <div className="flex items-baseline justify-between gap-4">
-                        <span className="text-muva-cream/80">{t.type}</span>
+                        <span className="text-muva-cream/80">{museum.getAccessType(item, locale)}</span>
                         <span className="font-serif text-base text-muva-cream whitespace-nowrap">
-                          {t.price}
+                          {item.price}
                         </span>
                       </div>
-                      {t.note && (
-                        <div className="mt-1 text-xs text-muva-cream/50">{t.note}</div>
+                      {item.noteKey && (
+                        <div className="mt-1 text-xs text-muva-cream/50">{museum.getAccessNote(item, locale)}</div>
                       )}
                     </li>
                   ))}

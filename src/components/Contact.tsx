@@ -12,7 +12,7 @@ export default function Contact() {
     <section
       id="contacto"
       className="relative bg-muva-beige py-28 md:py-40"
-      aria-label="Contacto"
+      aria-label={t("contact.ariaSection", locale)}
     >
       <div className="container-muva">
         <div

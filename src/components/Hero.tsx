@@ -16,7 +16,7 @@ export default function Hero() {
     <section
       id="inicio"
       className="relative isolate flex min-h-[100svh] flex-col justify-end overflow-hidden bg-muva-dark"
-      aria-label="MUVA – Museo Viedma"
+      aria-label={t("hero.ariaSection", locale)}
     >
       {/* Background image with subtle pattern fallback */}
       <div className="absolute inset-0 -z-10">
@@ -99,7 +99,7 @@ export default function Hero() {
             className="mt-2 font-serif text-2xl font-light text-muva-cream/85 md:text-4xl lg:text-5xl animate-fade-up opacity-0"
             style={{ animationDelay: "350ms" }}
           >
-            Museo Viedma
+            {t("hero.titleLine", locale)}
           </div>
 
           <p
@@ -156,7 +156,7 @@ export default function Hero() {
             type="button"
             onClick={() => scrollTo("#historia")}
             className="group flex items-center gap-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/60 transition-colors duration-300 hover:text-muva-cream"
-            aria-label="Descender a la siguiente sección"
+            aria-label={t("hero.ariaScrollDown", locale)}
           >
             {t("hero.descubrir", locale)}
             <ChevronDown

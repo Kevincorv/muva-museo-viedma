@@ -1,6 +1,9 @@
+import { t, type Locale } from "../i18n/translations";
+
 export interface MuseumSchedule {
-  days: string;
-  hours: string;
+  daysKey: string;
+  hours?: string;
+  hoursKey?: string;
 }
 
 export interface MuseumContact {
@@ -22,9 +25,9 @@ export interface MuseumContact {
 }
 
 export interface MuseumAccess {
-  vehicles: { type: string; price: string }[];
-  individual: { type: string; price: string; note?: string }[];
-  groups: { type: string; price: string; note?: string }[];
+  vehicles: { typeKey: string; price: string }[];
+  individual: { typeKey: string; price: string; noteKey?: string }[];
+  groups: { typeKey: string; price: string; noteKey?: string }[];
 }
 
 export const museum = {
@@ -39,9 +42,9 @@ export const museum = {
   founded: 2026,
   location: "San Ignacio Guazú, Misiones, Paraguay",
   schedule: [
-    { days: "Miércoles a Viernes", hours: "9:00 – 17:00 hs" },
-    { days: "Sábados y Domingos", hours: "9:00 – 19:00 hs" },
-    { days: "Lunes y Martes", hours: "Cerrado al público" },
+    { daysKey: "schedule.wedFri", hours: "9:00 – 17:00 hs" },
+    { daysKey: "schedule.satSun", hours: "9:00 – 19:00 hs" },
+    { daysKey: "schedule.monTue", hoursKey: "schedule.closed" },
   ] satisfies MuseumSchedule[],
   contact: {
     phone: "+595973423719",
@@ -62,42 +65,51 @@ export const museum = {
   } satisfies MuseumContact,
   access: {
     vehicles: [
-      { type: "Motos", price: "5.000 Gs." },
-      { type: "Vehículos en general", price: "10.000 Gs." },
-      { type: "Minivan (hasta 12 personas)", price: "20.000 Gs." },
-      { type: "Mini Bus (hasta 30 personas)", price: "30.000 Gs." },
-      { type: "Bus Grande", price: "50.000 Gs." },
+      { typeKey: "access.motos", price: "5.000 Gs." },
+      { typeKey: "access.vehiculos", price: "10.000 Gs." },
+      { typeKey: "access.minivan", price: "20.000 Gs." },
+      { typeKey: "access.minibus", price: "30.000 Gs." },
+      { typeKey: "access.busGrande", price: "50.000 Gs." },
     ],
     individual: [
       {
-        type: "Acceso al predio – recorrido exterior",
+        typeKey: "access.accesoExterior",
         price: "2.000 Gs. por persona",
-        note: "Niños hasta 10 años: gratuito.",
+        noteKey: "access.ninosFree",
       },
       {
-        type: "Recorrido Murales Experiencia Guaraní – Jesuítica",
+        typeKey: "access.accesoMurales",
         price: "20.000 Gs. por persona",
-        note: "Niños hasta 10 años: 10.000 Gs. por persona.",
+        noteKey: "access.ninosReduced",
       },
     ],
     groups: [
       {
-        type: "Grupos de 10 personas en adelante",
+        typeKey: "access.gruposGrandes",
         price: "20.000 Gs. por persona",
-        note: "Con reserva previa.",
+        noteKey: "access.reservaPrevia",
       },
       {
-        type: "Grupos de niños hasta 10 años",
+        typeKey: "access.gruposNinos",
         price: "8.000 Gs. por persona",
-        note: "Con reserva previa al (+595) 0973 – 423 719.",
+        noteKey: "access.reservaNinos",
       },
     ],
   } satisfies MuseumAccess,
   navLinks: [
-    { label: "Inicio", href: "#inicio" },
-    { label: "Museo", href: "#museo" },
-    { label: "Historia", href: "#historia" },
-    { label: "Colección", href: "#coleccion" },
-    // { label: "Exposiciones", href: "#exposiciones" },
+    { labelKey: "nav.inicio", href: "#inicio" },
+    { labelKey: "nav.museo", href: "#museo" },
+    { labelKey: "nav.historia", href: "#historia" },
+    { labelKey: "nav.coleccion", href: "#coleccion" },
   ],
+  getScheduleDay: (s: MuseumSchedule, locale: Locale) => t(s.daysKey, locale),
+  getScheduleHours: (s: MuseumSchedule & { hoursKey?: string }, locale: Locale) =>
+    s.hoursKey ? t(s.hoursKey, locale) : s.hours,
+  getVehicleType: (v: { typeKey: string }, locale: Locale) => t(v.typeKey, locale),
+  getAccessType: (v: { typeKey: string }, locale: Locale) => t(v.typeKey, locale),
+  getAccessNote: (v: { noteKey?: string }, locale: Locale) =>
+    v.noteKey ? t(v.noteKey, locale) : undefined,
+  getFullName: (locale: Locale) => t("museum.fullName", locale),
+  getTagline: (locale: Locale) => t("museum.tagline", locale),
+  getMission: (locale: Locale) => t("museum.mission", locale),
 };

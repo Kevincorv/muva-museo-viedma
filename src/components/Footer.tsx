@@ -52,7 +52,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
           <div className="md:col-span-5">
             <img
               src="/images/muva-logo-footer.png"
-              alt="MUVA – Museo Viedma"
+              alt={t("footer.brandAlt", locale)}
               className="h-16 w-auto md:h-20"
               width={800}
               height={319}
@@ -75,7 +75,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    aria-label={`MUVA en ${key}`}
+                    aria-label={`${t("footer.ariaSocial", locale)} ${key}`}
                     className="flex h-10 w-10 items-center justify-center border border-muva-cream/20 text-muva-cream/80 transition-colors duration-300 hover:border-muva-cream hover:bg-muva-cream hover:text-muva-dark"
                   >
                     <Icon size={16} />

@@ -13,14 +13,17 @@ import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import LoadingScreen from "./components/LoadingScreen";
 import { museum } from "./data/museum";
+import { useLanguage } from "./i18n/LanguageContext";
 
 const SculptureViewer = lazy(() => import("./components/SculptureViewer"));
 const ColeccionPage = lazy(() => import("./pages/ColeccionPage"));
 
 function HomePage() {
+  const { locale } = useLanguage();
+
   useEffect(() => {
-    document.title = "MUVA – Museo Viedma | Experiencia Guaraní – Jesuítica";
-  }, []);
+    document.title = `${museum.getFullName(locale)} | ${museum.getTagline(locale)}`;
+  }, [locale]);
 
   return (
     <div className="relative bg-muva-ivory text-muva-dark antialiased">

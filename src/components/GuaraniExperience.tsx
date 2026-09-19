@@ -12,7 +12,7 @@ export default function GuaraniExperience() {
     <section
       id="experiencia"
       className="relative overflow-hidden bg-muva-dark py-28 text-muva-cream md:py-40"
-      aria-label="Experiencia Guaraní – Jesuítica"
+      aria-label={t("experience.ariaSection", locale)}
     >
       <div
         className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -66,7 +66,7 @@ export default function GuaraniExperience() {
           <div className="relative aspect-[3/4] overflow-hidden bg-muva-brown md:col-span-4 md:aspect-[3/5]">
             <img
               src="/images/experience/mural para la página.jpeg"
-              alt="Mural guaraní – jesuítico del recorrido interior"
+              alt={t("experience.altMural", locale)}
               className="h-full w-full object-cover"
               loading="lazy"
               onError={(e) => {
@@ -89,7 +89,7 @@ export default function GuaraniExperience() {
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:aspect-auto md:h-full">
               <img
                 src="/images/experience/jardines - naturaleza.jpeg"
-                alt="Jardines del museo"
+                alt={t("experience.altJardines", locale)}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 onError={(e) => {
@@ -110,7 +110,7 @@ export default function GuaraniExperience() {
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:aspect-auto md:h-full">
               <img
                 src="/images/experience/Esculturas • Obra de Viedma.jpeg"
-                alt="Escultura del recorrido"
+                alt={t("experience.altEscultura", locale)}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 onError={(e) => {
@@ -131,7 +131,7 @@ export default function GuaraniExperience() {
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:col-span-2 md:aspect-[16/6]">
               <img
                 src="/images/experience/arquitectura - espacio.jpeg"
-                alt="Arquitectura del museo"
+                alt={t("experience.altArquitectura", locale)}
                 className="h-full w-full object-cover"
                 loading="lazy"
                 onError={(e) => {

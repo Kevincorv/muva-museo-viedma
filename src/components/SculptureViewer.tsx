@@ -4,6 +4,8 @@ import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-thre
 import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 import * as THREE from "three";
 import { sculptures } from "../data/sculptures";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 const MUVA_BG = "#2a2018";
 
@@ -104,6 +106,7 @@ export default function SculptureViewer() {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<any>(null);
+  const { locale } = useLanguage();
 
   const sculpture = activeId ? sculptures.find((s) => s.id === activeId) : null;
 
@@ -176,7 +179,7 @@ export default function SculptureViewer() {
       }`}
       role="dialog"
       aria-modal="true"
-      aria-label={`Visor 3D – ${sculpture.title}`}
+      aria-label={`${t("viewer.ariaLabel", locale)} – ${sculpture.getTitle(locale)}`}
     >
       <div
         className="absolute inset-0 bg-muva-dark/95 backdrop-blur-md"
@@ -262,7 +265,7 @@ export default function SculptureViewer() {
                 strokeWidth={1.2}
               />
               <div className="mt-6 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream/80">
-                Preparando la experiencia
+                {t("viewer.preparando", locale)}
               </div>
             </div>
           )}
@@ -271,12 +274,12 @@ export default function SculptureViewer() {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/95 p-6 text-center">
               <AlertCircle size={36} className="text-muva-sand" strokeWidth={1.4} />
               <p className="mt-6 font-serif text-2xl text-muva-cream">
-                No fue posible cargar esta obra.
+                {t("viewer.errorTitle", locale)}
               </p>
               <p className="mt-3 max-w-md text-sm text-muva-cream/60">
-                Verificá que el archivo <code className="text-muva-sand">.glb</code>{" "}
-                correspondiente se encuentre en la carpeta
-                <code className="text-muva-sand"> /public/models/sculptures/</code>.
+                {t("viewer.errorDesc", locale)} <code className="text-muva-sand">.glb</code>{" "}
+                {t("viewer.errorDesc2", locale)}
+                <code className="text-muva-sand"> {t("viewer.errorDesc3", locale)}</code>.
               </p>
               <button
                 type="button"
@@ -287,7 +290,7 @@ export default function SculptureViewer() {
                 className="mt-8 inline-flex items-center gap-2 border border-muva-cream/40 px-6 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream transition-colors duration-300 hover:border-muva-cream hover:bg-muva-cream/10"
               >
                 <RefreshCw size={14} />
-                Intentar nuevamente
+                {t("viewer.reintentar", locale)}
               </button>
             </div>
           )}
@@ -298,17 +301,17 @@ export default function SculptureViewer() {
               type="button"
               onClick={close}
               className="pointer-events-auto group flex items-center gap-2 border border-muva-cream/20 bg-muva-dark/60 px-4 py-2.5 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream hover:bg-muva-cream hover:text-muva-dark"
-              aria-label="Volver al inicio"
+              aria-label={t("viewer.ariaClose", locale)}
             >
               <X size={14} />
-              <span className="hidden sm:inline">Volver</span>
+              <span className="hidden sm:inline">{t("viewer.volver", locale)}</span>
             </button>
 
             <button
               type="button"
               onClick={toggleFullscreen}
               className={`pointer-events-auto ${buttonClass}`}
-              aria-label={isFullscreen ? "Salir de pantalla completa" : "Pantalla completa"}
+              aria-label={isFullscreen ? t("viewer.ariaExitFullscreen", locale) : t("viewer.ariaFullscreen", locale)}
             >
               {isFullscreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
             </button>
@@ -320,7 +323,7 @@ export default function SculptureViewer() {
               type="button"
               onClick={zoomIn}
               className={`pointer-events-auto ${buttonClass}`}
-              aria-label="Acercar"
+              aria-label={t("viewer.ariaZoomIn", locale)}
             >
               <ZoomIn size={18} />
             </button>
@@ -328,7 +331,7 @@ export default function SculptureViewer() {
               type="button"
               onClick={zoomOut}
               className={`pointer-events-auto ${buttonClass}`}
-              aria-label="Alejar"
+              aria-label={t("viewer.ariaZoomOut", locale)}
             >
               <ZoomOut size={18} />
             </button>
@@ -336,7 +339,7 @@ export default function SculptureViewer() {
               type="button"
               onClick={reset}
               className={`pointer-events-auto ${buttonClass}`}
-              aria-label="Restablecer vista"
+              aria-label={t("viewer.ariaReset", locale)}
             >
               <RotateCcw size={18} />
             </button>
@@ -344,7 +347,7 @@ export default function SculptureViewer() {
 
           {/* Help text */}
           <div className="pointer-events-none absolute bottom-6 left-5 z-20 hidden font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/50 md:bottom-8 md:left-8 md:block">
-            Arrastrar · Rotar · Scroll · Zoom
+            {t("viewer.helpText", locale)}
           </div>
         </div>
 
@@ -357,17 +360,17 @@ export default function SculptureViewer() {
                   {sculpture.inventoryNumber} · {sculpture.year}
                 </div>
                 <h2 className="mt-3 font-serif text-3xl font-light text-muva-dark md:text-4xl">
-                  {sculpture.title}
+                  {sculpture.getTitle(locale)}
                 </h2>
                 <div className="mt-2 font-serif text-lg italic text-muva-brown">
                   {sculpture.artist}
                 </div>
                 <p className="mt-6 max-w-2xl text-muva-brown text-pretty">
-                  {sculpture.description}
+                  {sculpture.getDescription(locale)}
                 </p>
-                {sculpture.historicalContext && (
+                {sculpture.getHistoricalContext && (
                   <p className="mt-4 max-w-2xl text-sm italic text-muva-stone text-pretty">
-                    {sculpture.historicalContext}
+                    {sculpture.getHistoricalContext(locale)}
                   </p>
                 )}
               </div>
@@ -375,7 +378,7 @@ export default function SculptureViewer() {
                 {sculpture.material && (
                   <>
                     <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      Material
+                      {t("viewer.labelMaterial", locale)}
                     </dt>
                     <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
                       {sculpture.material}
@@ -385,7 +388,7 @@ export default function SculptureViewer() {
                 {sculpture.dimensions && (
                   <>
                     <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      Dimensiones
+                      {t("viewer.labelDimensions", locale)}
                     </dt>
                     <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
                       {sculpture.dimensions}
@@ -395,7 +398,7 @@ export default function SculptureViewer() {
                 {sculpture.year && (
                   <>
                     <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      Año
+                      {t("viewer.labelYear", locale)}
                     </dt>
                     <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
                       {sculpture.year}

@@ -14,14 +14,6 @@ export default function Navbar() {
   const isHome = location.pathname === "/";
   const { locale } = useLanguage();
 
-  const navLabelMap: Record<string, string> = {
-    "Inicio": "nav.inicio",
-    "Museo": "nav.museo",
-    "Historia": "nav.historia",
-    "Colección": "nav.coleccion",
-    "Exposiciones": "nav.exposiciones",
-  };
-
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
@@ -54,18 +46,18 @@ export default function Navbar() {
           <Link
             to="/"
             className="group flex shrink-0 items-center gap-3 -ml-6 lg:-ml-10"
-            aria-label="Ir al inicio – MUVA"
+            aria-label={t("nav.ariaHome", locale)}
           >
             <img
               src="/images/muva-logo.png"
-              alt="MUVA – Museo Viedma"
+              alt={t("nav.brandAlt", locale)}
               className="h-10 w-auto transition-opacity duration-500 md:h-12 lg:h-14"
               width={500}
               height={199}
             />
           </Link>
 
-          <nav className="hidden items-center gap-7 lg:flex xl:gap-8" aria-label="Navegación principal">
+          <nav className="hidden items-center gap-7 lg:flex xl:gap-8" aria-label={t("nav.ariaMain", locale)}>
             {museum.navLinks.map((link) => (
               <a
                 key={link.href}
@@ -76,7 +68,7 @@ export default function Navbar() {
                 }}
                 className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
               >
-                {t(navLabelMap[link.label] ?? link.label, locale)}
+                {t(link.labelKey, locale)}
               </a>
             ))}
           </nav>
@@ -95,7 +87,7 @@ export default function Navbar() {
             </a>
             <button
               type="button"
-              aria-label="Abrir menú"
+              aria-label={t("nav.ariaOpen", locale)}
               aria-expanded={open}
               onClick={() => setOpen((o) => !o)}
               className="text-muva-dark lg:hidden"
@@ -128,14 +120,14 @@ export default function Navbar() {
             <span className="font-serif text-2xl tracking-[0.3em] text-muva-dark">MUVA</span>
             <button
               type="button"
-              aria-label="Cerrar menú"
+              aria-label={t("nav.ariaClose", locale)}
               onClick={() => setOpen(false)}
               className="text-muva-dark"
             >
               <X size={26} />
             </button>
           </div>
-          <nav className="flex flex-col px-8 py-10" aria-label="Navegación móvil">
+          <nav className="flex flex-col px-8 py-10" aria-label={t("nav.ariaMobile", locale)}>
             {museum.navLinks.map((link, i) => (
               <a
                 key={link.href}
@@ -149,7 +141,7 @@ export default function Navbar() {
                 }`}
                 style={{ transitionDelay: open ? `${i * 60 + 150}ms` : "0ms" }}
               >
-                {t(navLabelMap[link.label] ?? link.label, locale)}
+                {t(link.labelKey, locale)}
               </a>
             ))}
             <div className="mt-6">
