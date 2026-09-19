@@ -3,9 +3,8 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import AboutMuseum from "./components/AboutMuseum";
 import History from "./components/History";
-import Collection from "./components/Collection";
+import Collection3D from "./components/Collection3D";
 import GuaraniExperience from "./components/GuaraniExperience";
-import VirtualEnvironment from "./components/VirtualEnvironment";
 import Exhibitions from "./components/Exhibitions";
 import News from "./components/News";
 import Visit from "./components/Visit";
@@ -30,9 +29,8 @@ function App() {
         <Hero />
         <AboutMuseum />
         <History />
-        <Collection />
+        <Collection3D />
         <GuaraniExperience />
-        <VirtualEnvironment />
         <Exhibitions />
         <News />
         <Visit />

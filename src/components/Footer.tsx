@@ -30,7 +30,6 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
       title: "Experiencia",
       links: [
         { label: "Guaraní – Jesuítica", href: "#experiencia" },
-        { label: "Entorno Virtual 3D", href: "#entorno-virtual" },
         { label: "Noticias y agenda", href: "#" },
       ],
     },

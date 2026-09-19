@@ -98,7 +98,6 @@ export const museum = {
     { label: "Museo", href: "#museo" },
     { label: "Historia", href: "#historia" },
     { label: "Colección", href: "#coleccion" },
-    { label: "Entorno Virtual", href: "#entorno-virtual" },
     { label: "Exposiciones", href: "#exposiciones" },
   ],
 };

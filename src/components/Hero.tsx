@@ -1,4 +1,4 @@
-import { ArrowRight, Box, ChevronDown } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { museum } from "../data/museum";
 
 export default function Hero() {
@@ -121,11 +121,10 @@ export default function Hero() {
             </button>
             <button
               type="button"
-              onClick={() => scrollTo("#entorno-virtual")}
+              onClick={() => scrollTo("#coleccion")}
               className="group inline-flex items-center justify-center gap-3 border border-muva-cream/40 px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-cream transition-all duration-500 hover:border-muva-cream hover:bg-muva-cream/10"
             >
-              <Box size={16} />
-              Explorar entorno virtual
+              Explorar colección 3D
             </button>
           </div>
         </div>
