@@ -93,10 +93,11 @@ function EmbeddedModel({
     onLoaded();
   }, [cloned, onLoaded]);
 
-  useFrame(() => {
+  useFrame(({ invalidate }) => {
     if (ref.current) {
       ref.current.position.y =
         Math.sin(Date.now() * 0.0008) * 0.015;
+      invalidate();
     }
   });
 
@@ -126,6 +127,7 @@ export function SculptureCanvas({
   return (
     <div className={`relative w-full overflow-hidden rounded-sm bg-muva-dark ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
       <Canvas
+        frameloop="demand"
         shadows
         dpr={[1, 1.2]}
         camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
@@ -309,7 +311,25 @@ function SculptureCard({
 }) {
   const [modelError, setModelError] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const [canvasVisible, setCanvasVisible] = useState(false);
   const { locale } = useLanguage();
+
+  useEffect(() => {
+    const el = canvasContainerRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCanvasVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <article
@@ -318,14 +338,24 @@ function SculptureCard({
         reveal.isVisible ? "is-visible" : ""
       }`}
     >
-      {!modelError ? (
-        <SculptureCanvas
-          modelUrl={sculpture.model}
-          onError={() => setModelError(true)}
-        />
-      ) : (
-        <ThumbnailFallback sculpture={sculpture} />
-      )}
+      <div ref={canvasContainerRef}>
+        {!modelError ? (
+          canvasVisible ? (
+            <SculptureCanvas
+              modelUrl={sculpture.model}
+              onError={() => setModelError(true)}
+            />
+          ) : (
+            <div className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-sm bg-muva-dark flex items-center justify-center">
+              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/40">
+                {t("collection3d.cargando", locale)}
+              </div>
+            </div>
+          )
+        ) : (
+          <ThumbnailFallback sculpture={sculpture} />
+        )}
+      </div>
 
       <div className="mt-5">
         <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">

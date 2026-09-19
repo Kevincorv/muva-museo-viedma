@@ -57,9 +57,10 @@ function SculptureModel({ url, onLoaded }: { url: string; onLoaded: () => void }
     onLoaded();
   }, [cloned, onLoaded]);
 
-  useFrame(() => {
+  useFrame(({ invalidate }) => {
     if (ref.current) {
       ref.current.position.y = Math.sin(Date.now() * 0.0008) * 0.02;
+      invalidate();
     }
   });
 
@@ -188,6 +189,7 @@ export default function SculptureViewer() {
       >
         <div className="relative flex-1 overflow-hidden">
           <Canvas
+            frameloop="demand"
             shadows
             dpr={[1, 1.8]}
             camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
