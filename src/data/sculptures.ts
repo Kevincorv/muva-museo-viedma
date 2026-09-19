@@ -48,7 +48,7 @@ export const sculptures: Sculpture[] = [
     historicalContext:
       "Inspirada en los testimonios visuales de las comunidades guaraníes que habitaron las misiones jesuíticas durante los siglos XVII y XVIII.",
     thumbnail: "/images/sculptures/obra-02.webp",
-    model: "/models/sculptures/obra-02.glb",
+    model: "/models/sculptures/prueba.glb",
   },
   {
     id: "obra-03",
