@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import { sculptures } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
@@ -49,8 +50,8 @@ export default function CollectionPreview() {
         </div>
 
         <div className="mt-16 flex justify-center md:mt-20">
-          <a
-            href="/coleccion"
+          <Link
+            to="/colección"
             className="group inline-flex items-center gap-3 border border-muva-dark px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-dark transition-all duration-500 hover:bg-muva-dark hover:text-muva-cream"
           >
             Ver colección completa
@@ -58,8 +59,7 @@ export default function CollectionPreview() {
               size={16}
               className="transition-transform duration-500 group-hover:translate-x-1"
             />
-          </a>
-        </div>
+          </Link>        </div>
       </div>
     </section>
   );

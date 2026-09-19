@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { museum } from "../data/museum";
 import { useScrolled } from "../hooks/useScrollReveal";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const scrolled = useScrolled(40);
@@ -54,33 +55,23 @@ export default function Navbar() {
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex xl:gap-8" aria-label="Navegación principal">
-            {museum.navLinks.map((link) => {
-              const isColeccion = link.href === "#coleccion";
-              return isColeccion ? (
-                <Link
-                  key={link.href}
-                  to="/coleccion"
-                  className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
-                >
-                  {link.label}
-                </a>
-              );
-            })}
+            {museum.navLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(link.href);
+                }}
+                className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
+              >
+                {link.label}
+              </a>
+            ))}
           </nav>
 
           <div className="flex shrink-0 items-center gap-3">
+            <LanguageSwitcher />
             <a
               href="#visita"
               onClick={(e) => {
@@ -134,44 +125,32 @@ export default function Navbar() {
             </button>
           </div>
           <nav className="flex flex-col px-8 py-10" aria-label="Navegación móvil">
-            {museum.navLinks.map((link, i) => {
-              const isColeccion = link.href === "#coleccion";
-              return isColeccion ? (
-                <Link
-                  key={link.href}
-                  to="/coleccion"
-                  onClick={() => setOpen(false)}
-                  className={`border-b border-muva-sand/30 py-5 font-serif text-3xl text-muva-dark transition-all duration-700 ${
-                    open ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
-                  }`}
-                  style={{ transitionDelay: open ? `${i * 60 + 150}ms` : "0ms" }}
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavClick(link.href);
-                  }}
-                  className={`border-b border-muva-sand/30 py-5 font-serif text-3xl text-muva-dark transition-all duration-700 ${
-                    open ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
-                  }`}
-                  style={{ transitionDelay: open ? `${i * 60 + 150}ms` : "0ms" }}
-                >
-                  {link.label}
-                </a>
-              );
-            })}
+            {museum.navLinks.map((link, i) => (
+              <a
+                key={link.href}
+                href={link.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleNavClick(link.href);
+                }}
+                className={`border-b border-muva-sand/30 py-5 font-serif text-3xl text-muva-dark transition-all duration-700 ${
+                  open ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
+                }`}
+                style={{ transitionDelay: open ? `${i * 60 + 150}ms` : "0ms" }}
+              >
+                {link.label}
+              </a>
+            ))}
+            <div className="mt-6">
+              <LanguageSwitcher />
+            </div>
             <a
               href="#visita"
               onClick={(e) => {
                 e.preventDefault();
                 handleNavClick("#visita");
               }}
-              className="btn-primary mt-10 w-full"
+              className="btn-primary mt-6 w-full"
             >
               Visitar MUVA
             </a>

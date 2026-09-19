@@ -58,7 +58,7 @@ function App() {
     <Routes>
       <Route path="/" element={<HomePage />} />
       <Route
-        path="/coleccion"
+        path="/colección"
         element={
           <Suspense fallback={null}>
             <ColeccionPage />

@@ -22,7 +22,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
       links: [
         { label: "El Museo", href: "#museo" },
         { label: "Historia", href: "#historia" },
-        { label: "Colección", href: "/coleccion", isRoute: true },
+        { label: "Colección", href: "/colección", isRoute: true },
         { label: "Exposiciones", href: "#exposiciones" },
       ],
     },

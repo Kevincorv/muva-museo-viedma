@@ -97,7 +97,7 @@ export const museum = {
     { label: "Inicio", href: "#inicio" },
     { label: "Museo", href: "#museo" },
     { label: "Historia", href: "#historia" },
-    { label: "Colección", href: "/coleccion", isRoute: true },
+    { label: "Colección", href: "#coleccion" },
     { label: "Exposiciones", href: "#exposiciones" },
   ],
 };
