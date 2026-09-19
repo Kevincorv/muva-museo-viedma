@@ -54,11 +54,9 @@ class ModelErrorBoundary extends Component<
 function EmbeddedModel({
   url,
   onLoaded,
-  onError,
 }: {
   url: string;
   onLoaded: () => void;
-  onError: () => void;
 }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
@@ -160,7 +158,6 @@ function SculptureCanvas({
             <EmbeddedModel
               url={modelUrl}
               onLoaded={() => setLoading(false)}
-              onError={onError}
             />
             <ContactShadows
               position={[0, -1.2, 0]}
@@ -254,10 +251,8 @@ function SculptureCanvas({
 
 function ThumbnailFallback({
   sculpture,
-  index,
 }: {
   sculpture: Sculpture;
-  index: number;
 }) {
   return (
     <div className="relative aspect-[4/5] w-full overflow-hidden bg-muva-sand md:aspect-[3/4]">
@@ -356,7 +351,7 @@ function SculptureUploadCard({
           </button>
         </div>
       ) : (
-        <ThumbnailFallback sculpture={sculpture} index={index} />
+        <ThumbnailFallback sculpture={sculpture} />
       )}
 
       <div className="mt-5">
