@@ -1,19 +1,64 @@
-import { Suspense, useCallback, useMemo, useRef, useState, type ChangeEvent } from "react";
+import {
+  Suspense,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  Component,
+  type ReactNode,
+  type ChangeEvent,
+} from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
-import { Upload, Loader2, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
+import {
+  ContactShadows,
+  Environment,
+  OrbitControls,
+  useGLTF,
+} from "@react-three/drei";
+import {
+  Upload,
+  Loader2,
+  RotateCcw,
+  ZoomIn,
+  ZoomOut,
+  Move,
+  AlertCircle,
+  Box,
+} from "lucide-react";
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 
 const MUVA_BG = "#2a2018";
 
+class ModelErrorBoundary extends Component<
+  { children: ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; onError: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 function EmbeddedModel({
   url,
   onLoaded,
+  onError,
 }: {
   url: string;
   onLoaded: () => void;
+  onError: () => void;
 }) {
   const { scene } = useGLTF(url);
   const ref = useRef<THREE.Group>(null);
@@ -62,10 +107,12 @@ function EmbeddedModel({
   );
 }
 
-function Sculpture3DViewer({
+function SculptureCanvas({
   modelUrl,
+  onError,
 }: {
   modelUrl: string;
+  onError: () => void;
 }) {
   const [loading, setLoading] = useState(true);
   const orbitRef = useRef<any>(null);
@@ -109,19 +156,22 @@ function Sculpture3DViewer({
         />
 
         <Suspense fallback={null}>
-          <EmbeddedModel
-            url={modelUrl}
-            onLoaded={() => setLoading(false)}
-          />
-          <ContactShadows
-            position={[0, -1.2, 0]}
-            opacity={0.5}
-            scale={8}
-            blur={2.5}
-            far={4}
-            color="#1a1410"
-          />
-          <Environment preset="apartment" />
+          <ModelErrorBoundary onError={onError}>
+            <EmbeddedModel
+              url={modelUrl}
+              onLoaded={() => setLoading(false)}
+              onError={onError}
+            />
+            <ContactShadows
+              position={[0, -1.2, 0]}
+              opacity={0.5}
+              scale={8}
+              blur={2.5}
+              far={4}
+              color="#1a1410"
+            />
+            <Environment preset="apartment" />
+          </ModelErrorBoundary>
         </Suspense>
 
         <OrbitControls
@@ -149,7 +199,6 @@ function Sculpture3DViewer({
         </div>
       )}
 
-      {/* Controls */}
       <div className="pointer-events-none absolute bottom-3 right-3 z-20 flex flex-col gap-1.5 md:bottom-4 md:right-4">
         <button
           type="button"
@@ -203,6 +252,50 @@ function Sculpture3DViewer({
   );
 }
 
+function ThumbnailFallback({
+  sculpture,
+  index,
+}: {
+  sculpture: Sculpture;
+  index: number;
+}) {
+  return (
+    <div className="relative aspect-[4/5] w-full overflow-hidden bg-muva-sand md:aspect-[3/4]">
+      <img
+        src={sculpture.thumbnail}
+        alt={sculpture.title}
+        className="h-full w-full object-cover"
+        loading="lazy"
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.display = "none";
+        }}
+      />
+      <div
+        className="absolute inset-0 -z-10"
+        style={{
+          background:
+            "linear-gradient(150deg, #c9b89a 0%, #8a7560 50%, #3d2f22 100%)",
+        }}
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/40 p-4 text-center">
+        <AlertCircle
+          size={28}
+          className="text-muva-sand"
+          strokeWidth={1.4}
+        />
+        <p className="mt-3 font-serif text-lg text-muva-cream">
+          Modelo 3D no disponible
+        </p>
+        <p className="mt-2 max-w-xs text-xs text-muva-cream/60">
+          Subí un archivo{" "}
+          <code className="text-muva-sand">.glb</code> para
+          activar la vista 3D interactiva.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function SculptureUploadCard({
   sculpture,
   index,
@@ -214,6 +307,8 @@ function SculptureUploadCard({
     null
   );
   const [fileName, setFileName] = useState<string | null>(null);
+  const [viewerActive, setViewerActive] = useState(false);
+  const [modelError, setModelError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const reveal = useScrollReveal<HTMLDivElement>();
 
@@ -231,12 +326,13 @@ function SculptureUploadCard({
       const url = URL.createObjectURL(file);
       setCustomModelUrl(url);
       setFileName(file.name);
+      setModelError(false);
+      setViewerActive(true);
     },
     [customModelUrl]
   );
 
-  const modelUrl =
-    customModelUrl ?? sculpture.model;
+  const modelUrl = customModelUrl ?? sculpture.model;
 
   return (
     <article
@@ -245,9 +341,23 @@ function SculptureUploadCard({
         reveal.isVisible ? "is-visible" : ""
       }`}
     >
-      <Sculpture3DViewer
-        modelUrl={modelUrl}
-      />
+      {viewerActive && !modelError ? (
+        <div className="relative">
+          <SculptureCanvas
+            modelUrl={modelUrl}
+            onError={() => setModelError(true)}
+          />
+          <button
+            type="button"
+            onClick={() => setViewerActive(false)}
+            className="absolute left-3 top-3 z-20 flex items-center gap-2 border border-muva-cream/20 bg-muva-dark/60 px-3 py-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream hover:bg-muva-cream hover:text-muva-dark md:left-4 md:top-4"
+          >
+            Volver a imagen
+          </button>
+        </div>
+      ) : (
+        <ThumbnailFallback sculpture={sculpture} index={index} />
+      )}
 
       <div className="mt-5">
         <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
@@ -279,8 +389,17 @@ function SculptureUploadCard({
           {sculpture.description}
         </p>
 
-        {/* Upload button */}
-        <div className="mt-5">
+        <div className="mt-5 flex flex-wrap gap-3">
+          {!viewerActive && !modelError && (
+            <button
+              type="button"
+              onClick={() => setViewerActive(true)}
+              className="group inline-flex items-center gap-2.5 border border-muva-earth/40 px-5 py-2.5 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark transition-all duration-300 hover:border-muva-earth hover:bg-muva-earth hover:text-muva-cream"
+            >
+              <Box size={14} />
+              Ver en 3D
+            </button>
+          )}
           <input
             ref={fileInputRef}
             type="file"
