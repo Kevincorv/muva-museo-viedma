@@ -1,7 +1,10 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { museum } from "../data/museum";
 
 export default function Hero() {
+  const navigate = useNavigate();
+
   const scrollTo = (id: string) => {
     const el = document.querySelector(id);
     el?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -121,7 +124,7 @@ export default function Hero() {
             </button>
             <button
               type="button"
-              onClick={() => scrollTo("#coleccion")}
+              onClick={() => navigate("/coleccion")}
               className="group inline-flex items-center justify-center gap-3 border border-muva-cream/40 px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-cream transition-all duration-500 hover:border-muva-cream hover:bg-muva-cream/10"
             >
               Explorar colección 3D

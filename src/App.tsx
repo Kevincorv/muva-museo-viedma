@@ -1,9 +1,10 @@
 import { lazy, Suspense, useEffect } from "react";
+import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import AboutMuseum from "./components/AboutMuseum";
 import History from "./components/History";
-import Collection3D from "./components/Collection3D";
+import CollectionPreview from "./components/CollectionPreview";
 import GuaraniExperience from "./components/GuaraniExperience";
 import Exhibitions from "./components/Exhibitions";
 import News from "./components/News";
@@ -14,8 +15,9 @@ import LoadingScreen from "./components/LoadingScreen";
 import { museum } from "./data/museum";
 
 const SculptureViewer = lazy(() => import("./components/SculptureViewer"));
+const ColeccionPage = lazy(() => import("./pages/ColeccionPage"));
 
-function App() {
+function HomePage() {
   useEffect(() => {
     document.title = "MUVA – Museo Viedma | Experiencia Guaraní – Jesuítica";
   }, []);
@@ -29,7 +31,7 @@ function App() {
         <Hero />
         <AboutMuseum />
         <History />
-        <Collection3D />
+        <CollectionPreview />
         <GuaraniExperience />
         <Exhibitions />
         <News />
@@ -48,6 +50,22 @@ function App() {
         <SculptureViewer />
       </Suspense>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route
+        path="/coleccion"
+        element={
+          <Suspense fallback={null}>
+            <ColeccionPage />
+          </Suspense>
+        }
+      />
+    </Routes>
   );
 }
 

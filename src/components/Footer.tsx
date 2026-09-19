@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, type LucideIcon } from "lucide-react";
 import type { MuseumContact } from "../data/museum";
 
@@ -12,7 +13,6 @@ const socialIcons: Record<string, LucideIcon> = {
   facebook: Facebook,
   instagram: Instagram,
   linkedin: Linkedin,
-  // youtube: Youtube, // Comentado temporalmente – se puede reactivar luego
 };
 
 export default function Footer({ contact, fullName, tagline, year }: FooterProps) {
@@ -22,7 +22,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
       links: [
         { label: "El Museo", href: "#museo" },
         { label: "Historia", href: "#historia" },
-        { label: "Colección", href: "#coleccion" },
+        { label: "Colección", href: "/coleccion", isRoute: true },
         { label: "Exposiciones", href: "#exposiciones" },
       ],
     },
@@ -93,22 +93,31 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
                 <ul className="mt-5 space-y-3">
                   {section.links.map((link) => (
                     <li key={link.label}>
-                      <a
-                        href={link.href}
-                        target={"external" in link ? "_blank" : undefined}
-                        rel={"external" in link ? "noopener noreferrer" : undefined}
-                        onClick={(e) => {
-                          if (!("external" in link)) {
-                            e.preventDefault();
-                            document
-                              .querySelector(link.href)
-                              ?.scrollIntoView({ behavior: "smooth" });
-                          }
-                        }}
-                        className="font-serif text-lg text-muva-cream/85 transition-colors duration-300 hover:text-muva-sand"
-                      >
-                        {link.label}
-                      </a>
+                      {"isRoute" in link && link.isRoute ? (
+                        <Link
+                          to={link.href}
+                          className="font-serif text-lg text-muva-cream/85 transition-colors duration-300 hover:text-muva-sand"
+                        >
+                          {link.label}
+                        </Link>
+                      ) : (
+                        <a
+                          href={link.href}
+                          target={"external" in link ? "_blank" : undefined}
+                          rel={"external" in link ? "noopener noreferrer" : undefined}
+                          onClick={(e) => {
+                            if (!("external" in link)) {
+                              e.preventDefault();
+                              document
+                                .querySelector(link.href)
+                                ?.scrollIntoView({ behavior: "smooth" });
+                            }
+                          }}
+                          className="font-serif text-lg text-muva-cream/85 transition-colors duration-300 hover:text-muva-sand"
+                        >
+                          {link.label}
+                        </a>
+                      )}
                     </li>
                   ))}
                 </ul>
