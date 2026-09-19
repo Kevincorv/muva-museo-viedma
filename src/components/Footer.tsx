@@ -1,6 +1,8 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Linkedin, type LucideIcon } from "lucide-react";
 import type { MuseumContact } from "../data/museum";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 interface FooterProps {
   contact: MuseumContact;
@@ -16,29 +18,29 @@ const socialIcons: Record<string, LucideIcon> = {
 };
 
 export default function Footer({ contact, fullName, tagline, year }: FooterProps) {
+  const { locale } = useLanguage();
+
   const footerLinks = [
     {
-      title: "Museo",
+      title: t("footer.museo", locale),
       links: [
-        { label: "El Museo", href: "#museo" },
-        { label: "Historia", href: "#historia" },
-        { label: "Colección", href: "/colección", isRoute: true },
-        // { label: "Exposiciones", href: "#exposiciones" },
+        { label: t("footer.elMuseo", locale), href: "#museo" },
+        { label: t("footer.historia", locale), href: "#historia" },
+        { label: t("footer.coleccion", locale), href: "/colección", isRoute: true },
       ],
     },
     {
-      title: "Experiencia",
+      title: t("footer.experiencia", locale),
       links: [
-        { label: "Guaraní – Jesuítica", href: "#experiencia" },
-        { label: "Noticias y agenda", href: "#" },
+        { label: t("footer.guaraniJesuitica", locale), href: "#experiencia" },
       ],
     },
     {
-      title: "Visita",
+      title: t("footer.visita", locale),
       links: [
-        { label: "Horarios y entradas", href: "#visita" },
-        { label: "Contacto", href: "#contacto" },
-        { label: "Cómo llegar", href: contact.mapsUrl, external: true },
+        { label: t("footer.horariosEntradas", locale), href: "#visita" },
+        { label: t("footer.contacto", locale), href: "#contacto" },
+        { label: t("footer.comoLlegar", locale), href: contact.mapsUrl, external: true },
       ],
     },
   ];
@@ -59,8 +61,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
               {tagline}
             </div>
             <p className="mt-8 max-w-sm text-muva-cream/60 text-pretty">
-              Un espacio para el encuentro con nuestra historia, nuestro arte
-              y nuestro legado. Paraguay · Guaraní – Jesuítico.
+              {t("footer.descripcion", locale)}
             </p>
 
             <div className="mt-10 flex items-center gap-3">
@@ -145,7 +146,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
           <div className="text-sm text-muva-cream/60 md:text-right">
             © {year} MUVA – {fullName}
             <br />
-            <span className="text-muva-cream/40">Todos los derechos reservados</span>
+            <span className="text-muva-cream/40">{t("footer.derechos", locale)}</span>
           </div>
         </div>
       </div>
@@ -153,7 +154,7 @@ export default function Footer({ contact, fullName, tagline, year }: FooterProps
       <div className="border-t border-muva-cream/10 bg-black/30">
         <div className="container-muva flex flex-col items-center justify-between gap-2 py-5 text-[10px] uppercase tracking-extra-wide text-muva-cream/40 md:flex-row">
           <span>{tagline}</span>
-          <span>Experiencia cultural · San Ignacio Guazú, Paraguay</span>
+          <span>{t("footer.experienciaCultural", locale)}</span>
         </div>
       </div>
     </footer>

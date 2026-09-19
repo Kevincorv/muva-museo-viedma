@@ -1,9 +1,12 @@
 import { Clock, MapPin, MessageCircle, Navigation2, Phone } from "lucide-react";
 import { museum } from "../data/museum";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function Visit() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
 
   const scrollToContact = () => {
     document.querySelector("#contacto")?.scrollIntoView({ behavior: "smooth" });
@@ -28,14 +31,12 @@ export default function Visit() {
           ref={titleReveal.ref}
           className={`reveal-on-scroll ${titleReveal.isVisible ? "is-visible" : ""} max-w-3xl`}
         >
-          <div className="eyebrow !text-muva-sand">Visita</div>
+          <div className="eyebrow !text-muva-sand">{t("visit.eyebrow", locale)}</div>
           <h2 className="mt-6 font-serif font-light text-muva-cream text-display-xl text-balance">
-            Planifica tu visita
+            {t("visit.heading", locale)}
           </h2>
           <p className="mt-8 max-w-2xl font-serif text-xl italic text-muva-cream/80 text-pretty">
-            Te esperamos en San Ignacio Guazú, en el corazón de Misiones,
-            Paraguay. Viví una experiencia cultural única en uno de los
-            escenarios más bellos del país.
+            {t("visit.description", locale)}
           </p>
         </div>
 
@@ -45,11 +46,11 @@ export default function Visit() {
             <div className="flex items-center gap-3 text-muva-sand">
               <Clock size={18} strokeWidth={1.5} />
               <span className="font-sans text-[10px] uppercase tracking-extra-wide">
-                Horarios
+                {t("visit.horarios", locale)}
               </span>
             </div>
             <h3 className="mt-6 font-serif text-2xl text-muva-cream md:text-3xl">
-              Atención al público
+              {t("visit.atencion", locale)}
             </h3>
             <dl className="mt-8 space-y-5">
               {museum.schedule.map((s) => (
@@ -77,11 +78,11 @@ export default function Visit() {
             <div className="flex items-center gap-3 text-muva-sand">
               <MapPin size={18} strokeWidth={1.5} />
               <span className="font-sans text-[10px] uppercase tracking-extra-wide">
-                Ubicación
+                {t("visit.ubicacion", locale)}
               </span>
             </div>
             <h3 className="mt-6 font-serif text-2xl text-muva-cream md:text-3xl">
-              Cómo llegar
+              {t("visit.comoLlegar", locale)}
             </h3>
             <p className="mt-6 text-muva-cream/70 text-pretty">
               {museum.contact.address}
@@ -99,7 +100,7 @@ export default function Visit() {
                 className="group inline-flex items-center justify-center gap-2 border border-muva-cream/40 px-5 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream transition-colors duration-300 hover:border-muva-cream hover:bg-muva-cream/10"
               >
                 <Navigation2 size={14} />
-                Cómo llegar
+                {t("visit.comoLlegar", locale)}
               </a>
               <a
                 href={`https://wa.me/${museum.contact.whatsapp}?text=${encodeURIComponent(
@@ -110,7 +111,7 @@ export default function Visit() {
                 className="group inline-flex items-center justify-center gap-2 bg-muva-sand px-5 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark transition-colors duration-300 hover:bg-muva-cream"
               >
                 <MessageCircle size={14} />
-                Consultar por WhatsApp
+                {t("visit.whatsapp", locale)}
               </a>
             </div>
           </div>
@@ -118,10 +119,10 @@ export default function Visit() {
           {/* Tickets – vehicle access */}
           <div className="border border-muva-cream/15 bg-muva-dark/40 p-8 backdrop-blur-sm md:p-10">
             <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-sand">
-              Acceso vehicular
+              {t("visit.vehicular", locale)}
             </div>
             <h3 className="mt-3 font-serif text-2xl text-muva-cream md:text-3xl">
-              Estacionamiento
+              {t("visit.estacionamiento", locale)}
             </h3>
             <ul className="mt-8 space-y-3">
               {museum.access.vehicles.map((v) => (
@@ -139,16 +140,16 @@ export default function Visit() {
           {/* Tickets – individuals & groups */}
           <div className="border border-muva-cream/15 bg-muva-dark/40 p-8 backdrop-blur-sm md:p-10">
             <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-sand">
-              Entradas
+              {t("visit.entradas", locale)}
             </div>
             <h3 className="mt-3 font-serif text-2xl text-muva-cream md:text-3xl">
-              Individuales y grupos
+              {t("visit.individuales", locale)}
             </h3>
 
             <div className="mt-8 space-y-6">
               <div>
                 <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-sand/80">
-                  Individuales
+                  {t("visit.individuales", locale)}
                 </div>
                 <ul className="mt-3 space-y-3">
                   {museum.access.individual.map((t) => (
@@ -169,7 +170,7 @@ export default function Visit() {
 
               <div>
                 <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-sand/80">
-                  Grupales
+                  {t("visit.grupales", locale)}
                 </div>
                 <ul className="mt-3 space-y-3">
                   {museum.access.groups.map((t) => (
@@ -195,7 +196,7 @@ export default function Visit() {
               className="mt-8 inline-flex items-center gap-2 border-b border-muva-sand/60 pb-2 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream/90 transition-colors duration-300 hover:border-muva-cream"
             >
               <Phone size={14} />
-              Reservar visita guiada
+              {t("visit.reservar", locale)}
             </button>
           </div>
         </div>

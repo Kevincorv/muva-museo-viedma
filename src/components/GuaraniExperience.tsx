@@ -1,9 +1,12 @@
 import { ArrowRight } from "lucide-react";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function GuaraniExperience() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
   const galleryReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
 
   return (
     <section
@@ -25,24 +28,19 @@ export default function GuaraniExperience() {
           className={`reveal-on-scroll ${titleReveal.isVisible ? "is-visible" : ""} grid gap-12 md:grid-cols-12`}
         >
           <div className="md:col-span-5">
-            <div className="eyebrow !text-muva-sand">Experiencia</div>
+            <div className="eyebrow !text-muva-sand">{t("experience.eyebrow", locale)}</div>
             <h2 className="mt-6 font-serif font-light text-muva-cream text-display-lg text-balance">
-              Una historia que sigue viva
+              {t("experience.heading", locale)}
             </h2>
             <div className="mt-8 h-px w-24 bg-muva-sand/60" />
           </div>
 
           <div className="md:col-span-7 md:pl-8">
             <p className="font-serif text-2xl leading-relaxed text-muva-cream/90 text-pretty md:text-3xl">
-              El museo propone una mirada artística, histórica y contemporánea
-              sobre el encuentro guaraní–jesuítico: un cruce de mundos que
-              transformó la espiritualidad, el arte y la vida cotidiana de
-              nuestra tierra.
+              {t("experience.p1", locale)}
             </p>
             <p className="mt-8 max-w-xl text-muva-cream/70 text-pretty">
-              Recorré los murales, los jardines y las salas que dan vida a este
-              legado. Cada espacio ha sido pensado como una pausa, un
-              encuentro, una contemplación.
+              {t("experience.p2", locale)}
             </p>
             <a
               href="#visita"
@@ -52,7 +50,7 @@ export default function GuaraniExperience() {
               }}
               className="group mt-10 inline-flex items-center gap-3 border-b border-muva-sand/60 pb-2 font-sans text-[12px] uppercase tracking-extra-wide text-muva-cream transition-colors duration-300 hover:border-muva-cream"
             >
-              Descubrir la experiencia
+              {t("experience.descubrir", locale)}
               <ArrowRight
                 size={16}
                 className="transition-transform duration-300 group-hover:translate-x-1"
@@ -83,7 +81,7 @@ export default function GuaraniExperience() {
               }}
             />
             <div className="absolute bottom-4 left-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/80">
-              Murales · Recorrido interior
+              {t("experience.murales", locale)}
             </div>
           </div>
 
@@ -106,7 +104,7 @@ export default function GuaraniExperience() {
                 }}
               />
               <div className="absolute bottom-4 left-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/80">
-                Jardines · Naturaleza
+                {t("experience.jardines", locale)}
               </div>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:aspect-auto md:h-full">
@@ -127,7 +125,7 @@ export default function GuaraniExperience() {
                 }}
               />
               <div className="absolute bottom-4 left-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/80">
-                Esculturas · Obra de Viedma
+                {t("experience.esculturas", locale)}
               </div>
             </div>
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:col-span-2 md:aspect-[16/6]">
@@ -148,7 +146,7 @@ export default function GuaraniExperience() {
                 }}
               />
               <div className="absolute bottom-4 left-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-dark/80">
-                Arquitectura · Espacios
+                {t("experience.arquitectura", locale)}
               </div>
             </div>
           </div>

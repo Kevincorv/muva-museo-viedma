@@ -1,46 +1,76 @@
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 interface TimelineEntry {
   year: string;
-  title: string;
-  description: string;
+  titleEs: string;
+  titleEn: string;
+  titlePt: string;
+  descEs: string;
+  descEn: string;
+  descPt: string;
 }
 
 const timeline: TimelineEntry[] = [
   {
     year: "1941",
-    title: "Nacimiento de Manuel Viedma",
-    description:
-      "Nace en Asunción el artista cuya obra dará vida, décadas más tarde, a un proyecto cultural sin precedentes en Paraguay.",
+    titleEs: "Nacimiento de Manuel Viedma",
+    titleEn: "Birth of Manuel Viedma",
+    titlePt: "Nascimento de Manuel Viedma",
+    descEs: "Nace en Asunción el artista cuya obra dará vida, décadas más tarde, a un proyecto cultural sin precedentes en Paraguay.",
+    descEn: "Born in Asunción, the artist whose work would give life, decades later, to an unprecedented cultural project in Paraguay.",
+    descPt: "Nasce em Assunção o artista cuja obra dará vida, décadas depois, a um projeto cultural sem precedentes no Paraguai.",
   },
   {
     year: "1971",
-    title: "Fundación del ESAP",
-    description:
-      "La Escuela Superior de Arte y Patrimonio sienta las bases de una educación artística con identidad paraguaya.",
+    titleEs: "Fundación del ESAP",
+    titleEn: "Foundation of ESAP",
+    titlePt: "Fundação da ESAP",
+    descEs: "La Escuela Superior de Arte y Patrimonio sienta las bases de una educación artística con identidad paraguaya.",
+    descEn: "The Higher School of Art and Heritage lays the foundations for art education with Paraguayan identity.",
+    descPt: "A Escola Superior de Arte e Patrimônio sienta as bases de uma educação artística com identidade paraguaia.",
   },
   {
     year: "1996",
-    title: "Fundación de la UPAP",
-    description:
-      "La Universidad Paraguayo Alemana nace como un puente entre tradición, ciencia y futuro para el país.",
+    titleEs: "Fundación de la UPAP",
+    titleEn: "Foundation of UPAP",
+    titlePt: "Fundação da UPAP",
+    descEs: "La Universidad Paraguayo Alemana nace como un puente entre tradición, ciencia y futuro para el país.",
+    descEn: "The Paraguayan-German University is born as a bridge between tradition, science, and the country's future.",
+    descPt: "A Universidade Paraguai-Alemana nasce como uma ponte entre tradição, ciência e futuro para o país.",
   },
   {
     year: "+40 años",
-    title: "Desarrollo de la obra artística",
-    description:
-      "Décadas de trabajo silencioso: escultura, pintura, murales y pensamiento que hoy constituyen el corazón del museo.",
+    titleEs: "Desarrollo de la obra artística",
+    titleEn: "Development of artistic work",
+    titlePt: "Desenvolvimento da obra artística",
+    descEs: "Décadas de trabajo silencioso: escultura, pintura, murales y pensamiento que hoy constituyen el corazón del museo.",
+    descEn: "Decades of quiet work: sculpture, painting, murals, and thought that today constitute the heart of the museum.",
+    descPt: "Décadas de trabalho silencioso: escultura, pintura, murais e pensamento que hoje constituem o coração do museu.",
   },
   {
     year: "2026",
-    title: "Nacimiento del MUVA",
-    description:
-      "Se concreta en San Ignacio Guazú un espacio para el encuentro con el legado guaraní–jesuítico y la obra de Manuel Viedma.",
+    titleEs: "Nacimiento del MUVA",
+    titleEn: "Birth of MUVA",
+    titlePt: "Nascimento do MUVA",
+    descEs: "Se concreta en San Ignacio Guazú un espacio para el encuentro con el legado guaraní–jesuítico y la obra de Manuel Viedma.",
+    descEn: "In San Ignacio Guazú, a space for encounter with the Guaraní–Jesuit legacy and the work of Manuel Viedma becomes reality.",
+    descPt: "Em San Ignacio Guazú, um espaço para o encontro com o legado guarani–jesuíta e a obra de Manuel Viedma se concretiza.",
   },
 ];
 
 export default function History() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
+
+  const getLocalized = (entry: TimelineEntry, field: "title" | "desc") => {
+    if (field === "title") {
+      return locale === "en" ? entry.titleEn : locale === "pt" ? entry.titlePt : entry.titleEs;
+    }
+    return locale === "en" ? entry.descEn : locale === "pt" ? entry.descPt : entry.descEs;
+  };
+
   return (
     <section
       id="historia"
@@ -60,13 +90,12 @@ export default function History() {
           ref={titleReveal.ref}
           className={`reveal-on-scroll ${titleReveal.isVisible ? "is-visible" : ""} max-w-3xl`}
         >
-          <div className="eyebrow">Historia</div>
+          <div className="eyebrow">{t("history.eyebrow", locale)}</div>
           <h2 className="mt-6 font-serif font-light text-muva-dark text-display-lg text-balance">
-            Un legado construido en el tiempo
+            {t("history.heading", locale)}
           </h2>
           <p className="mt-8 max-w-2xl font-serif text-xl italic text-muva-brown">
-            Un recorrido breve por los hitos que hicieron posible la creación
-            del MUVA.
+            {t("history.intro", locale)}
           </p>
         </div>
 
@@ -76,7 +105,12 @@ export default function History() {
 
           <ol className="space-y-16 md:space-y-24">
             {timeline.map((entry, i) => (
-              <TimelineItem key={entry.year} entry={entry} index={i} />
+              <TimelineItem
+                key={entry.year}
+                entry={entry}
+                index={i}
+                getLocalized={getLocalized}
+              />
             ))}
           </ol>
         </div>
@@ -85,7 +119,15 @@ export default function History() {
   );
 }
 
-function TimelineItem({ entry, index }: { entry: TimelineEntry; index: number }) {
+function TimelineItem({
+  entry,
+  index,
+  getLocalized,
+}: {
+  entry: TimelineEntry;
+  index: number;
+  getLocalized: (entry: TimelineEntry, field: "title" | "desc") => string;
+}) {
   const reveal = useScrollReveal<HTMLLIElement>();
   const isLeft = index % 2 === 0;
 
@@ -108,10 +150,10 @@ function TimelineItem({ entry, index }: { entry: TimelineEntry; index: number })
           {entry.year}
         </div>
         <h3 className="mt-4 font-serif text-2xl text-muva-dark md:text-3xl">
-          {entry.title}
+          {getLocalized(entry, "title")}
         </h3>
         <p className={`mt-4 max-w-md text-muva-brown text-pretty ${isLeft ? "md:ml-auto" : ""}`}>
-          {entry.description}
+          {getLocalized(entry, "desc")}
         </p>
       </div>
     </li>

@@ -1,9 +1,12 @@
 import { Mail, MapPin, MessageCircle, Phone } from "lucide-react";
 import { museum } from "../data/museum";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function Contact() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
 
   return (
     <section
@@ -17,13 +20,12 @@ export default function Contact() {
           className={`reveal-on-scroll ${titleReveal.isVisible ? "is-visible" : ""} grid gap-16 md:grid-cols-2`}
         >
           <div>
-            <div className="eyebrow">Contacto</div>
+            <div className="eyebrow">{t("contact.eyebrow", locale)}</div>
             <h2 className="mt-6 font-serif font-light text-muva-dark text-display-lg text-balance">
-              Estamos para acompañarte
+              {t("contact.heading", locale)}
             </h2>
             <p className="mt-8 max-w-md text-muva-brown text-pretty">
-              Escribinos para consultas sobre visitas, reservas, exposiciones,
-              educación o prensa. Te responderemos a la brevedad.
+              {t("contact.description", locale)}
             </p>
 
             <ul className="mt-12 space-y-6">
@@ -31,7 +33,7 @@ export default function Contact() {
                 <Phone size={20} className="mt-0.5 text-muva-earth" strokeWidth={1.5} />
                 <div>
                   <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                    Teléfono
+                    {t("contact.telefono", locale)}
                   </div>
                   <a
                     href={`tel:${museum.contact.phone}`}
@@ -45,7 +47,7 @@ export default function Contact() {
                 <MessageCircle size={20} className="mt-0.5 text-muva-earth" strokeWidth={1.5} />
                 <div>
                   <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                    WhatsApp
+                    {t("contact.whatsapp", locale)}
                   </div>
                   <a
                     href={`https://wa.me/${museum.contact.whatsapp}`}
@@ -61,7 +63,7 @@ export default function Contact() {
                 <Mail size={20} className="mt-0.5 text-muva-earth" strokeWidth={1.5} />
                 <div>
                   <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                    Email
+                    {t("contact.email", locale)}
                   </div>
                   <a
                     href={`mailto:${museum.contact.email}`}
@@ -75,7 +77,7 @@ export default function Contact() {
                 <MapPin size={20} className="mt-0.5 text-muva-earth" strokeWidth={1.5} />
                 <div>
                   <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                    Dirección
+                    {t("contact.direccion", locale)}
                   </div>
                   <p className="mt-1 font-serif text-xl text-muva-dark">
                     {museum.contact.address}
@@ -117,7 +119,7 @@ export default function Contact() {
                   <div className="relative">
                     <div className="h-4 w-4 -translate-x-1/2 -translate-y-1/2 rounded-full bg-muva-earth ring-4 ring-muva-earth/30" />
                     <div className="absolute left-1/2 top-6 -translate-x-1/2 whitespace-nowrap bg-muva-dark px-3 py-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream">
-                      MUVA · San Ignacio
+                      {t("contact.mapLabel", locale)}
                     </div>
                   </div>
                 </div>
@@ -129,7 +131,7 @@ export default function Contact() {
               rel="noopener noreferrer"
               className="absolute bottom-6 right-6 inline-flex items-center gap-2 bg-muva-dark px-5 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream transition-colors duration-300 hover:bg-muva-brown"
             >
-              Abrir en Google Maps
+              {t("contact.googleMaps", locale)}
             </a>
           </div>
         </div>

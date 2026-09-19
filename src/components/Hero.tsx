@@ -1,9 +1,12 @@
 import { ArrowRight, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { museum } from "../data/museum";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function Hero() {
   const navigate = useNavigate();
+  const { locale } = useLanguage();
 
   const scrollTo = (id: string) => {
     const el = document.querySelector(id);
@@ -60,18 +63,18 @@ export default function Hero() {
       <div className="container-muva absolute inset-x-0 top-24 z-10 flex justify-between md:top-28">
         <div className="hidden text-muva-cream/60 md:block">
           <div className="text-[10px] font-sans uppercase tracking-extra-wide">
-            San Ignacio Guazú
+            {t("hero.location", locale)}
           </div>
           <div className="mt-1 text-[10px] font-sans uppercase tracking-extra-wide text-muva-cream/40">
-            Misiones · Paraguay
+            {t("hero.region", locale)}
           </div>
         </div>
         <div className="text-right text-muva-cream/60">
           <div className="text-[10px] font-sans uppercase tracking-extra-wide">
-            Museo · {new Date().getFullYear()}
+            {t("hero.museoAnio", locale)} {new Date().getFullYear()}
           </div>
           <div className="mt-1 text-[10px] font-sans uppercase tracking-extra-wide text-muva-cream/40">
-            {museum.tagline}
+            {t("hero.tagline", locale)}
           </div>
         </div>
       </div>
@@ -82,7 +85,7 @@ export default function Hero() {
           <div className="flex items-center gap-3 text-muva-sand/80 animate-fade-down opacity-0" style={{ animationDelay: "100ms" }}>
             <span className="h-px w-12 bg-muva-sand/60" />
             <span className="font-sans text-[11px] uppercase tracking-extra-wide">
-              {museum.tagline}
+              {t("hero.tagline", locale)}
             </span>
           </div>
 
@@ -104,7 +107,7 @@ export default function Hero() {
             className="mt-10 max-w-2xl font-serif text-xl italic text-muva-cream/80 md:text-2xl lg:text-3xl text-pretty animate-fade-up opacity-0"
             style={{ animationDelay: "500ms" }}
           >
-            &ldquo;Un espacio para encontrarnos con nuestra historia, nuestro arte y nuestro legado.&rdquo;
+            &ldquo;{t("hero.quote", locale)}&rdquo;
           </p>
 
           <div
@@ -116,7 +119,7 @@ export default function Hero() {
               onClick={() => scrollTo("#museo")}
               className="group inline-flex items-center justify-center gap-3 bg-muva-cream px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-dark transition-all duration-500 hover:bg-muva-sand"
             >
-              Conocer el museo
+              {t("hero.conocerMuseo", locale)}
               <ArrowRight
                 size={16}
                 className="transition-transform duration-500 group-hover:translate-x-1"
@@ -127,7 +130,7 @@ export default function Hero() {
               onClick={() => navigate("/colección")}
               className="group inline-flex items-center justify-center gap-3 border border-muva-cream/40 px-8 py-4 font-sans text-[12px] uppercase tracking-extra-wide text-muva-cream transition-all duration-500 hover:border-muva-cream hover:bg-muva-cream/10"
             >
-              Explorar colección 3D
+              {t("hero.explorarColeccion", locale)}
             </button>
           </div>
         </div>
@@ -140,14 +143,14 @@ export default function Hero() {
             <div className="flex items-center gap-3">
               <span className="h-1.5 w-1.5 rounded-full bg-muva-sand" />
               <span className="font-sans text-[11px] uppercase tracking-extra-wide">
-                Abierto al público
+                {t("hero.abierto", locale)}
               </span>
             </div>
             <div className="font-sans text-[11px] uppercase tracking-extra-wide">
-              Mié a Vie · 9 a 17 hs
+              {t("hero.horarioViernes", locale)}
             </div>
             <div className="font-sans text-[11px] uppercase tracking-extra-wide">
-              Sáb y Dom · 9 a 19 hs
+              {t("hero.horarioSabado", locale)}
             </div>
           </div>
           <button
@@ -156,7 +159,7 @@ export default function Hero() {
             className="group flex items-center gap-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/60 transition-colors duration-300 hover:text-muva-cream"
             aria-label="Descender a la siguiente sección"
           >
-            Descubrir
+            {t("hero.descubrir", locale)}
             <ChevronDown
               size={14}
               className="transition-transform duration-500 group-hover:translate-y-1"

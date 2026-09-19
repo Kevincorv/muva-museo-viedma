@@ -1,9 +1,12 @@
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { museum } from "../data/museum";
+import { useLanguage } from "../i18n/LanguageContext";
+import { t } from "../i18n/translations";
 
 export default function AboutMuseum() {
   const textReveal = useScrollReveal<HTMLDivElement>();
   const imgReveal = useScrollReveal<HTMLDivElement>();
+  const { locale } = useLanguage();
 
   return (
     <section
@@ -25,8 +28,8 @@ export default function AboutMuseum() {
                 className="h-full w-full object-cover"
                 loading="lazy"
                 onError={(e) => {
-                  const t = e.currentTarget as HTMLImageElement;
-                  t.style.display = "none";
+                  const img = e.currentTarget as HTMLImageElement;
+                  img.style.display = "none";
                 }}
               />
               <div
@@ -42,7 +45,7 @@ export default function AboutMuseum() {
 
             <div className="absolute -bottom-10 left-0 hidden bg-muva-dark px-6 py-4 text-muva-cream md:block">
               <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-sand/70">
-                Fundación
+                {t("about.fundacion", locale)}
               </div>
               <div className="mt-1 font-serif text-2xl">{museum.founded}</div>
             </div>
@@ -54,48 +57,40 @@ export default function AboutMuseum() {
             className={`reveal-on-scroll ${textReveal.isVisible ? "is-visible" : ""} lg:col-span-7 lg:pl-8`}
             style={{ transitionDelay: "150ms" }}
           >
-            <div className="eyebrow">El Museo</div>
+            <div className="eyebrow">{t("about.eyebrow", locale)}</div>
             <h2 className="mt-6 font-serif font-light text-muva-dark text-display-lg text-balance">
-              Un espacio para el encuentro
+              {t("about.heading", locale)}
             </h2>
             <div className="mt-10 space-y-6 text-base leading-relaxed text-muva-brown md:text-lg">
               <p className="first-letter:font-serif first-letter:text-5xl first-letter:font-light first-letter:float-left first-letter:mr-3 first-letter:mt-1 first-letter:text-muva-earth first-letter:leading-none">
                 {museum.mission}
               </p>
               <p>
-                Investigamos, conservamos, interpretamos y exhibimos patrimonio
-                cultural con foco en el legado guaraní–jesuita. Un museo que
-                invita al silencio, a la contemplación y al encuentro profundo
-                con la historia del Paraguay.
+                {t("about.p1", locale)}
               </p>
               <p>
-                Les invitamos a recorrer nuestras salas con programación de
-                exposiciones permanentes — la obra legado del artista Manuel
-                Viedma — y temporales. La biblioteca, auditorio, tienda y café,
-                así como el recorrido por los jardines, han sido diseñados
-                especialmente para que cada visitante viva una experiencia
-                única y transformadora.
+                {t("about.p2", locale)}
               </p>
             </div>
 
             <div className="mt-12 flex flex-wrap gap-x-12 gap-y-6 border-t border-muva-sand/40 pt-10">
               <div>
                 <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                  Investigación
+                  {t("about.investigacion", locale)}
                 </div>
-                <div className="mt-2 font-serif text-2xl text-muva-dark">Patrimonio</div>
+                <div className="mt-2 font-serif text-2xl text-muva-dark">{t("about.patrimonio", locale)}</div>
               </div>
               <div>
                 <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                  Conservación
+                  {t("about.conservacion", locale)}
                 </div>
-                <div className="mt-2 font-serif text-2xl text-muva-dark">Memoria</div>
+                <div className="mt-2 font-serif text-2xl text-muva-dark">{t("about.memoria", locale)}</div>
               </div>
               <div>
                 <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                  Exhibición
+                  {t("about.exhibicion", locale)}
                 </div>
-                <div className="mt-2 font-serif text-2xl text-muva-dark">Encuentro</div>
+                <div className="mt-2 font-serif text-2xl text-muva-dark">{t("about.encuentro", locale)}</div>
               </div>
             </div>
           </div>
