@@ -6,6 +6,7 @@ import * as THREE from "three";
 import { sculptures } from "../data/sculptures";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
 
@@ -372,6 +373,11 @@ export default function SculptureViewer() {
                   <p className="mt-4 max-w-2xl text-sm italic text-muva-stone text-pretty">
                     {sculpture.getHistoricalContext(locale)}
                   </p>
+                )}
+                {sculpture.getAudio && (
+                  <div className="mt-6 max-w-md">
+                    <AudioPlayer src={sculpture.getAudio(locale)} />
+                  </div>
                 )}
               </div>
               <dl className="grid grid-cols-2 gap-x-6 gap-y-4 self-center md:col-span-5 md:grid-cols-1 md:gap-y-3">

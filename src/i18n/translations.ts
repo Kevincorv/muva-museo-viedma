@@ -175,6 +175,11 @@ const es: TranslationKeys = {
   "viewer.labelDimensions": "Dimensiones",
   "viewer.labelYear": "Año",
 
+  "audio.play": "Reproducir",
+  "audio.pause": "Pausar",
+  "audio.guide": "Audioguía",
+  "audio.seek": "Buscar",
+
   "langSelector.ariaLabel": "Seleccionar idioma",
 
   "lang.es": "Español",
@@ -394,6 +399,11 @@ const en: TranslationKeys = {
   "viewer.labelDimensions": "Dimensions",
   "viewer.labelYear": "Year",
 
+  "audio.play": "Play",
+  "audio.pause": "Pause",
+  "audio.guide": "Audio guide",
+  "audio.seek": "Seek",
+
   "langSelector.ariaLabel": "Select language",
 
   "lang.es": "Español",
@@ -612,6 +622,11 @@ const pt: TranslationKeys = {
   "viewer.labelMaterial": "Material",
   "viewer.labelDimensions": "Dimensões",
   "viewer.labelYear": "Ano",
+
+  "audio.play": "Reproduzir",
+  "audio.pause": "Pausar",
+  "audio.guide": "Audioguia",
+  "audio.seek": "Buscar",
 
   "langSelector.ariaLabel": "Selecionar idioma",
 

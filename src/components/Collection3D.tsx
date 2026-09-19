@@ -28,6 +28,7 @@ import { sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
 
@@ -386,6 +387,11 @@ function SculptureCard({
         <p className="mt-3 text-sm text-muva-brown text-pretty">
           {sculpture.getDescription(locale)}
         </p>
+        {sculpture.getAudio && (
+          <div className="mt-3">
+            <AudioPlayer src={sculpture.getAudio(locale)} compact />
+          </div>
+        )}
       </div>
     </article>
   );
