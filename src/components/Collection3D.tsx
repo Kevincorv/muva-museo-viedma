@@ -181,8 +181,8 @@ function SculptureCanvas({
           dampingFactor={0.08}
           enablePan={true}
           panSpeed={0.5}
-          minDistance={2}
-          maxDistance={9}
+          minDistance={0.3}
+          maxDistance={12}
           autoRotate={false}
           makeDefault
         />
@@ -212,7 +212,7 @@ function SculptureCanvas({
               const dir = new THREE.Vector3()
                 .subVectors(cam.position, target)
                 .normalize();
-              cam.position.addScaledVector(dir, 0.5);
+              cam.position.addScaledVector(dir, -0.8);
               orbitRef.current.update();
             }}
             className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
@@ -229,7 +229,7 @@ function SculptureCanvas({
               const dir = new THREE.Vector3()
                 .subVectors(cam.position, target)
                 .normalize();
-              cam.position.addScaledVector(dir, -0.5);
+              cam.position.addScaledVector(dir, 0.8);
               orbitRef.current.update();
             }}
             className="pointer-events-auto flex h-9 w-9 items-center justify-center border border-muva-cream/20 bg-muva-dark/60 text-muva-cream backdrop-blur-sm transition-all duration-300 hover:border-muva-cream/60 hover:bg-muva-dark/90"
