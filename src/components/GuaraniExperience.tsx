@@ -67,7 +67,7 @@ export default function GuaraniExperience() {
         >
           <div className="relative aspect-[3/4] overflow-hidden bg-muva-brown md:col-span-4 md:aspect-[3/5]">
             <img
-              src="/images/experience/mural.webp"
+              src="/images/experience/mural para la página.jpeg"
               alt="Mural guaraní – jesuítico del recorrido interior"
               className="h-full w-full object-cover"
               loading="lazy"
@@ -90,7 +90,7 @@ export default function GuaraniExperience() {
           <div className="grid gap-4 md:col-span-8 md:grid-cols-2 md:gap-6">
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:aspect-auto md:h-full">
               <img
-                src="/images/experience/jardin.webp"
+                src="/images/experience/jardines - naturaleza.jpeg"
                 alt="Jardines del museo"
                 className="h-full w-full object-cover"
                 loading="lazy"
@@ -132,7 +132,7 @@ export default function GuaraniExperience() {
             </div>
             <div className="relative aspect-[4/3] overflow-hidden bg-muva-brown md:col-span-2 md:aspect-[16/6]">
               <img
-                src="/images/experience/arquitectura.webp"
+                src="/images/experience/arquitectura - espacio.jpeg"
                 alt="Arquitectura del museo"
                 className="h-full w-full object-cover"
                 loading="lazy"
