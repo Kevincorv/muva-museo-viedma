@@ -1,7 +1,7 @@
 import { Suspense, useCallback, useMemo, useRef, useState, type ChangeEvent } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
-import { Upload, Loader2, AlertCircle, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
+import { Upload, Loader2, RotateCcw, ZoomIn, ZoomOut, Move } from "lucide-react";
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
@@ -63,14 +63,11 @@ function EmbeddedModel({
 }
 
 function Sculpture3DViewer({
-  sculpture,
   modelUrl,
 }: {
-  sculpture: Sculpture;
   modelUrl: string;
 }) {
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const orbitRef = useRef<any>(null);
 
   const reset = () => orbitRef.current?.reset();
@@ -112,23 +109,19 @@ function Sculpture3DViewer({
         />
 
         <Suspense fallback={null}>
-          {!error && (
-            <EmbeddedModel
-              url={modelUrl}
-              onLoaded={() => setLoading(false)}
-            />
-          )}
-          {!error && (
-            <ContactShadows
-              position={[0, -1.2, 0]}
-              opacity={0.5}
-              scale={8}
-              blur={2.5}
-              far={4}
-              color="#1a1410"
-            />
-          )}
-          {!error && <Environment preset="apartment" />}
+          <EmbeddedModel
+            url={modelUrl}
+            onLoaded={() => setLoading(false)}
+          />
+          <ContactShadows
+            position={[0, -1.2, 0]}
+            opacity={0.5}
+            scale={8}
+            blur={2.5}
+            far={4}
+            color="#1a1410"
+          />
+          <Environment preset="apartment" />
         </Suspense>
 
         <OrbitControls
@@ -143,7 +136,7 @@ function Sculpture3DViewer({
         />
       </Canvas>
 
-      {loading && !error && (
+      {loading && (
         <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/40 backdrop-blur-[2px]">
           <Loader2
             size={28}
@@ -153,24 +146,6 @@ function Sculpture3DViewer({
           <div className="mt-4 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/80">
             Cargando modelo 3D
           </div>
-        </div>
-      )}
-
-      {error && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/95 p-4 text-center">
-          <AlertCircle
-            size={28}
-            className="text-muva-sand"
-            strokeWidth={1.4}
-          />
-          <p className="mt-4 font-serif text-lg text-muva-cream">
-            No se pudo cargar el modelo
-          </p>
-          <p className="mt-2 max-w-xs text-xs text-muva-cream/60">
-            Subí un archivo{" "}
-            <code className="text-muva-sand">.glb</code> usando
-            el botón de carga.
-          </p>
         </div>
       )}
 
