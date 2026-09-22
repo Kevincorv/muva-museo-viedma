@@ -22,7 +22,7 @@ export default function MissionVision() {
             <div>
               <div className="eyebrow">{t("missionVision.misionLabel", locale)}</div>
               <div className="divider-thin mt-4" />
-              <p className="mt-6 font-serif text-xl italic leading-relaxed text-muva-brown text-pretty">
+              <p className="mt-6 font-serif text-2xl italic leading-relaxed text-muva-brown text-pretty">
                 {t("missionVision.mision", locale)}
               </p>
             </div>
@@ -31,7 +31,7 @@ export default function MissionVision() {
             <div>
               <div className="eyebrow">{t("missionVision.visionLabel", locale)}</div>
               <div className="divider-thin mt-4" />
-              <p className="mt-6 font-serif text-xl italic leading-relaxed text-muva-brown text-pretty">
+              <p className="mt-6 font-serif text-2xl italic leading-relaxed text-muva-brown text-pretty">
                 {t("missionVision.vision", locale)}
               </p>
             </div>
