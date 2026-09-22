@@ -87,8 +87,8 @@ export const sculptures: Sculpture[] = [
     model: "/models/sculptures/sagrada familia 1.glb",
     models: [
       { url: "/models/sculptures/sagrada familia 1.glb", labelKey: "sculpture.obra03.model1" },
-      { url: "/models/sculptures/Sagrada familia 2.glb", labelKey: "sculpture.obra03.model2" },
       { url: "/models/sculptures/foto niño jesus.glb", labelKey: "sculpture.obra03.model3" },
+      { url: "/models/sculptures/Sagrada familia 2.glb", labelKey: "sculpture.obra03.model2" },
     ],
     audio: {
       es: "/audio/sculptures/obra-03-es.mp3",
