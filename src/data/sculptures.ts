@@ -6,6 +6,11 @@ export interface SculptureAudio {
   pt?: string;
 }
 
+export interface SculptureModelItem {
+  url: string;
+  labelKey?: string;
+}
+
 export interface Sculpture {
   id: string;
   titleKey: string;
@@ -18,6 +23,7 @@ export interface Sculpture {
   historicalContextKey?: string;
   thumbnail: string;
   model: string;
+  models?: SculptureModelItem[];
   audio?: SculptureAudio;
   getTitle: (locale: Locale) => string;
   getDescription: (locale: Locale) => string;
@@ -78,7 +84,12 @@ export const sculptures: Sculpture[] = [
     artist: "Manuel Viedma",
     descriptionKey: "sculpture.obra03.desc",
     thumbnail: "/images/sculptures/obra-03.webp",
-    model: "/models/sculptures/prueba.glb",
+    model: "/models/sculptures/sagrada familia 1.glb",
+    models: [
+      { url: "/models/sculptures/sagrada familia 1.glb", labelKey: "sculpture.obra03.model1" },
+      { url: "/models/sculptures/Sagrada familia 2.glb", labelKey: "sculpture.obra03.model2" },
+      { url: "/models/sculptures/foto niño jesus.glb", labelKey: "sculpture.obra03.model3" },
+    ],
     audio: {
       es: "/audio/sculptures/obra-03-es.mp3",
       en: "/audio/sculptures/obra-03-en.mp3",
