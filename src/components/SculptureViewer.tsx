@@ -10,6 +10,8 @@ import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
 
+sculptures.forEach((s) => useGLTF.preload(s.model));
+
 class ErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { hasError: boolean }
