@@ -224,6 +224,17 @@ const es: TranslationKeys = {
   "access.reservaPrevia": "Con reserva previa.",
   "access.gruposNinos": "Grupos de niños hasta 10 años",
   "access.reservaNinos": "Con reserva previa al (+595) 0973 – 423 719.",
+
+  "sculpture.obra03.model1": "Sagrada Familia 1",
+  "sculpture.obra03.model2": "Sagrada Familia 2",
+  "sculpture.obra03.model3": "Niño Jesús",
+  "sculpture.modelSelector": "Modelo",
+
+  "missionVision.mision": "Somos un espacio que quiere hacer presente desde una perspectiva histórica, artística y de Fe Cristiana, el legado de uno de los eventos más importantes de la historia de la humanidad: el encuentro guaraní-jesuítico, con una mirada abierta, reflexiva y contemporánea.",
+  "missionVision.vision": "Ser un espacio con una mirada abierta, reflexiva y contemporánea, hacer presente el legado de uno de los eventos más importantes de la historia de la humanidad: el encuentro guaraní-jesuítico desde una perspectiva histórica, artística y de Fe Cristiana.",
+  "missionVision.misionLabel": "Misión",
+  "missionVision.visionLabel": "Visión",
+  "missionVision.ariaSection": "Misión y Visión",
 };
 
 const en: TranslationKeys = {
@@ -448,6 +459,17 @@ const en: TranslationKeys = {
   "access.reservaPrevia": "Advance reservation required.",
   "access.gruposNinos": "Groups of children under 10",
   "access.reservaNinos": "Advance reservation at (+595) 0973 – 423 719.",
+
+  "sculpture.obra03.model1": "Holy Family 1",
+  "sculpture.obra03.model2": "Holy Family 2",
+  "sculpture.obra03.model3": "Child Jesus",
+  "sculpture.modelSelector": "Model",
+
+  "missionVision.mision": "We are a space that seeks to present from a historical, artistic, and Christian faith perspective, the legacy of one of the most important events in human history: the Guaraní-Jesuit encounter, with an open, reflective, and contemporary vision.",
+  "missionVision.vision": "To be a space with an open, reflective, and contemporary vision, presenting the legacy of one of the most important events in human history: the Guaraní-Jesuit encounter from a historical, artistic, and Christian faith perspective.",
+  "missionVision.misionLabel": "Mission",
+  "missionVision.visionLabel": "Vision",
+  "missionVision.ariaSection": "Mission and Vision",
 };
 
 const pt: TranslationKeys = {
@@ -672,6 +694,12 @@ const pt: TranslationKeys = {
   "access.reservaPrevia": "Com reserva prévia.",
   "access.gruposNinos": "Grupos de crianças até 10 anos",
   "access.reservaNinos": "Com reserva prévia ao (+595) 0973 – 423 719.",
+
+  "missionVision.mision": "Somos um espaço que quer fazer presente de uma perspectiva histórica, artística e de Fé Cristã, o legado de um dos eventos mais importantes da história da humanidade: o encontro guarani-jesuíta, com uma visão aberta, reflexiva e contemporânea.",
+  "missionVision.vision": "Ser um espaço com uma visão aberta, reflexiva e contemporânea, fazer presente o legado de um dos eventos mais importantes da história da humanidade: o encontro guarani-jesuíta de uma perspectiva histórica, artística e de Fé Cristã.",
+  "missionVision.misionLabel": "Missão",
+  "missionVision.visionLabel": "Visão",
+  "missionVision.ariaSection": "Missão e Visão",
 };
 
 const translations: Record<Locale, TranslationKeys> = { es, en, pt };

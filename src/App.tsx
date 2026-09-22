@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import AboutMuseum from "./components/AboutMuseum";
+import MissionVision from "./components/MissionVision";
 import History from "./components/History";
 import CollectionPreview from "./components/CollectionPreview";
 import GuaraniExperience from "./components/GuaraniExperience";
@@ -33,6 +34,7 @@ function HomePage() {
       <main>
         <Hero />
         <AboutMuseum />
+        <MissionVision />
         <History />
         <CollectionPreview />
         <GuaraniExperience />
