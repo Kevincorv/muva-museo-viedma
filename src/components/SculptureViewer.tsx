@@ -1,6 +1,6 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { ContactShadows, Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
 import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 import * as THREE from "three";
 import { sculptures } from "../data/sculptures";
@@ -9,8 +9,6 @@ import { t } from "../i18n/translations";
 import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
-
-sculptures.forEach((s) => useGLTF.preload(s.model));
 
 class ErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
@@ -228,6 +226,11 @@ export default function SculptureViewer() {
               intensity={0.8}
               color="#fdfaf3"
             />
+            <hemisphereLight
+              color="#f5ecda"
+              groundColor="#3d2f22"
+              intensity={0.5}
+            />
 
             <Suspense fallback={null}>
               <ErrorBoundary onError={() => setError(true)}>
@@ -243,7 +246,6 @@ export default function SculptureViewer() {
                   far={4}
                   color="#1a1410"
                 />
-                <Environment preset="apartment" />
               </ErrorBoundary>
             </Suspense>
 

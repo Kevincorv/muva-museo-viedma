@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import { sculptures } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
-import { SculptureCanvas, ThumbnailFallback } from "./Collection3D";
+import {
+  SculptureCanvas,
+  ThumbnailFallback,
+} from "./Collection3D";
 
 export default function CollectionPreview() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
@@ -69,6 +72,24 @@ export default function CollectionPreview() {
   );
 }
 
+function useNearViewport<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
+  rootMargin = "100px"
+) {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setNear(entry.isIntersecting),
+      { rootMargin, threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, rootMargin]);
+  return near;
+}
+
 function PreviewCard({
   sculpture,
   index,
@@ -78,6 +99,8 @@ function PreviewCard({
 }) {
   const reveal = useScrollReveal<HTMLDivElement>();
   const [modelError, setModelError] = useState(false);
+  const canvasContainerRef = useRef<HTMLDivElement>(null);
+  const near = useNearViewport(canvasContainerRef, "120px 0px");
   const { locale } = useLanguage();
 
   return (
@@ -86,15 +109,37 @@ function PreviewCard({
       className={`reveal-on-scroll ${reveal.isVisible ? "is-visible" : ""} group relative flex flex-col`}
       style={{ transitionDelay: `${index * 60}ms` }}
     >
-      <div className="relative overflow-hidden">
-        {!modelError ? (
+      <div ref={canvasContainerRef} className="relative overflow-hidden">
+        {modelError ? (
+          <ThumbnailFallback sculpture={sculpture} compact />
+        ) : near ? (
           <SculptureCanvas
             modelUrl={sculpture.model}
             onError={() => setModelError(true)}
             compact
           />
         ) : (
-          <ThumbnailFallback sculpture={sculpture} compact />
+          <div className="relative aspect-square overflow-hidden rounded-sm bg-muva-dark flex items-center justify-center">
+            <img
+              src={sculpture.thumbnail}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-40"
+              loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(150deg, rgba(201,184,154,0.25) 0%, rgba(42,32,24,0.9) 100%)",
+              }}
+            />
+            <p className="relative px-4 text-center font-serif text-lg text-muva-cream">
+              {sculpture.getTitle(locale)}
+            </p>
+          </div>
         )}
         <div className="absolute left-4 top-4 z-10 bg-muva-ivory/95 px-3 py-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
           {sculpture.inventoryNumber ?? "MUVA"}

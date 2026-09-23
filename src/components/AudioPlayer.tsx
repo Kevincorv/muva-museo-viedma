@@ -19,7 +19,7 @@ export default function AudioPlayer({ src, compact = false }: AudioPlayerProps) 
   const { locale } = useLanguage();
   const { state, toggle, seek } = useAudioPlayer(src);
 
-  if (!src) return null;
+  if (!src || state.hasError) return null;
 
   if (compact) {
     return (

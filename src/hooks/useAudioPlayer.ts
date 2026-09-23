@@ -5,6 +5,7 @@ export interface AudioPlayerState {
   isLoading: boolean;
   currentTime: number;
   duration: number;
+  hasError: boolean;
 }
 
 export function useAudioPlayer(src: string | undefined) {
@@ -14,12 +15,13 @@ export function useAudioPlayer(src: string | undefined) {
     isLoading: false,
     currentTime: 0,
     duration: 0,
+    hasError: false,
   });
 
   useEffect(() => {
     if (!src) return;
     const audio = new Audio();
-    audio.preload = "metadata";
+    audio.preload = "none";
     audio.src = src;
     audioRef.current = audio;
 
@@ -39,20 +41,31 @@ export function useAudioPlayer(src: string | undefined) {
     const onCanPlay = () => {
       setState((s) => ({ ...s, isLoading: false }));
     };
+    const onError = () => {
+      setState((s) => ({
+        ...s,
+        isLoading: false,
+        isPlaying: false,
+        hasError: true,
+      }));
+    };
 
     audio.addEventListener("loadedmetadata", onLoadedMetadata);
     audio.addEventListener("timeupdate", onTimeUpdate);
     audio.addEventListener("ended", onEnded);
     audio.addEventListener("waiting", onWaiting);
     audio.addEventListener("canplay", onCanPlay);
+    audio.addEventListener("error", onError);
 
     return () => {
       audio.pause();
+      audio.removeAttribute("src");
       audio.removeEventListener("loadedmetadata", onLoadedMetadata);
       audio.removeEventListener("timeupdate", onTimeUpdate);
       audio.removeEventListener("ended", onEnded);
       audio.removeEventListener("waiting", onWaiting);
       audio.removeEventListener("canplay", onCanPlay);
+      audio.removeEventListener("error", onError);
       audioRef.current = null;
     };
   }, [src]);
@@ -60,9 +73,12 @@ export function useAudioPlayer(src: string | undefined) {
   const play = useCallback(() => {
     const audio = audioRef.current;
     if (!audio) return;
+    setState((s) => ({ ...s, isLoading: true, hasError: false }));
     audio.play().then(() => {
-      setState((s) => ({ ...s, isPlaying: true }));
-    }).catch(() => {});
+      setState((s) => ({ ...s, isPlaying: true, isLoading: false }));
+    }).catch(() => {
+      setState((s) => ({ ...s, isLoading: false, hasError: true }));
+    });
   }, []);
 
   const pause = useCallback(() => {

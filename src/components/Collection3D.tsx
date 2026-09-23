@@ -8,13 +8,8 @@ import {
   Component,
   type ReactNode,
 } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import {
-  ContactShadows,
-  Environment,
-  OrbitControls,
-  useGLTF,
-} from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import {
   Loader2,
   RotateCcw,
@@ -31,8 +26,6 @@ import { t } from "../i18n/translations";
 import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
-
-sculptures.forEach((s) => useGLTF.preload(s.model));
 
 class ModelErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
@@ -70,8 +63,8 @@ function EmbeddedModel({
     c.traverse((obj) => {
       if ((obj as THREE.Mesh).isMesh) {
         const mesh = obj as THREE.Mesh;
-        mesh.castShadow = true;
-        mesh.receiveShadow = true;
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
       }
     });
     return c;
@@ -96,13 +89,11 @@ function EmbeddedModel({
     onLoaded();
   }, [cloned, onLoaded]);
 
-  useFrame(({ invalidate }) => {
-    if (ref.current) {
-      ref.current.position.y =
-        Math.sin(Date.now() * 0.0008) * 0.015;
-      invalidate();
-    }
-  });
+  useEffect(() => {
+    return () => {
+      useGLTF.clear(url);
+    };
+  }, [url]);
 
   return (
     <group ref={ref}>
@@ -131,32 +122,28 @@ export function SculptureCanvas({
     <div className={`relative w-full overflow-hidden rounded-sm bg-muva-dark ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
       <Canvas
         frameloop="demand"
-        shadows
-        dpr={[1, 1.2]}
+        dpr={[1, 1]}
         camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
         gl={{
-          antialias: true,
+          antialias: false,
           alpha: false,
-          powerPreference: "high-performance",
+          powerPreference: "default",
           stencil: false,
+          depth: true,
         }}
         onCreated={({ gl, scene }) => {
           gl.setClearColor(new THREE.Color(MUVA_BG));
           scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
-          gl.shadowMap.enabled = true;
-          gl.shadowMap.type = THREE.PCFSoftShadowMap;
         }}
       >
         <color attach="background" args={[MUVA_BG]} />
         <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-        <ambientLight intensity={0.35} color="#e8dcc4" />
+        <ambientLight intensity={0.6} color="#e8dcc4" />
         <directionalLight
           position={[5, 6, 5]}
           intensity={1.1}
           color="#f5ecda"
-          castShadow
-          shadow-mapSize={[512, 512]}
         />
         <directionalLight
           position={[-4, 3, -3]}
@@ -170,15 +157,6 @@ export function SculptureCanvas({
               url={modelUrl}
               onLoaded={handleLoaded}
             />
-            <ContactShadows
-              position={[0, -1.2, 0]}
-              opacity={0.5}
-              scale={8}
-              blur={2.5}
-              far={4}
-              color="#1a1410"
-            />
-            <Environment preset="apartment" />
           </ModelErrorBoundary>
         </Suspense>
 
@@ -305,6 +283,24 @@ export function ThumbnailFallback({
   );
 }
 
+function useNearViewport<T extends HTMLElement>(
+  ref: React.RefObject<T | null>,
+  rootMargin = "100px"
+) {
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) => setNear(entry.isIntersecting),
+      { rootMargin, threshold: 0 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [ref, rootMargin]);
+  return near;
+}
+
 function SculptureCard({
   sculpture,
   index,
@@ -315,24 +311,8 @@ function SculptureCard({
   const [modelError, setModelError] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const [canvasVisible, setCanvasVisible] = useState(false);
+  const near = useNearViewport(canvasContainerRef, "80px 0px");
   const { locale } = useLanguage();
-
-  useEffect(() => {
-    const el = canvasContainerRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setCanvasVisible(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
 
   return (
     <article
@@ -342,21 +322,35 @@ function SculptureCard({
       }`}
     >
       <div ref={canvasContainerRef}>
-        {!modelError ? (
-          canvasVisible ? (
-            <SculptureCanvas
-              modelUrl={sculpture.model}
-              onError={() => setModelError(true)}
-            />
-          ) : (
-            <div className="relative w-full aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-sm bg-muva-dark flex items-center justify-center">
-              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/40">
-                {t("collection3d.cargando", locale)}
-              </div>
-            </div>
-          )
-        ) : (
+        {modelError ? (
           <ThumbnailFallback sculpture={sculpture} />
+        ) : near ? (
+          <SculptureCanvas
+            modelUrl={sculpture.model}
+            onError={() => setModelError(true)}
+          />
+        ) : (
+          <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-sm bg-muva-dark flex items-center justify-center">
+            <img
+              src={sculpture.thumbnail}
+              alt=""
+              className="absolute inset-0 h-full w-full object-cover opacity-40"
+              loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(150deg, rgba(201,184,154,0.25) 0%, rgba(42,32,24,0.9) 100%)",
+              }}
+            />
+            <p className="relative px-4 text-center font-serif text-xl text-muva-cream">
+              {sculpture.getTitle(locale)}
+            </p>
+          </div>
         )}
       </div>
 
