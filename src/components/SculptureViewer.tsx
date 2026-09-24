@@ -1,11 +1,12 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
-import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2, Box } from "lucide-react";
 import * as THREE from "three";
 import { sculptures } from "../data/sculptures";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import { hasWebGL, isConstrainedDevice, isSlowConnection } from "../lib/capabilities";
 import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
@@ -30,8 +31,28 @@ class ErrorBoundary extends Component<
   }
 }
 
+class CanvasErrorBoundary extends Component<
+  { children: ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; onError: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
 function SculptureModel({ url, onLoaded }: { url: string; onLoaded: () => void }) {
-  const { scene } = useGLTF(url);
+  const { scene } = useGLTF(url, "/draco/");
   const ref = useRef<THREE.Group>(null);
 
   const cloned = useMemo(() => {
@@ -60,11 +81,12 @@ function SculptureModel({ url, onLoaded }: { url: string; onLoaded: () => void }
     onLoaded();
   }, [cloned, onLoaded]);
 
+  const animate = !isConstrainedDevice();
+
   useFrame(({ invalidate }) => {
-    if (ref.current) {
-      ref.current.position.y = Math.sin(Date.now() * 0.0008) * 0.02;
-      invalidate();
-    }
+    if (!animate || !ref.current) return;
+    ref.current.position.y = Math.sin(Date.now() * 0.0008) * 0.02;
+    invalidate();
   });
 
   return (
@@ -104,20 +126,32 @@ export default function SculptureViewer() {
   const [closing, setClosing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [userStart, setUserStart] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<any>(null);
   const { locale } = useLanguage();
 
   const sculpture = activeId ? sculptures.find((s) => s.id === activeId) : null;
+  const lightMode = isConstrainedDevice();
+  const webglAvailable = hasWebGL();
+  const slowConnection = isSlowConnection();
+  const pendingConfirm = slowConnection && !userStart;
+  const showCanvas =
+    webglAvailable && !pendingConfirm && !error && !!sculpture;
 
   useEffect(() => {
     const handler = (e: Event) => {
       const id = (e as CustomEvent<{ id: string }>).detail.id;
       setActiveId(id);
-      setError(false);
-      setLoading(true);
+      const slow = isSlowConnection();
+      const ok = hasWebGL();
+      setUserStart(!slow);
+      setError(!ok);
+      setLoading(ok && !slow);
       setClosing(false);
+      setRetryKey((k) => k + 1);
     };
     window.addEventListener("muva:open-sculpture", handler);
     return () => window.removeEventListener("muva:open-sculpture", handler);
@@ -144,6 +178,7 @@ export default function SculptureViewer() {
       setClosing(false);
       setError(false);
       setLoading(false);
+      setUserStart(false);
     }, 400);
   };
 
@@ -192,75 +227,128 @@ export default function SculptureViewer() {
         className="relative z-10 flex h-full w-full flex-col"
       >
         <div className="relative flex-1 overflow-hidden">
-          <Canvas
-            frameloop="demand"
-            shadows
-            dpr={[1, 1.8]}
-            camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
-            gl={{ antialias: true, preserveDrawingBuffer: false, alpha: false }}
-            onCreated={({ gl, scene }) => {
-              gl.setClearColor(new THREE.Color(MUVA_BG));
-              scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
-            }}
-          >
-            <color attach="background" args={[MUVA_BG]} />
-            <fog attach="fog" args={[MUVA_BG, 8, 18]} />
+          {showCanvas && (
+            <CanvasErrorBoundary
+              key={`outer-${retryKey}`}
+              onError={() => {
+                setError(true);
+                setLoading(false);
+              }}
+            >
+              <Canvas
+                key={`canvas-${retryKey}`}
+                frameloop="demand"
+                shadows={!lightMode}
+                dpr={lightMode ? [1, 1] : [1, 1.5]}
+                camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
+                gl={{
+                  antialias: !lightMode,
+                  preserveDrawingBuffer: false,
+                  alpha: false,
+                  powerPreference: lightMode ? "low-power" : "high-performance",
+                }}
+                onCreated={({ gl, scene }) => {
+                  gl.setClearColor(new THREE.Color(MUVA_BG));
+                  scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
+                  gl.domElement.addEventListener(
+                    "webglcontextlost",
+                    (e: Event) => {
+                      e.preventDefault();
+                      setError(true);
+                      setLoading(false);
+                    },
+                    false
+                  );
+                }}
+              >
+                <color attach="background" args={[MUVA_BG]} />
+                <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-            <ambientLight intensity={0.35} color="#e8dcc4" />
-            <directionalLight
-              position={[5, 6, 5]}
-              intensity={1.1}
-              color="#f5ecda"
-              castShadow
-              shadow-mapSize={[1024, 1024]}
-            />
-            <directionalLight
-              position={[-4, 3, -3]}
-              intensity={0.4}
-              color="#c9b89a"
-            />
-            <spotLight
-              position={[0, 6, 0]}
-              angle={0.6}
-              penumbra={0.7}
-              intensity={0.8}
-              color="#fdfaf3"
-            />
-            <hemisphereLight
-              color="#f5ecda"
-              groundColor="#3d2f22"
-              intensity={0.5}
-            />
-
-            <Suspense fallback={null}>
-              <ErrorBoundary onError={() => setError(true)}>
-                <SculptureModel
-                  url={sculpture.model}
-                  onLoaded={() => setLoading(false)}
+                <ambientLight intensity={0.35} color="#e8dcc4" />
+                <directionalLight
+                  position={[5, 6, 5]}
+                  intensity={1.1}
+                  color="#f5ecda"
+                  castShadow={!lightMode}
+                  shadow-mapSize={[1024, 1024]}
                 />
-                <ContactShadows
-                  position={[0, -1.2, 0]}
-                  opacity={0.5}
-                  scale={8}
-                  blur={2.5}
-                  far={4}
-                  color="#1a1410"
+                <directionalLight
+                  position={[-4, 3, -3]}
+                  intensity={0.4}
+                  color="#c9b89a"
                 />
-              </ErrorBoundary>
-            </Suspense>
+                <spotLight
+                  position={[0, 6, 0]}
+                  angle={0.6}
+                  penumbra={0.7}
+                  intensity={0.8}
+                  color="#fdfaf3"
+                />
+                <hemisphereLight
+                  color="#f5ecda"
+                  groundColor="#3d2f22"
+                  intensity={0.5}
+                />
 
-            <OrbitControls
-              ref={orbitRef}
-              enableDamping
-              dampingFactor={0.08}
-              enablePan={false}
-              minDistance={2}
-              maxDistance={9}
-              autoRotate={false}
-              makeDefault
-            />
-            <CameraController orbitRef={orbitRef} />
-          </Canvas>
+                <Suspense fallback={null}>
+                  <ErrorBoundary
+                    key={`model-${retryKey}`}
+                    onError={() => {
+                      setError(true);
+                      setLoading(false);
+                    }}
+                  >
+                    <SculptureModel
+                      url={sculpture.model}
+                      onLoaded={() => setLoading(false)}
+                    />
+                    {!lightMode && (
+                      <ContactShadows
+                        position={[0, -1.2, 0]}
+                        opacity={0.5}
+                        scale={8}
+                        blur={2.5}
+                        far={4}
+                        color="#1a1410"
+                      />
+                    )}
+                  </ErrorBoundary>
+                </Suspense>
+
+                <OrbitControls
+                  ref={orbitRef}
+                  enableDamping
+                  dampingFactor={0.08}
+                  enablePan={false}
+                  minDistance={2}
+                  maxDistance={9}
+                  autoRotate={false}
+                  makeDefault
+                />
+                <CameraController orbitRef={orbitRef} />
+              </Canvas>
+            </CanvasErrorBoundary>
+          )}
+
+          {pendingConfirm && !error && (
+            <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-muva-dark p-6 text-center">
+              <Box size={36} className="text-muva-sand" strokeWidth={1.3} />
+              <p className="mt-6 max-w-md font-serif text-xl text-muva-cream">
+                {t("viewer.slowHint", locale)}
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setUserStart(true);
+                  setLoading(true);
+                }}
+                className="mt-8 inline-flex items-center gap-2 border border-muva-cream/40 px-6 py-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-cream transition-colors duration-300 hover:border-muva-cream hover:bg-muva-cream/10"
+              >
+                <Loader2 size={14} />
+                {t("viewer.loadModel", locale)}
+              </button>
+            </div>
+          )}
 
           {loading && !error && (
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center bg-muva-dark/40 backdrop-blur-[2px]">
@@ -289,6 +377,7 @@ export default function SculptureViewer() {
               <button
                 type="button"
                 onClick={() => {
+                  setRetryKey((k) => k + 1);
                   setError(false);
                   setLoading(true);
                 }}

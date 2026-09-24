@@ -31,7 +31,10 @@ export default function LoadingScreen() {
   return (
     <div
       className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-muva-dark text-muva-cream transition-opacity duration-700"
-      style={{ opacity: progress < 100 ? 1 : 0 }}
+      style={{
+        opacity: progress < 100 ? 1 : 0,
+        pointerEvents: progress < 100 ? "auto" : "none",
+      }}
     >
       <div className="text-[10px] font-sans uppercase tracking-ultra-wide text-muva-sand/70">
         {t("loading.museo", locale)}

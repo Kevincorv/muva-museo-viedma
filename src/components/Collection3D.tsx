@@ -21,13 +21,37 @@ import {
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
+import { useNearViewport } from "../hooks/useNearViewport";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import { shouldUseStatic3D } from "../lib/capabilities";
+import { useWebGLSlot } from "../lib/webglSlots";
 import AudioPlayer from "./AudioPlayer";
+import SculptureStaticTile from "./SculptureStaticTile";
 
 const MUVA_BG = "#2a2018";
 
 class ModelErrorBoundary extends Component<
+  { children: ReactNode; onError: () => void },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; onError: () => void }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch() {
+    this.props.onError();
+  }
+  render() {
+    if (this.state.hasError) return null;
+    return this.props.children;
+  }
+}
+
+class CanvasErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { hasError: boolean }
 > {
@@ -54,7 +78,7 @@ function EmbeddedModel({
   url: string;
   onLoaded: () => void;
 }) {
-  const { scene } = useGLTF(url);
+  const { scene } = useGLTF(url, "/draco/");
   const ref = useRef<THREE.Group>(null);
   const loadedRef = useRef(false);
 
@@ -120,58 +144,68 @@ export function SculptureCanvas({
 
   return (
     <div className={`relative w-full overflow-hidden rounded-sm bg-muva-dark ${compact ? "aspect-square" : "aspect-[4/5] md:aspect-[3/4]"}`}>
-      <Canvas
-        frameloop="demand"
-        dpr={[1, 1]}
-        camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
-        gl={{
-          antialias: false,
-          alpha: false,
-          powerPreference: "default",
-          stencil: false,
-          depth: true,
-        }}
-        onCreated={({ gl, scene }) => {
-          gl.setClearColor(new THREE.Color(MUVA_BG));
-          scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
-        }}
-      >
-        <color attach="background" args={[MUVA_BG]} />
-        <fog attach="fog" args={[MUVA_BG, 8, 18]} />
+      <CanvasErrorBoundary onError={onError}>
+        <Canvas
+          frameloop="demand"
+          dpr={[1, 1]}
+          camera={{ position: [3.5, 2.2, 4.5], fov: 38 }}
+          gl={{
+            antialias: false,
+            alpha: false,
+            powerPreference: "default",
+            stencil: false,
+            depth: true,
+          }}
+          onCreated={({ gl, scene }) => {
+            gl.setClearColor(new THREE.Color(MUVA_BG));
+            scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
+            gl.domElement.addEventListener(
+              "webglcontextlost",
+              (e: Event) => {
+                e.preventDefault();
+                onError();
+              },
+              false
+            );
+          }}
+        >
+          <color attach="background" args={[MUVA_BG]} />
+          <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-        <ambientLight intensity={0.6} color="#e8dcc4" />
-        <directionalLight
-          position={[5, 6, 5]}
-          intensity={1.1}
-          color="#f5ecda"
-        />
-        <directionalLight
-          position={[-4, 3, -3]}
-          intensity={0.4}
-          color="#c9b89a"
-        />
+          <ambientLight intensity={0.6} color="#e8dcc4" />
+          <directionalLight
+            position={[5, 6, 5]}
+            intensity={1.1}
+            color="#f5ecda"
+          />
+          <directionalLight
+            position={[-4, 3, -3]}
+            intensity={0.4}
+            color="#c9b89a"
+          />
 
-        <Suspense fallback={null}>
-          <ModelErrorBoundary onError={onError}>
-            <EmbeddedModel
-              url={modelUrl}
-              onLoaded={handleLoaded}
-            />
-          </ModelErrorBoundary>
-        </Suspense>
+          <Suspense fallback={null}>
+            <ModelErrorBoundary onError={onError}>
+              <EmbeddedModel
+                url={modelUrl}
+                onLoaded={handleLoaded}
+              />
+            </ModelErrorBoundary>
+          </Suspense>
 
-        <OrbitControls
-          ref={orbitRef}
-          enableDamping
-          dampingFactor={0.08}
-          enablePan={true}
-          panSpeed={0.5}
-          minDistance={0.3}
-          maxDistance={12}
-          autoRotate={false}
-          makeDefault
-        />
-      </Canvas>
+          <OrbitControls
+            ref={orbitRef}
+            enableDamping
+            dampingFactor={0.08}
+            enablePan={true}
+            panSpeed={0.5}
+            minDistance={0.3}
+            maxDistance={12}
+            autoRotate={false}
+            makeDefault
+          />
+        </Canvas>
+      </CanvasErrorBoundary>
 
       {loading && (
         <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-muva-dark/40 backdrop-blur-[2px]">
@@ -283,24 +317,6 @@ export function ThumbnailFallback({
   );
 }
 
-function useNearViewport<T extends HTMLElement>(
-  ref: React.RefObject<T | null>,
-  rootMargin = "100px"
-) {
-  const [near, setNear] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([entry]) => setNear(entry.isIntersecting),
-      { rootMargin, threshold: 0 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, [ref, rootMargin]);
-  return near;
-}
-
 function SculptureCard({
   sculpture,
   index,
@@ -311,7 +327,10 @@ function SculptureCard({
   const [modelError, setModelError] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
-  const near = useNearViewport(canvasContainerRef, "80px 0px");
+  const staticMode = shouldUseStatic3D();
+  const wantCanvas = !staticMode && !modelError;
+  const near = useNearViewport(canvasContainerRef, "80px 0px", wantCanvas);
+  const hasSlot = useWebGLSlot(near && wantCanvas);
   const { locale } = useLanguage();
 
   return (
@@ -322,35 +341,17 @@ function SculptureCard({
       }`}
     >
       <div ref={canvasContainerRef}>
-        {modelError ? (
-          <ThumbnailFallback sculpture={sculpture} />
-        ) : near ? (
+        {hasSlot ? (
           <SculptureCanvas
             modelUrl={sculpture.model}
             onError={() => setModelError(true)}
           />
         ) : (
-          <div className="relative aspect-[4/5] md:aspect-[3/4] overflow-hidden rounded-sm bg-muva-dark flex items-center justify-center">
-            <img
-              src={sculpture.thumbnail}
-              alt=""
-              className="absolute inset-0 h-full w-full object-cover opacity-40"
-              loading="lazy"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).style.display = "none";
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "linear-gradient(150deg, rgba(201,184,154,0.25) 0%, rgba(42,32,24,0.9) 100%)",
-              }}
-            />
-            <p className="relative px-4 text-center font-serif text-xl text-muva-cream">
-              {sculpture.getTitle(locale)}
-            </p>
-          </div>
+          <SculptureStaticTile
+            sculpture={sculpture}
+            reason={modelError ? "error" : undefined}
+            showCta={!modelError}
+          />
         )}
       </div>
 

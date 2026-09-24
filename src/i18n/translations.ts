@@ -75,6 +75,7 @@ const es: TranslationKeys = {
   "collection3d.pieza": "Pieza ·",
   "collection3d.soloGLB": "Solo se aceptan archivos .glb",
   "collection3d.ariaSection": "Colección 3D",
+  "collection3d.ver3d": "Ver en 3D",
 
   "experience.eyebrow": "Experiencia",
   "experience.heading": "Una historia que sigue viva",
@@ -174,6 +175,9 @@ const es: TranslationKeys = {
   "viewer.labelMaterial": "Material",
   "viewer.labelDimensions": "Dimensiones",
   "viewer.labelYear": "Año",
+  "viewer.loadModel": "Cargar modelo 3D",
+  "viewer.slowHint":
+    "Estás en una conexión lenta o con ahorro de datos. El modelo 3D pesa varios megabytes; podés cargarlo cuando quieras.",
 
   "audio.play": "Reproducir",
   "audio.pause": "Pausar",
@@ -322,6 +326,7 @@ const en: TranslationKeys = {
   "collection3d.pieza": "Piece ·",
   "collection3d.soloGLB": "Only .glb files are accepted",
   "collection3d.ariaSection": "3D Collection",
+  "collection3d.ver3d": "View in 3D",
 
   "experience.eyebrow": "Experience",
   "experience.heading": "A story that lives on",
@@ -421,6 +426,9 @@ const en: TranslationKeys = {
   "viewer.labelMaterial": "Material",
   "viewer.labelDimensions": "Dimensions",
   "viewer.labelYear": "Year",
+  "viewer.loadModel": "Load 3D model",
+  "viewer.slowHint":
+    "You are on a slow connection or data saver mode. The 3D model weighs several megabytes; you can load it whenever you want.",
 
   "audio.play": "Play",
   "audio.pause": "Pause",
@@ -568,6 +576,7 @@ const pt: TranslationKeys = {
   "collection3d.pieza": "Peça ·",
   "collection3d.soloGLB": "Apenas arquivos .glb são aceitos",
   "collection3d.ariaSection": "Coleção 3D",
+  "collection3d.ver3d": "Ver em 3D",
 
   "experience.eyebrow": "Experiência",
   "experience.heading": "Uma história que continua viva",
@@ -667,6 +676,9 @@ const pt: TranslationKeys = {
   "viewer.labelMaterial": "Material",
   "viewer.labelDimensions": "Dimensões",
   "viewer.labelYear": "Ano",
+  "viewer.loadModel": "Carregar modelo 3D",
+  "viewer.slowHint":
+    "Você está em uma conexão lenta ou com economia de dados. O modelo 3D pesa vários megabytes; você pode carregá-lo quando quiser.",
 
   "audio.play": "Reproduzir",
   "audio.pause": "Pausar",

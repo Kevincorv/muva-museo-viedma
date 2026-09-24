@@ -16,13 +16,22 @@ const LanguageContext = createContext<LanguageContextType>({
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>(() => {
-    const saved = localStorage.getItem("muva-lang");
-    return (saved as Locale) || "es";
+    try {
+      const saved = localStorage.getItem("muva-lang");
+      if (saved === "es" || saved === "en" || saved === "pt") return saved;
+    } catch {
+      // localStorage bloqueado (modo privado, storage deshabilitado)
+    }
+    return "es";
   });
 
   const setLocale = (l: Locale) => {
     setLocaleState(l);
-    localStorage.setItem("muva-lang", l);
+    try {
+      localStorage.setItem("muva-lang", l);
+    } catch {
+      // sin storage disponible: el idioma solo vive en memoria
+    }
     document.documentElement.lang = l;
   };
 

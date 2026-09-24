@@ -1,9 +1,15 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import legacy from "@vitejs/plugin-legacy";
 import path from "node:path";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    legacy({
+      targets: ["defaults", "not dead", "chrome >= 40", "android >= 4.4", "safari >= 9", "ios >= 9", "firefox >= 40"],
+    }),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
@@ -13,15 +19,5 @@ export default defineConfig({
     port: 5173,
     open: true,
   },
-  build: {
-    target: "es2020",
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          three: ["three"],
-          fiber: ["@react-three/fiber", "@react-three/drei"],
-        },
-      },
-    },
-  },
+  build: {},
 });
