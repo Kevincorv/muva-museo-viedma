@@ -260,6 +260,9 @@ const es: TranslationKeys = {
   "sculpture.obra12.desc": "Fray Luis de Bolaños fue un religioso franciscano cuya labor tuvo especial importancia en la evangelización de las comunidades guaraníes. Los documentos del museo destacan su actividad en las zonas de Caazapá y Villarrica y su contribución a la transmisión de las enseñanzas cristianas en guaraní.\n\nSu figura recuerda la importancia de la lengua en la enseñanza religiosa y en la comunicación entre los misioneros y las comunidades locales. En el conjunto, representa la relación entre fe, aprendizaje y transmisión de conocimientos.",
   "sculpture.obra12.icono": "Pendiente de confirmar la identificación: la figura que provisionalmente asociamos con Fray Luis de Bolaños viste un hábito largo, ceñido por un cordón, y una capa corta sobre los hombros. Sostiene un libro cerrado con la mano izquierda. Este elemento puede relacionarse con la enseñanza y con su labor de difusión del catecismo en guaraní, aunque la inscripción del libro debe verificarse antes de identificar su contenido.",
 
+  "sculpture.obra13.title": "La Pasionaria y San Ignacio",
+  "sculpture.obra13.desc": "Obra que fusiona la simbología de la Pasionaria o Mburukuja con la espiritualidad de San Ignacio, representando el encuentro entre la naturaleza misionera y la fe jesuítica.",
+
   "museum.mission": "Somos un espacio que busca, con una mirada abierta, reflexiva y contemporánea, hacer presente el legado de uno de los eventos más importantes en la historia de la humanidad: el encuentro guaraní – jesuítico, exhibido a la comunidad desde una perspectiva histórica, con un enfoque artístico, académico y espiritual.",
   "museum.fullName": "Museo Viedma",
   "museum.tagline": "Experiencia Guaraní – Jesuítica",
@@ -550,6 +553,9 @@ const en: TranslationKeys = {
   "sculpture.obra12.desc": "Fray Luis de Bolaños was a Franciscan friar whose work was especially important in the evangelisation of Guaraní communities. The museum's documents highlight his activity in the areas of Caazapá and Villarrica and his contribution to the transmission of Christian teachings in Guaraní.\n\nHis figure recalls the importance of language in religious teaching and in the communication between missionaries and local communities. Within the group, he represents the relationship between faith, learning and the transmission of knowledge.",
   "sculpture.obra12.icono": "Identification still to be confirmed: the figure we provisionally associate with Fray Luis de Bolaños wears a long habit belted with a cord and a short cape over the shoulders. He holds a closed book in his left hand. This element may be related to teaching and to his work spreading the catechism in Guaraní, although the inscription on the book must be verified before its content can be identified.",
 
+  "sculpture.obra13.title": "The Passionflower and Saint Ignatius",
+  "sculpture.obra13.desc": "A work that merges the symbolism of the Passionflower or Mburukuja with the spirituality of Saint Ignatius, representing the encounter between missionary nature and Jesuit faith.",
+
   "museum.mission": "We are a space that seeks, with an open, reflective, and contemporary perspective, to present the legacy of one of the most important events in human history: the Guaraní–Jesuit encounter, exhibited to the community from a historical perspective, with an artistic, academic, and spiritual approach.",
   "museum.fullName": "Viedma Museum",
   "museum.tagline": "Guaraní – Jesuit Experience",
@@ -839,6 +845,9 @@ const pt: TranslationKeys = {
   "sculpture.obra12.sub": "Missionário franciscano vinculado à evangelização em língua guarani",
   "sculpture.obra12.desc": "Frei Luís de Bolaños foi um religioso franciscano cuja labor teve especial importância na evangelização das comunidades guaranis. Os documentos do museu destacam sua atividade nas zonas de Caazapá e Villarrica e sua contribuição à transmissão dos ensinamentos cristãos em guarani.\n\nSua figura recorda a importância da língua no ensino religioso e na comunicação entre os missionários e as comunidades locais. No conjunto, representa a relação entre fé, aprendizagem e transmissão de conhecimentos.",
   "sculpture.obra12.icono": "Pendente de confirmar a identificação: a figura que provisoriamente associamos com Frei Luís de Bolaños veste um hábito longo, cingido por um cordão, e uma capa curta sobre os ombros. Sustenta um livro fechado com a mão esquerda. Este elemento pode relacionar-se com o ensino e com sua labor de difusão do catecismo em guarani, embora a inscrição do livro deva ser verificada antes de identificar seu conteúdo.",
+
+  "sculpture.obra13.title": "A Pasionária e São Ignácio",
+  "sculpture.obra13.desc": "Obra que funde a simbologia da Pasionária ou Mburukuja com a espiritualidade de São Ignácio, representando o encontro entre a natureza missionária e a fé jesuíta.",
 
   "museum.mission": "Somos um espaço que busca, com uma visão aberta, reflexiva e contemporânea, fazer presente o legado de um dos eventos mais importantes da história da humanidade: o encontro guarani–jesuíta, exibido à comunidade de uma perspectiva histórica, com um enfoque artístico, acadêmico e espiritual.",
   "museum.fullName": "Museu Viedma",

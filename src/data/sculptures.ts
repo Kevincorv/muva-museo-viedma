@@ -221,4 +221,14 @@ export const sculptures: Sculpture[] = [
     getDescription: (locale) => t("sculpture.obra12.desc", locale),
     getIconografia: (locale) => t("sculpture.obra12.icono", locale),
   },
+  {
+    id: "obra-13",
+    titleKey: "sculpture.obra13.title",
+    artist: "Manuel Viedma",
+    descriptionKey: "sculpture.obra13.desc",
+    thumbnail: "/images/sculptures/obra-13.webp",
+    model: "/models/sculptures/prueba.glb",
+    getTitle: (locale) => t("sculpture.obra13.title", locale),
+    getDescription: (locale) => t("sculpture.obra13.desc", locale),
+  },
 ];
