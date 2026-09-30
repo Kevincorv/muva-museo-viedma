@@ -19,6 +19,13 @@ export function useAudioPlayer(src: string | undefined) {
   });
 
   useEffect(() => {
+    setState({
+      isPlaying: false,
+      isLoading: false,
+      currentTime: 0,
+      duration: 0,
+      hasError: false,
+    });
     if (!src) return;
     const audio = new Audio();
     audio.preload = "none";

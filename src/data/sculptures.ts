@@ -50,6 +50,12 @@ export interface Sculpture {
  * `material` / `dimensions` se mantienen en español para el visor; las
  * tarjetas usan `materialKey` / `dimensionsKey` para traducir.
  */
+export const PASIONARIA_AUDIO: SculptureAudio = {
+  es: "/audio/sculptures/obra-13-es.mp3",
+  en: "/audio/sculptures/obra-13-en.mp3",
+  pt: "/audio/sculptures/obra-13-pt.mp3",
+};
+
 export const sculptures: Sculpture[] = [
   {
     id: "obra-01",
@@ -228,7 +234,9 @@ export const sculptures: Sculpture[] = [
     descriptionKey: "sculpture.obra13.desc",
     thumbnail: "/images/sculptures/obra-13.webp",
     model: "/models/sculptures/prueba.glb",
+    audio: PASIONARIA_AUDIO,
     getTitle: (locale) => t("sculpture.obra13.title", locale),
     getDescription: (locale) => t("sculpture.obra13.desc", locale),
+    getAudio: (locale) => PASIONARIA_AUDIO[locale] ?? PASIONARIA_AUDIO.es,
   },
 ];
