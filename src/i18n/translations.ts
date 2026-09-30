@@ -197,6 +197,8 @@ const es: TranslationKeys = {
   "sculpture.material.piedraTalladaCorta": "Piedra tallada",
   "sculpture.dimensions.altura11": "11 metros de altura",
   "collection3d.proximamente": "Modelo 3D próximamente",
+  "collection3d.verMas": "Ver más…",
+  "collection3d.verMenos": "Ver menos",
 
   "sculpture.obra01.title": "La Sagrada Familia",
   "sculpture.obra01.sub": "San José y la Virgen María, Custodios del Salvador",
@@ -485,6 +487,8 @@ const en: TranslationKeys = {
   "sculpture.material.piedraTalladaCorta": "Carved stone",
   "sculpture.dimensions.altura11": "11 metres high",
   "collection3d.proximamente": "3D model coming soon",
+  "collection3d.verMas": "Read more…",
+  "collection3d.verMenos": "Read less",
 
   "sculpture.obra01.title": "The Holy Family",
   "sculpture.obra01.sub": "Saint Joseph and the Virgin Mary, Custodians of the Saviour",
@@ -773,6 +777,8 @@ const pt: TranslationKeys = {
   "sculpture.material.piedraTalladaCorta": "Pedra talhada",
   "sculpture.dimensions.altura11": "11 metros de altura",
   "collection3d.proximamente": "Modelo 3D em breve",
+  "collection3d.verMas": "Ver mais…",
+  "collection3d.verMenos": "Ver menos",
 
   "sculpture.obra01.title": "A Sagrada Família",
   "sculpture.obra01.sub": "São José e a Virgem Maria, Custódios do Salvador",

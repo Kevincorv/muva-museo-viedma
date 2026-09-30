@@ -17,6 +17,7 @@ import {
   ZoomOut,
   Move,
   AlertCircle,
+  ChevronDown,
 } from "lucide-react";
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
@@ -332,6 +333,7 @@ function SculptureCard({
   index: number;
 }) {
   const [modelError, setModelError] = useState(false);
+  const [showHistoria, setShowHistoria] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const staticMode = shouldUseStatic3D();
@@ -403,22 +405,42 @@ function SculptureCard({
           </div>
         )}
         <div className="mt-4 space-y-4 text-sm text-muva-brown text-pretty">
-          <div>
-            <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-              {t("sculpture.labelHistoria", locale)}
-            </div>
-            {historia.map((paragraph, i) => (
-              <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
-                {paragraph}
-              </p>
-            ))}
-          </div>
           {iconografia.length > 0 && (
             <div>
               <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
                 {t("sculpture.labelIconografia", locale)}
               </div>
               {iconografia.map((paragraph, i) => (
+                <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          )}
+          {iconografia.length > 0 && (
+            <button
+              type="button"
+              onClick={() => setShowHistoria((v) => !v)}
+              aria-expanded={showHistoria}
+              className="group inline-flex items-center gap-1.5 self-start border-b border-muva-sand/60 pb-1 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth transition-colors duration-300 hover:border-muva-dark hover:text-muva-dark"
+            >
+              {showHistoria
+                ? t("collection3d.verMenos", locale)
+                : t("collection3d.verMas", locale)}
+              <ChevronDown
+                size={12}
+                className={`transition-transform duration-300 ${
+                  showHistoria ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+          )}
+          {(showHistoria || iconografia.length === 0) && (
+            <div>
+              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                {t("sculpture.labelHistoria", locale)}
+              </div>
+              {historia.map((paragraph, i) => (
                 <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
                   {paragraph}
                 </p>
