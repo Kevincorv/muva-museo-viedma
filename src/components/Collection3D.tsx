@@ -31,6 +31,13 @@ import SculptureStaticTile from "./SculptureStaticTile";
 
 const MUVA_BG = "#2a2018";
 
+function toParagraphs(text: string): string[] {
+  return text
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean);
+}
+
 class ModelErrorBoundary extends Component<
   { children: ReactNode; onError: () => void },
   { hasError: boolean }
@@ -328,10 +335,23 @@ function SculptureCard({
   const reveal = useScrollReveal<HTMLDivElement>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const staticMode = shouldUseStatic3D();
-  const wantCanvas = !staticMode && !modelError;
+  const hasModel = Boolean(sculpture.model);
+  const wantCanvas = hasModel && !staticMode && !modelError;
   const near = useNearViewport(canvasContainerRef, "80px 0px", wantCanvas);
   const hasSlot = useWebGLSlot(near && wantCanvas);
   const { locale } = useLanguage();
+
+  const subtitle = sculpture.getSubtitle?.(locale);
+  const material = sculpture.materialKey
+    ? t(sculpture.materialKey, locale)
+    : sculpture.material;
+  const dimensions = sculpture.dimensionsKey
+    ? t(sculpture.dimensionsKey, locale)
+    : sculpture.dimensions;
+  const historia = toParagraphs(sculpture.getDescription(locale));
+  const iconografia = sculpture.getIconografia
+    ? toParagraphs(sculpture.getIconografia(locale))
+    : [];
 
   return (
     <article
@@ -341,7 +361,7 @@ function SculptureCard({
       }`}
     >
       <div ref={canvasContainerRef}>
-        {hasSlot ? (
+        {hasModel && hasSlot ? (
           <SculptureCanvas
             modelUrl={sculpture.model}
             onError={() => setModelError(true)}
@@ -350,7 +370,8 @@ function SculptureCard({
           <SculptureStaticTile
             sculpture={sculpture}
             reason={modelError ? "error" : undefined}
-            showCta={!modelError}
+            showCta={hasModel && !modelError}
+            note={!hasModel ? t("collection3d.proximamente", locale) : undefined}
           />
         )}
       </div>
@@ -364,26 +385,47 @@ function SculptureCard({
         <h3 className="mt-2 font-serif text-2xl text-muva-dark md:text-3xl">
           {sculpture.getTitle(locale)}
         </h3>
-        <div className="mt-1 font-serif text-base italic text-muva-brown">
-          {sculpture.artist}
-          {sculpture.year && (
-            <span className="not-italic text-muva-stone">
-              {" "}
-              · {sculpture.year}
-            </span>
-          )}
-        </div>
-        {sculpture.material && (
-          <div className="mt-2 font-sans text-[11px] uppercase tracking-extra-wide text-muva-stone">
-            {sculpture.material}
-            {sculpture.dimensions && (
-              <span> · {sculpture.dimensions}</span>
+        {(subtitle || sculpture.artist) && (
+          <div className="mt-1 font-serif text-base italic text-muva-brown">
+            {subtitle ?? sculpture.artist}
+            {sculpture.year && (
+              <span className="not-italic text-muva-stone">
+                {" "}
+                · {sculpture.year}
+              </span>
             )}
           </div>
         )}
-        <p className="mt-3 text-sm text-muva-brown text-pretty">
-          {sculpture.getDescription(locale)}
-        </p>
+        {(material || dimensions) && (
+          <div className="mt-2 font-sans text-[11px] uppercase tracking-extra-wide text-muva-stone">
+            {material}
+            {dimensions && <span> · {dimensions}</span>}
+          </div>
+        )}
+        <div className="mt-4 space-y-4 text-sm text-muva-brown text-pretty">
+          <div>
+            <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+              {t("sculpture.labelHistoria", locale)}
+            </div>
+            {historia.map((paragraph, i) => (
+              <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
+                {paragraph}
+              </p>
+            ))}
+          </div>
+          {iconografia.length > 0 && (
+            <div>
+              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                {t("sculpture.labelIconografia", locale)}
+              </div>
+              {iconografia.map((paragraph, i) => (
+                <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
+                  {paragraph}
+                </p>
+              ))}
+            </div>
+          )}
+        </div>
         {sculpture.getAudio && (
           <div className="mt-3">
             <AudioPlayer src={sculpture.getAudio(locale)} compact />

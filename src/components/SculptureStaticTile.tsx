@@ -9,11 +9,13 @@ export default function SculptureStaticTile({
   compact = false,
   showCta = true,
   reason,
+  note,
 }: {
   sculpture: Sculpture;
   compact?: boolean;
   showCta?: boolean;
   reason?: "error" | "static";
+  note?: string;
 }) {
   const { locale } = useLanguage();
 
@@ -52,6 +54,11 @@ export default function SculptureStaticTile({
         {reason === "error" && (
           <p className="mt-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/60">
             {t("collection3d.noDisponible", locale)}
+          </p>
+        )}
+        {note && !reason && (
+          <p className="mt-2 font-sans text-[10px] uppercase tracking-extra-wide text-muva-cream/60">
+            {note}
           </p>
         )}
         {showCta && (

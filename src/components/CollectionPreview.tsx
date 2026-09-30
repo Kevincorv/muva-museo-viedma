@@ -87,10 +87,19 @@ function PreviewCard({
   const [modelError, setModelError] = useState(false);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const staticMode = shouldUseStatic3D();
-  const wantCanvas = !staticMode && !modelError;
+  const hasModel = Boolean(sculpture.model);
+  const wantCanvas = hasModel && !staticMode && !modelError;
   const near = useNearViewport(canvasContainerRef, "120px 0px", wantCanvas);
   const hasSlot = useWebGLSlot(near && wantCanvas);
   const { locale } = useLanguage();
+
+  const subtitle = sculpture.getSubtitle?.(locale);
+  const material = sculpture.materialKey
+    ? t(sculpture.materialKey, locale)
+    : sculpture.material;
+  const dimensions = sculpture.dimensionsKey
+    ? t(sculpture.dimensionsKey, locale)
+    : sculpture.dimensions;
 
   return (
     <article
@@ -99,7 +108,7 @@ function PreviewCard({
       style={{ transitionDelay: `${index * 60}ms` }}
     >
       <div ref={canvasContainerRef} className="relative overflow-hidden">
-        {hasSlot ? (
+        {hasModel && hasSlot ? (
           <Suspense
             fallback={
               <SculptureStaticTile sculpture={sculpture} compact showCta={false} />
@@ -116,7 +125,8 @@ function PreviewCard({
             sculpture={sculpture}
             compact
             reason={modelError ? "error" : undefined}
-            showCta={!modelError}
+            showCta={hasModel && !modelError}
+            note={!hasModel ? t("collection3d.proximamente", locale) : undefined}
           />
         )}
         <div className="absolute left-4 top-4 z-10 bg-muva-ivory/95 px-3 py-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
@@ -128,16 +138,18 @@ function PreviewCard({
         <h3 className="font-serif text-2xl text-muva-dark transition-colors duration-300 group-hover:text-muva-earth">
           {sculpture.getTitle(locale)}
         </h3>
-        <div className="mt-2 font-serif text-base italic text-muva-brown">
-          {sculpture.artist}
-          {sculpture.year && (
-            <span className="not-italic text-muva-stone"> · {sculpture.year}</span>
-          )}
-        </div>
-        {sculpture.material && (
+        {(subtitle || sculpture.artist) && (
+          <div className="mt-2 font-serif text-base italic text-muva-brown">
+            {subtitle ?? sculpture.artist}
+            {sculpture.year && (
+              <span className="not-italic text-muva-stone"> · {sculpture.year}</span>
+            )}
+          </div>
+        )}
+        {(material || dimensions) && (
           <div className="mt-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-stone">
-            {sculpture.material}
-            {sculpture.dimensions && <span> · {sculpture.dimensions}</span>}
+            {material}
+            {dimensions && <span> · {dimensions}</span>}
           </div>
         )}
       </div>
