@@ -57,8 +57,8 @@ export function shouldUseStatic3D(): boolean {
 export function inlineCanvasLimit(): number {
   if (shouldUseStatic3D()) return 0;
   const mem = deviceMemoryGB();
-  if (mem !== null && mem <= 4) return 1;
-  return 2;
+  if (mem === null || mem <= 4) return 3;
+  return 8;
 }
 
 /** Conexión lenta o ahorro de datos: evitar descargas masivas automáticas. */

@@ -146,6 +146,25 @@ export function SculptureCanvas({
   const [loading, setLoading] = useState(true);
   const orbitRef = useRef<any>(null);
   const { locale } = useLanguage();
+  const glRef = useRef<THREE.WebGLRenderer | null>(null);
+  const disposedRef = useRef(false);
+
+  useEffect(() => {
+    return () => {
+      disposedRef.current = true;
+      const gl = glRef.current;
+      glRef.current = null;
+      if (!gl) return;
+      setTimeout(() => {
+        try {
+          gl.dispose();
+          gl.forceContextLoss();
+        } catch {
+          /* el contexto ya fue liberado por el navegador */
+        }
+      }, 0);
+    };
+  }, []);
 
   const reset = () => orbitRef.current?.reset();
   const handleLoaded = useCallback(() => setLoading(false), []);
@@ -165,12 +184,15 @@ export function SculptureCanvas({
             depth: true,
           }}
           onCreated={({ gl, scene }) => {
+            glRef.current = gl;
             gl.setClearColor(new THREE.Color(MUVA_BG));
+            gl.toneMappingExposure = 1.15;
             scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
             gl.domElement.addEventListener(
               "webglcontextlost",
               (e: Event) => {
                 e.preventDefault();
+                if (disposedRef.current) return;
                 onError();
               },
               false
@@ -180,16 +202,21 @@ export function SculptureCanvas({
           <color attach="background" args={[MUVA_BG]} />
           <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-          <ambientLight intensity={0.6} color="#e8dcc4" />
+          <ambientLight intensity={1.15} color="#e8dcc4" />
           <directionalLight
             position={[5, 6, 5]}
-            intensity={1.1}
+            intensity={2.2}
             color="#f5ecda"
           />
           <directionalLight
             position={[-4, 3, -3]}
-            intensity={0.4}
+            intensity={0.9}
             color="#c9b89a"
+          />
+          <directionalLight
+            position={[0, 2, 8]}
+            intensity={0.6}
+            color="#fff2df"
           />
 
           <Suspense fallback={null}>

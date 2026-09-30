@@ -249,6 +249,7 @@ export default function SculptureViewer() {
                 }}
                 onCreated={({ gl, scene }) => {
                   gl.setClearColor(new THREE.Color(MUVA_BG));
+                  gl.toneMappingExposure = 1.15;
                   scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
                   gl.domElement.addEventListener(
                     "webglcontextlost",
@@ -264,30 +265,35 @@ export default function SculptureViewer() {
                 <color attach="background" args={[MUVA_BG]} />
                 <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-                <ambientLight intensity={0.35} color="#e8dcc4" />
+                <ambientLight intensity={1} color="#e8dcc4" />
                 <directionalLight
                   position={[5, 6, 5]}
-                  intensity={1.1}
+                  intensity={2.2}
                   color="#f5ecda"
                   castShadow={!lightMode}
                   shadow-mapSize={[1024, 1024]}
                 />
                 <directionalLight
                   position={[-4, 3, -3]}
-                  intensity={0.4}
+                  intensity={0.9}
                   color="#c9b89a"
+                />
+                <directionalLight
+                  position={[0, 2, 8]}
+                  intensity={0.6}
+                  color="#fff2df"
                 />
                 <spotLight
                   position={[0, 6, 0]}
                   angle={0.6}
                   penumbra={0.7}
-                  intensity={0.8}
+                  intensity={1.3}
                   color="#fdfaf3"
                 />
                 <hemisphereLight
                   color="#f5ecda"
                   groundColor="#3d2f22"
-                  intensity={0.5}
+                  intensity={0.8}
                 />
 
                 <Suspense fallback={null}>
