@@ -61,7 +61,7 @@ const es: TranslationKeys = {
 
   "collection3d.eyebrow": "Colección",
   "collection3d.heading": "Explorá la colección en tres dimensiones",
-  "collection3d.description": "Recorré cada obra de Manuel Viedma en 360°. Girá, acercá y alejá cada pieza para descubrir sus detalles. Subí tus propios modelos .glb para reemplazar o agregar esculturas.",
+  "collection3d.description": "Recorré cada obra de Manuel Viedma en 360°. Girá, acercá y alejá cada pieza para descubrir sus detalles.",
   "collection3d.cargando": "Cargando modelo 3D",
   "collection3d.acercar": "Acercar",
   "collection3d.alejar": "Alejar",
@@ -351,7 +351,7 @@ const en: TranslationKeys = {
 
   "collection3d.eyebrow": "Collection",
   "collection3d.heading": "Explore the collection in 3D",
-  "collection3d.description": "Walk through each of Manuel Viedma's works in 360°. Rotate, zoom in and out to discover details. Upload your own .glb models to replace or add sculptures.",
+  "collection3d.description": "Walk through each of Manuel Viedma's works in 360°. Rotate, zoom in and out to discover details.",
   "collection3d.cargando": "Loading 3D model",
   "collection3d.acercar": "Zoom in",
   "collection3d.alejar": "Zoom out",
@@ -641,7 +641,7 @@ const pt: TranslationKeys = {
 
   "collection3d.eyebrow": "Coleção",
   "collection3d.heading": "Explore a coleção em três dimensões",
-  "collection3d.description": "Percorra cada obra de Manuel Viedma em 360°. Gire, aproxime e afaste cada peça para descobrir seus detalhes. Envie seus próprios modelos .glb para substituir ou adicionar esculturas.",
+  "collection3d.description": "Percorra cada obra de Manuel Viedma em 360°. Gire, aproxime e afaste cada peça para descobrir seus detalhes.",
   "collection3d.cargando": "Carregando modelo 3D",
   "collection3d.acercar": "Aproximar",
   "collection3d.alejar": "Afastar",
