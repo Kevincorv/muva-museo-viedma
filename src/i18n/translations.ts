@@ -76,6 +76,10 @@ const es: TranslationKeys = {
   "collection3d.soloGLB": "Solo se aceptan archivos .glb",
   "collection3d.ariaSection": "Colección 3D",
   "collection3d.ver3d": "Ver en 3D",
+  "collection3d.anterior": "Pieza anterior",
+  "collection3d.siguiente": "Pieza siguiente",
+  "collection3d.verFicha": "Ver ficha",
+  "collection3d.cerrarFicha": "Cerrar ficha",
 
   "experience.eyebrow": "Experiencia",
   "experience.heading": "Una historia que sigue viva",
@@ -266,6 +270,11 @@ const es: TranslationKeys = {
   "sculpture.obra13.title": "La Pasionaria y San Ignacio",
   "sculpture.obra13.desc": "Obra que fusiona la simbología de la Pasionaria o Mburukuja con la espiritualidad de San Ignacio, representando el encuentro entre la naturaleza misionera y la fe jesuítica.",
 
+  "sculpture.obra14.title": "Los Orantes",
+  "sculpture.obra14.sub": "Figuras arrodilladas en actitud de oración",
+  "sculpture.obra14.desc": "Pendiente de confirmar la identificación: el grupo que provisionalmente identificamos como Los Orantes reúne a las figuras arrodilladas en actitud de oración. Su presencia en el recorrido del museo representa la vida de oración y la espiritualidad de las comunidades indígenas durante el proceso de evangelización de las tierras guaraníes.\n\nLa pieza invita a contemplar la entrega y la fe sencilla como parte de la memoria religiosa de la región. La identificación definitiva del grupo y de sus figuras quedará confirmada cuando la documentación del museo sea verificada.",
+  "sculpture.obra14.icono": "Pendiente de confirmar la identificación: la figura que provisionalmente asociamos con el grupo de los Orantes aparece arrodillada, con el torso erguido y las rodillas apoyadas sobre el suelo. Viste un hábito sencillo y mantiene las manos unidas o extendidas en un gesto de súplica. El acabado rojizo de la pieza la integra con las demás figuras del conjunto.",
+
   "museum.mission": "Somos un espacio que busca, con una mirada abierta, reflexiva y contemporánea, hacer presente el legado de uno de los eventos más importantes en la historia de la humanidad: el encuentro guaraní – jesuítico, exhibido a la comunidad desde una perspectiva histórica, con un enfoque artístico, académico y espiritual.",
   "museum.fullName": "Museo Viedma",
   "museum.tagline": "Experiencia Guaraní – Jesuítica",
@@ -372,6 +381,10 @@ const en: TranslationKeys = {
   "collection3d.soloGLB": "Only .glb files are accepted",
   "collection3d.ariaSection": "3D Collection",
   "collection3d.ver3d": "View in 3D",
+  "collection3d.anterior": "Previous piece",
+  "collection3d.siguiente": "Next piece",
+  "collection3d.verFicha": "View details",
+  "collection3d.cerrarFicha": "Close details",
 
   "experience.eyebrow": "Experience",
   "experience.heading": "A story that lives on",
@@ -562,6 +575,11 @@ const en: TranslationKeys = {
   "sculpture.obra13.title": "The Passionflower and Saint Ignatius",
   "sculpture.obra13.desc": "A work that merges the symbolism of the Passionflower or Mburukuja with the spirituality of Saint Ignatius, representing the encounter between missionary nature and Jesuit faith.",
 
+  "sculpture.obra14.title": "The Orants",
+  "sculpture.obra14.sub": "Kneeling figures in an attitude of prayer",
+  "sculpture.obra14.desc": "Identification still to be confirmed: the group we provisionally identify as The Orants brings together the kneeling figures in an attitude of prayer. Their presence in the museum's route represents the prayer life and spirituality of indigenous communities during the evangelisation of the Guaraní lands.\n\nThe piece invites us to contemplate devotion and simple faith as part of the region's religious memory. The definitive identification of the group and its figures will be confirmed once the museum's documentation is verified.",
+  "sculpture.obra14.icono": "Identification still to be confirmed: the figure we provisionally associate with the Orants group appears kneeling, with an upright torso and knees resting on the ground. She wears a simple habit and keeps her hands joined or extended in a gesture of supplication. The reddish finish of the piece integrates it with the other figures of the group.",
+
   "museum.mission": "We are a space that seeks, with an open, reflective, and contemporary perspective, to present the legacy of one of the most important events in human history: the Guaraní–Jesuit encounter, exhibited to the community from a historical perspective, with an artistic, academic, and spiritual approach.",
   "museum.fullName": "Viedma Museum",
   "museum.tagline": "Guaraní – Jesuit Experience",
@@ -668,6 +686,10 @@ const pt: TranslationKeys = {
   "collection3d.soloGLB": "Apenas arquivos .glb são aceitos",
   "collection3d.ariaSection": "Coleção 3D",
   "collection3d.ver3d": "Ver em 3D",
+  "collection3d.anterior": "Peça anterior",
+  "collection3d.siguiente": "Próxima peça",
+  "collection3d.verFicha": "Ver ficha",
+  "collection3d.cerrarFicha": "Fechar ficha",
 
   "experience.eyebrow": "Experiência",
   "experience.heading": "Uma história que continua viva",
@@ -857,6 +879,11 @@ const pt: TranslationKeys = {
 
   "sculpture.obra13.title": "A Pasionária e São Ignácio",
   "sculpture.obra13.desc": "Obra que funde a simbologia da Pasionária ou Mburukuja com a espiritualidade de São Ignácio, representando o encontro entre a natureza missionária e a fé jesuíta.",
+
+  "sculpture.obra14.title": "Os Orantes",
+  "sculpture.obra14.sub": "Figuras ajoelhadas em atitude de oração",
+  "sculpture.obra14.desc": "Pendente de confirmar a identificação: o grupo que provisoriamente identificamos como Os Orantes reúne as figuras ajoelhadas em atitude de oração. Sua presença no percurso do museu representa a vida de oração e a espiritualidade das comunidades indígenas durante o processo de evangelização das terras guaranis.\n\nA peça convida a contemplar a entrega e a fé simples como parte da memória religiosa da região. A identificação definitiva do grupo e de suas figuras será confirmada quando a documentação do museu for verificada.",
+  "sculpture.obra14.icono": "Pendente de confirmar a identificação: a figura que provisoriamente associamos com o grupo dos Orantes aparece ajoelhada, com o tronco ereto e os joelhos apoiados no chão. Veste um hábito simples e mantém as mãos unidas ou estendidas em um gesto de súplica. O acabamento avermelhado da peça a integra com as demais figuras do conjunto.",
 
   "museum.mission": "Somos um espaço que busca, com uma visão aberta, reflexiva e contemporânea, fazer presente o legado de um dos eventos mais importantes da história da humanidade: o encontro guarani–jesuíta, exibido à comunidade de uma perspectiva histórica, com um enfoque artístico, acadêmico e espiritual.",
   "museum.fullName": "Museu Viedma",

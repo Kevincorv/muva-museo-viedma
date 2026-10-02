@@ -239,4 +239,17 @@ export const sculptures: Sculpture[] = [
     getDescription: (locale) => t("sculpture.obra13.desc", locale),
     getAudio: (locale) => PASIONARIA_AUDIO[locale] ?? PASIONARIA_AUDIO.es,
   },
+  {
+    id: "obra-14",
+    titleKey: "sculpture.obra14.title",
+    subtitleKey: "sculpture.obra14.sub",
+    descriptionKey: "sculpture.obra14.desc",
+    iconografiaKey: "sculpture.obra14.icono",
+    thumbnail: "/images/sculptures/obra-14.webp",
+    model: "/models/sculptures/nativa_arrodillada_rezando.glb",
+    getTitle: (locale) => t("sculpture.obra14.title", locale),
+    getSubtitle: (locale) => t("sculpture.obra14.sub", locale),
+    getDescription: (locale) => t("sculpture.obra14.desc", locale),
+    getIconografia: (locale) => t("sculpture.obra14.icono", locale),
+  },
 ];
