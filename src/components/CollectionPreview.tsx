@@ -6,7 +6,7 @@ import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useNearViewport } from "../hooks/useNearViewport";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
-import { shouldUseStatic3D } from "../lib/capabilities";
+import { shouldUseStatic3D, isSlowConnection } from "../lib/capabilities";
 import { useWebGLSlot } from "../lib/webglSlots";
 import SculptureStaticTile from "./SculptureStaticTile";
 
@@ -88,7 +88,8 @@ function PreviewCard({
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const staticMode = shouldUseStatic3D();
   const hasModel = Boolean(sculpture.model);
-  const wantCanvas = hasModel && !staticMode && !modelError;
+  const wantCanvas =
+    hasModel && !staticMode && !modelError && !isSlowConnection();
   const near = useNearViewport(canvasContainerRef, "120px 0px", wantCanvas);
   const hasSlot = useWebGLSlot(near && wantCanvas);
   const { locale } = useLanguage();

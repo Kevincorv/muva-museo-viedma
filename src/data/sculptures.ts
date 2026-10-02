@@ -11,6 +11,18 @@ export interface SculptureModelItem {
   labelKey?: string;
 }
 
+/** Bloque secundario de una ficha combinada (varios nombres en una tarjeta). */
+export interface SculptureBlock {
+  titleKey: string;
+  subtitleKey?: string;
+  descriptionKey: string;
+  iconografiaKey?: string;
+  getTitle: (locale: Locale) => string;
+  getSubtitle?: (locale: Locale) => string;
+  getDescription: (locale: Locale) => string;
+  getIconografia?: (locale: Locale) => string;
+}
+
 export interface Sculpture {
   id: string;
   titleKey: string;
@@ -35,6 +47,7 @@ export interface Sculpture {
   getIconografia?: (locale: Locale) => string;
   getHistoricalContext?: (locale: Locale) => string;
   getAudio?: (locale: Locale) => string | undefined;
+  blocks?: SculptureBlock[];
 }
 
 /**
@@ -113,7 +126,7 @@ export const sculptures: Sculpture[] = [
     material: "Escultura en piedra tallada",
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-04.webp",
-    model: "/models/sculptures/Santo_de_pie_sosteniendo_un_libro_abierto.glb",
+    model: "/models/sculptures/virgen_de_pie.glb",
     getTitle: (locale) => t("sculpture.obra04.title", locale),
     getSubtitle: (locale) => t("sculpture.obra04.sub", locale),
     getDescription: (locale) => t("sculpture.obra04.desc", locale),
@@ -128,7 +141,7 @@ export const sculptures: Sculpture[] = [
     material: "Escultura en piedra tallada",
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-05.webp",
-    model: "",
+    model: "/models/sculptures/Santo_de_pie_sosteniendo_un_libro_abierto.glb",
     getTitle: (locale) => t("sculpture.obra05.title", locale),
     getSubtitle: (locale) => t("sculpture.obra05.sub", locale),
     getDescription: (locale) => t("sculpture.obra05.desc", locale),
@@ -164,29 +177,34 @@ export const sculptures: Sculpture[] = [
   },
   {
     id: "obra-08",
-    titleKey: "sculpture.obra08.title",
-    subtitleKey: "sculpture.obra08.sub",
+    titleKey: "sculpture.obra08.group",
     descriptionKey: "sculpture.obra08.desc",
-    iconografiaKey: "sculpture.obra08.icono",
     thumbnail: "/images/sculptures/obra-08.webp",
-    model: "",
-    getTitle: (locale) => t("sculpture.obra08.title", locale),
-    getSubtitle: (locale) => t("sculpture.obra08.sub", locale),
+    model: "/models/sculptures/prueba.glb",
+    getTitle: (locale) => t("sculpture.obra08.group", locale),
     getDescription: (locale) => t("sculpture.obra08.desc", locale),
-    getIconografia: (locale) => t("sculpture.obra08.icono", locale),
-  },
-  {
-    id: "obra-09",
-    titleKey: "sculpture.obra09.title",
-    subtitleKey: "sculpture.obra09.sub",
-    descriptionKey: "sculpture.obra09.desc",
-    iconografiaKey: "sculpture.obra09.icono",
-    thumbnail: "/images/sculptures/obra-09.webp",
-    model: "",
-    getTitle: (locale) => t("sculpture.obra09.title", locale),
-    getSubtitle: (locale) => t("sculpture.obra09.sub", locale),
-    getDescription: (locale) => t("sculpture.obra09.desc", locale),
-    getIconografia: (locale) => t("sculpture.obra09.icono", locale),
+    blocks: [
+      {
+        titleKey: "sculpture.obra08.title",
+        subtitleKey: "sculpture.obra08.sub",
+        descriptionKey: "sculpture.obra08.desc",
+        iconografiaKey: "sculpture.obra08.icono",
+        getTitle: (locale) => t("sculpture.obra08.title", locale),
+        getSubtitle: (locale) => t("sculpture.obra08.sub", locale),
+        getDescription: (locale) => t("sculpture.obra08.desc", locale),
+        getIconografia: (locale) => t("sculpture.obra08.icono", locale),
+      },
+      {
+        titleKey: "sculpture.obra09.title",
+        subtitleKey: "sculpture.obra09.sub",
+        descriptionKey: "sculpture.obra09.desc",
+        iconografiaKey: "sculpture.obra09.icono",
+        getTitle: (locale) => t("sculpture.obra09.title", locale),
+        getSubtitle: (locale) => t("sculpture.obra09.sub", locale),
+        getDescription: (locale) => t("sculpture.obra09.desc", locale),
+        getIconografia: (locale) => t("sculpture.obra09.icono", locale),
+      },
+    ],
   },
   {
     id: "obra-10",
@@ -195,7 +213,7 @@ export const sculptures: Sculpture[] = [
     descriptionKey: "sculpture.obra10.desc",
     iconografiaKey: "sculpture.obra10.icono",
     thumbnail: "/images/sculptures/obra-10.webp",
-    model: "/models/sculptures/virgen_de_pie.glb",
+    model: "",
     getTitle: (locale) => t("sculpture.obra10.title", locale),
     getSubtitle: (locale) => t("sculpture.obra10.sub", locale),
     getDescription: (locale) => t("sculpture.obra10.desc", locale),
@@ -233,7 +251,7 @@ export const sculptures: Sculpture[] = [
     artist: "Manuel Viedma",
     descriptionKey: "sculpture.obra13.desc",
     thumbnail: "/images/sculptures/obra-13.webp",
-    model: "/models/sculptures/prueba.glb",
+    model: "",
     audio: PASIONARIA_AUDIO,
     getTitle: (locale) => t("sculpture.obra13.title", locale),
     getDescription: (locale) => t("sculpture.obra13.desc", locale),

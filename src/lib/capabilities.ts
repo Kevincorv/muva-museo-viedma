@@ -47,15 +47,31 @@ export function deviceMemoryGB(): number | null {
   }
 }
 
-/** No montar ningún canvas 3D inline (móviles, sin WebGL, poca memoria). */
-export function shouldUseStatic3D(): boolean {
-  if (!hasWebGL()) return true;
-  return isConstrainedDevice();
+/** Navegadores demasiado viejos para decodificar .glb pesados en línea. */
+export function isLegacyDevice(): boolean {
+  if (typeof navigator === "undefined") return true;
+  try {
+    const ua = navigator.userAgent || "";
+    return /Android\s+[1-5]\.|MSIE\s|Opera Mini|IEMobile/i.test(ua);
+  } catch {
+    return true;
+  }
 }
 
-/** Máximo de canvases 3D embebidos en la página (0 = solo modo estático). */
+/** No montar ningún canvas 3D inline (sin WebGL o navegador muy antiguo). */
+export function shouldUseStatic3D(): boolean {
+  if (!hasWebGL()) return true;
+  return isLegacyDevice();
+}
+
+/**
+ * Máximo de canvases 3D embebidos en la página (0 = solo modo estático).
+ * En celulares va de a uno: solo la tarjeta más cercana monta su modelo,
+ * el resto espera en modo imagen hasta liberar el slot.
+ */
 export function inlineCanvasLimit(): number {
   if (shouldUseStatic3D()) return 0;
+  if (isConstrainedDevice()) return 1;
   const mem = deviceMemoryGB();
   if (mem === null || mem <= 4) return 3;
   return 8;

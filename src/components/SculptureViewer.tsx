@@ -1,12 +1,13 @@
 import { Component, Suspense, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
-import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2, Box } from "lucide-react";
+import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2, Box, ChevronUp } from "lucide-react";
 import * as THREE from "three";
 import { sculptures } from "../data/sculptures";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
 import { hasWebGL, isConstrainedDevice, isSlowConnection } from "../lib/capabilities";
+import { fitCameraToModel } from "../lib/fitCamera";
 import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
@@ -51,9 +52,20 @@ class CanvasErrorBoundary extends Component<
   }
 }
 
-function SculptureModel({ url, onLoaded }: { url: string; onLoaded: () => void }) {
+function SculptureModel({
+  url,
+  onLoaded,
+  orbitRef,
+}: {
+  url: string;
+  onLoaded: () => void;
+  orbitRef: React.MutableRefObject<any>;
+}) {
   const { scene } = useGLTF(url, "/draco/");
   const ref = useRef<THREE.Group>(null);
+  const { camera, size: canvasSize, invalidate } = useThree();
+  const halfExtents = useRef<THREE.Vector3 | null>(null);
+  const fittedAspect = useRef(0);
 
   const cloned = useMemo(() => {
     const c = scene.clone(true);
@@ -67,19 +79,56 @@ function SculptureModel({ url, onLoaded }: { url: string; onLoaded: () => void }
     return c;
   }, [scene]);
 
+  const fitToFrame = () => {
+    const half = halfExtents.current;
+    if (!half) return;
+    fitCameraToModel({
+      camera: camera as THREE.PerspectiveCamera,
+      canvasSize: { width: canvasSize.width, height: canvasSize.height },
+      halfExtents: half,
+      controls: orbitRef.current,
+      margin: 1.12,
+      invalidate,
+    });
+    fittedAspect.current =
+      canvasSize.width / Math.max(canvasSize.height, 1);
+  };
+
   useEffect(() => {
     if (!ref.current) return;
     const box = new THREE.Box3().setFromObject(cloned);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    const maxDim = Math.max(size.x, size.y, size.z);
+    const boxSize = new THREE.Vector3();
+    const boxCenter = new THREE.Vector3();
+    box.getSize(boxSize);
+    box.getCenter(boxCenter);
+    const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
     const scale = maxDim > 0 ? 2.4 / maxDim : 1;
     ref.current.scale.setScalar(scale);
-    ref.current.position.set(-center.x * scale, -center.y * scale, -center.z * scale);
+    ref.current.position.set(
+      -boxCenter.x * scale,
+      -boxCenter.y * scale,
+      -boxCenter.z * scale
+    );
+    halfExtents.current = new THREE.Vector3(
+      (boxSize.x * scale) / 2,
+      (boxSize.y * scale) / 2,
+      (boxSize.z * scale) / 2
+    );
+    fitToFrame();
     onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cloned, onLoaded]);
+
+  // Reencuadra cuando el contenedor cambia de forma (rotar el celular,
+  // pantalla completa o plegar la ficha en móvil).
+  useEffect(() => {
+    if (!halfExtents.current) return;
+    const aspect = canvasSize.width / Math.max(canvasSize.height, 1);
+    const last = fittedAspect.current;
+    if (last && Math.abs(aspect - last) < last * 0.3) return;
+    fitToFrame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasSize.width, canvasSize.height]);
 
   const animate = !isConstrainedDevice();
 
@@ -129,6 +178,7 @@ export default function SculptureViewer() {
   const [userStart, setUserStart] = useState(false);
   const [retryKey, setRetryKey] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showInfo, setShowInfo] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<any>(null);
   const { locale } = useLanguage();
@@ -188,12 +238,12 @@ export default function SculptureViewer() {
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
+    // Si el navegador no lo soporta (p. ej. iPhone), no existe el evento
+    // fullscreenchange y el estado queda como estaba.
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen?.();
-      setIsFullscreen(true);
+      void containerRef.current.requestFullscreen?.().catch(() => {});
     } else {
-      document.exitFullscreen?.();
-      setIsFullscreen(false);
+      void document.exitFullscreen?.().catch(() => {});
     }
   };
 
@@ -226,7 +276,7 @@ export default function SculptureViewer() {
         ref={containerRef}
         className="relative z-10 flex h-full w-full flex-col"
       >
-        <div className="relative flex-1 overflow-hidden">
+        <div className="relative min-h-0 flex-1 overflow-hidden">
           {showCanvas && (
             <CanvasErrorBoundary
               key={`outer-${retryKey}`}
@@ -249,7 +299,7 @@ export default function SculptureViewer() {
                 }}
                 onCreated={({ gl, scene }) => {
                   gl.setClearColor(new THREE.Color(MUVA_BG));
-                  gl.toneMappingExposure = 1.15;
+                  gl.toneMappingExposure = 1.4;
                   scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
                   gl.domElement.addEventListener(
                     "webglcontextlost",
@@ -265,35 +315,35 @@ export default function SculptureViewer() {
                 <color attach="background" args={[MUVA_BG]} />
                 <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-                <ambientLight intensity={1} color="#e8dcc4" />
+                <ambientLight intensity={1.35} color="#e8dcc4" />
                 <directionalLight
                   position={[5, 6, 5]}
-                  intensity={2.2}
+                  intensity={2.6}
                   color="#f5ecda"
                   castShadow={!lightMode}
                   shadow-mapSize={[1024, 1024]}
                 />
                 <directionalLight
                   position={[-4, 3, -3]}
-                  intensity={0.9}
+                  intensity={1.15}
                   color="#c9b89a"
                 />
                 <directionalLight
                   position={[0, 2, 8]}
-                  intensity={0.6}
+                  intensity={0.85}
                   color="#fff2df"
                 />
                 <spotLight
                   position={[0, 6, 0]}
                   angle={0.6}
                   penumbra={0.7}
-                  intensity={1.3}
+                  intensity={1.55}
                   color="#fdfaf3"
                 />
                 <hemisphereLight
                   color="#f5ecda"
                   groundColor="#3d2f22"
-                  intensity={0.8}
+                  intensity={1}
                 />
 
                 <Suspense fallback={null}>
@@ -307,6 +357,7 @@ export default function SculptureViewer() {
                     <SculptureModel
                       url={sculpture.model}
                       onLoaded={() => setLoading(false)}
+                      orbitRef={orbitRef}
                     />
                     {!lightMode && (
                       <ContactShadows
@@ -452,65 +503,126 @@ export default function SculptureViewer() {
         </div>
 
         {/* Info panel */}
-        <div className="bg-muva-cream px-6 py-8 md:px-12 md:py-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <div className="grid gap-8 md:grid-cols-12">
-              <div className="md:col-span-7">
-                <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                  {sculpture.inventoryNumber} · {sculpture.year}
+        <div className="flex shrink-0 flex-col bg-muva-cream">
+          <button
+            type="button"
+            onClick={() => setShowInfo((v) => !v)}
+            aria-expanded={showInfo}
+            aria-controls="viewer-info"
+            className="flex w-full items-center justify-between gap-4 border-t border-muva-sand/50 px-5 py-3.5 text-left md:hidden"
+          >
+            <span className="truncate font-serif text-lg text-muva-dark">
+              {sculpture.getTitle(locale)}
+            </span>
+            <span className="flex shrink-0 items-center gap-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+              {showInfo
+                ? t("viewer.hideInfo", locale)
+                : t("viewer.showInfo", locale)}
+              <ChevronUp
+                size={14}
+                className={`transition-transform duration-300 ${
+                  showInfo ? "rotate-180" : ""
+                }`}
+              />
+            </span>
+          </button>
+
+          <div
+            id="viewer-info"
+            className={`px-5 md:block md:px-12 md:pb-10 md:pt-10 md:max-h-[52vh] md:overflow-y-auto ${
+              showInfo
+                ? "max-h-[42vh] overscroll-contain overflow-y-auto pb-8 pt-4"
+                : "hidden"
+            }`}
+          >
+            <div className="mx-auto w-full max-w-7xl">
+              <div className="grid gap-8 md:grid-cols-12">
+                <div className="md:col-span-7">
+                  {(sculpture.inventoryNumber || sculpture.year) && (
+                    <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                      {[sculpture.inventoryNumber, sculpture.year]
+                        .filter(Boolean)
+                        .join(" · ")}
+                    </div>
+                  )}
+                  <h2 className="mt-3 font-serif text-3xl font-light text-muva-dark md:text-4xl">
+                    {sculpture.getTitle(locale)}
+                  </h2>
+                  {sculpture.artist && (
+                    <div className="mt-2 font-serif text-lg italic text-muva-brown">
+                      {sculpture.artist}
+                    </div>
+                  )}
+                  {sculpture.blocks ? (
+                    <div className="mt-6 space-y-6">
+                      {sculpture.blocks.map((block) => {
+                        const blockSubtitle = block.getSubtitle?.(locale);
+                        return (
+                          <div key={block.titleKey}>
+                            <h3 className="font-serif text-xl font-light text-muva-dark md:text-2xl">
+                              {block.getTitle(locale)}
+                            </h3>
+                            {blockSubtitle && (
+                              <div className="mt-1 font-serif text-base italic text-muva-brown">
+                                {blockSubtitle}
+                              </div>
+                            )}
+                            <p className="mt-3 max-w-2xl text-muva-brown text-pretty">
+                              {block.getDescription(locale)}
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="mt-6 max-w-2xl text-muva-brown text-pretty">
+                      {sculpture.getDescription(locale)}
+                    </p>
+                  )}
+                  {sculpture.getHistoricalContext && (
+                    <p className="mt-4 max-w-2xl text-sm italic text-muva-stone text-pretty">
+                      {sculpture.getHistoricalContext(locale)}
+                    </p>
+                  )}
+                  {sculpture.getAudio && (
+                    <div className="mt-6 max-w-md">
+                      <AudioPlayer src={sculpture.getAudio(locale)} />
+                    </div>
+                  )}
                 </div>
-                <h2 className="mt-3 font-serif text-3xl font-light text-muva-dark md:text-4xl">
-                  {sculpture.getTitle(locale)}
-                </h2>
-                <div className="mt-2 font-serif text-lg italic text-muva-brown">
-                  {sculpture.artist}
-                </div>
-                <p className="mt-6 max-w-2xl text-muva-brown text-pretty">
-                  {sculpture.getDescription(locale)}
-                </p>
-                {sculpture.getHistoricalContext && (
-                  <p className="mt-4 max-w-2xl text-sm italic text-muva-stone text-pretty">
-                    {sculpture.getHistoricalContext(locale)}
-                  </p>
-                )}
-                {sculpture.getAudio && (
-                  <div className="mt-6 max-w-md">
-                    <AudioPlayer src={sculpture.getAudio(locale)} />
-                  </div>
-                )}
+                <dl className="grid grid-cols-2 gap-x-6 gap-y-4 self-center md:col-span-5 md:grid-cols-1 md:gap-y-3">
+                  {sculpture.material && (
+                    <>
+                      <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                        {t("viewer.labelMaterial", locale)}
+                      </dt>
+                      <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
+                        {sculpture.material}
+                      </dd>
+                    </>
+                  )}
+                  {sculpture.dimensions && (
+                    <>
+                      <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                        {t("viewer.labelDimensions", locale)}
+                      </dt>
+                      <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
+                        {sculpture.dimensions}
+                      </dd>
+                    </>
+                  )}
+                  {sculpture.year && (
+                    <>
+                      <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+                        {t("viewer.labelYear", locale)}
+                      </dt>
+                      <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
+                        {sculpture.year}
+                      </dd>
+                    </>
+                  )}
+                </dl>
               </div>
-              <dl className="grid grid-cols-2 gap-x-6 gap-y-4 self-center md:col-span-5 md:grid-cols-1 md:gap-y-3">
-                {sculpture.material && (
-                  <>
-                    <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      {t("viewer.labelMaterial", locale)}
-                    </dt>
-                    <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
-                      {sculpture.material}
-                    </dd>
-                  </>
-                )}
-                {sculpture.dimensions && (
-                  <>
-                    <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      {t("viewer.labelDimensions", locale)}
-                    </dt>
-                    <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
-                      {sculpture.dimensions}
-                    </dd>
-                  </>
-                )}
-                {sculpture.year && (
-                  <>
-                    <dt className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                      {t("viewer.labelYear", locale)}
-                    </dt>
-                    <dd className="-mt-2 text-sm text-muva-dark md:mt-0">
-                      {sculpture.year}
-                    </dd>
-                  </>
-                )}
-              </dl>
             </div>
           </div>
         </div>

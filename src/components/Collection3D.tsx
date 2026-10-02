@@ -8,7 +8,7 @@ import {
   Component,
   type ReactNode,
 } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import {
   Loader2,
@@ -25,7 +25,8 @@ import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useNearViewport } from "../hooks/useNearViewport";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
-import { shouldUseStatic3D } from "../lib/capabilities";
+import { shouldUseStatic3D, isSlowConnection } from "../lib/capabilities";
+import { fitCameraToModel } from "../lib/fitCamera";
 import { useWebGLSlot } from "../lib/webglSlots";
 import AudioPlayer from "./AudioPlayer";
 import SculptureStaticTile from "./SculptureStaticTile";
@@ -82,13 +83,18 @@ class CanvasErrorBoundary extends Component<
 function EmbeddedModel({
   url,
   onLoaded,
+  orbitRef,
 }: {
   url: string;
   onLoaded: () => void;
+  orbitRef: React.MutableRefObject<any>;
 }) {
   const { scene } = useGLTF(url, "/draco/");
   const ref = useRef<THREE.Group>(null);
   const loadedRef = useRef(false);
+  const { camera, size: canvasSize, invalidate } = useThree();
+  const halfExtents = useRef<THREE.Vector3 | null>(null);
+  const fittedAspect = useRef(0);
 
   const cloned = useMemo(() => {
     const c = scene.clone(true);
@@ -102,24 +108,55 @@ function EmbeddedModel({
     return c;
   }, [scene]);
 
+  const fitToFrame = () => {
+    const half = halfExtents.current;
+    if (!half) return;
+    fitCameraToModel({
+      camera: camera as THREE.PerspectiveCamera,
+      canvasSize: { width: canvasSize.width, height: canvasSize.height },
+      halfExtents: half,
+      controls: orbitRef.current,
+      margin: 1.1,
+      invalidate,
+    });
+    fittedAspect.current = canvasSize.width / Math.max(canvasSize.height, 1);
+  };
+
   useEffect(() => {
     if (!ref.current || loadedRef.current) return;
     loadedRef.current = true;
     const box = new THREE.Box3().setFromObject(cloned);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    const maxDim = Math.max(size.x, size.y, size.z);
+    const boxSize = new THREE.Vector3();
+    const boxCenter = new THREE.Vector3();
+    box.getSize(boxSize);
+    box.getCenter(boxCenter);
+    const maxDim = Math.max(boxSize.x, boxSize.y, boxSize.z);
     const scale = maxDim > 0 ? 2.2 / maxDim : 1;
     ref.current.scale.setScalar(scale);
     ref.current.position.set(
-      -center.x * scale,
-      -center.y * scale,
-      -center.z * scale
+      -boxCenter.x * scale,
+      -boxCenter.y * scale,
+      -boxCenter.z * scale
     );
+    halfExtents.current = new THREE.Vector3(
+      (boxSize.x * scale) / 2,
+      (boxSize.y * scale) / 2,
+      (boxSize.z * scale) / 2
+    );
+    fitToFrame();
     onLoaded();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cloned, onLoaded]);
+
+  // Reencuadra si la tarjeta cambia de tamaño (rotar el celular, responsive).
+  useEffect(() => {
+    if (!halfExtents.current) return;
+    const aspect = canvasSize.width / Math.max(canvasSize.height, 1);
+    const last = fittedAspect.current;
+    if (last && Math.abs(aspect - last) < last * 0.3) return;
+    fitToFrame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canvasSize.width, canvasSize.height]);
 
   useEffect(() => {
     return () => {
@@ -132,6 +169,26 @@ function EmbeddedModel({
       <primitive object={cloned} />
     </group>
   );
+}
+
+/**
+ * OrbitControls fuerza `touch-action: none`, lo que "traba" el scroll de la
+ * página al deslizar el dedo sobre la escultura en un celular. Con `pan-y`
+ * el deslizamiento vertical desplaza la página y el horizontal rota la pieza.
+ */
+function TouchScrollGuard() {
+  const { gl } = useThree();
+
+  useEffect(() => {
+    const coarse =
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function" &&
+      window.matchMedia("(pointer: coarse)").matches;
+    if (!coarse) return;
+    gl.domElement.style.touchAction = "pan-y";
+  });
+
+  return null;
 }
 
 export function SculptureCanvas({
@@ -186,7 +243,7 @@ export function SculptureCanvas({
           onCreated={({ gl, scene }) => {
             glRef.current = gl;
             gl.setClearColor(new THREE.Color(MUVA_BG));
-            gl.toneMappingExposure = 1.15;
+            gl.toneMappingExposure = 1.4;
             scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
             gl.domElement.addEventListener(
               "webglcontextlost",
@@ -202,20 +259,20 @@ export function SculptureCanvas({
           <color attach="background" args={[MUVA_BG]} />
           <fog attach="fog" args={[MUVA_BG, 8, 18]} />
 
-          <ambientLight intensity={1.15} color="#e8dcc4" />
+          <ambientLight intensity={1.5} color="#e8dcc4" />
           <directionalLight
             position={[5, 6, 5]}
-            intensity={2.2}
+            intensity={2.6}
             color="#f5ecda"
           />
           <directionalLight
             position={[-4, 3, -3]}
-            intensity={0.9}
+            intensity={1.15}
             color="#c9b89a"
           />
           <directionalLight
             position={[0, 2, 8]}
-            intensity={0.6}
+            intensity={0.85}
             color="#fff2df"
           />
 
@@ -224,6 +281,7 @@ export function SculptureCanvas({
               <EmbeddedModel
                 url={modelUrl}
                 onLoaded={handleLoaded}
+                orbitRef={orbitRef}
               />
             </ModelErrorBoundary>
           </Suspense>
@@ -239,6 +297,8 @@ export function SculptureCanvas({
             autoRotate={false}
             makeDefault
           />
+
+          <TouchScrollGuard />
         </Canvas>
       </CanvasErrorBoundary>
 
@@ -352,6 +412,64 @@ export function ThumbnailFallback({
   );
 }
 
+function PieceTexts({
+  iconografia,
+  historia,
+}: {
+  iconografia: string[];
+  historia: string[];
+}) {
+  const [showHistoria, setShowHistoria] = useState(false);
+  const { locale } = useLanguage();
+
+  return (
+    <div className="mt-4 space-y-4 text-sm text-muva-brown text-pretty">
+      {iconografia.length > 0 && (
+        <div>
+          <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+            {t("sculpture.labelIconografia", locale)}
+          </div>
+          {iconografia.map((paragraph, i) => (
+            <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )}
+      {iconografia.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowHistoria((v) => !v)}
+          aria-expanded={showHistoria}
+          className="group inline-flex items-center gap-1.5 self-start border-b border-muva-sand/60 pb-1 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth transition-colors duration-300 hover:border-muva-dark hover:text-muva-dark"
+        >
+          {showHistoria
+            ? t("collection3d.verMenos", locale)
+            : t("collection3d.verMas", locale)}
+          <ChevronDown
+            size={12}
+            className={`transition-transform duration-300 ${
+              showHistoria ? "rotate-180" : ""
+            }`}
+          />
+        </button>
+      )}
+      {(showHistoria || iconografia.length === 0) && (
+        <div>
+          <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+            {t("sculpture.labelHistoria", locale)}
+          </div>
+          {historia.map((paragraph, i) => (
+            <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
+              {paragraph}
+            </p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function SculptureCard({
   sculpture,
   index,
@@ -360,12 +478,12 @@ function SculptureCard({
   index: number;
 }) {
   const [modelError, setModelError] = useState(false);
-  const [showHistoria, setShowHistoria] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const staticMode = shouldUseStatic3D();
   const hasModel = Boolean(sculpture.model);
-  const wantCanvas = hasModel && !staticMode && !modelError;
+  const wantCanvas =
+    hasModel && !staticMode && !modelError && !isSlowConnection();
   const near = useNearViewport(canvasContainerRef, "80px 0px", wantCanvas);
   const hasSlot = useWebGLSlot(near && wantCanvas);
   const { locale } = useLanguage();
@@ -381,6 +499,7 @@ function SculptureCard({
   const iconografia = sculpture.getIconografia
     ? toParagraphs(sculpture.getIconografia(locale))
     : [];
+  const blocks = sculpture.blocks;
 
   return (
     <article
@@ -431,50 +550,37 @@ function SculptureCard({
             {dimensions && <span> · {dimensions}</span>}
           </div>
         )}
-        <div className="mt-4 space-y-4 text-sm text-muva-brown text-pretty">
-          {iconografia.length > 0 && (
-            <div>
-              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                {t("sculpture.labelIconografia", locale)}
-              </div>
-              {iconografia.map((paragraph, i) => (
-                <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          )}
-          {iconografia.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setShowHistoria((v) => !v)}
-              aria-expanded={showHistoria}
-              className="group inline-flex items-center gap-1.5 self-start border-b border-muva-sand/60 pb-1 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth transition-colors duration-300 hover:border-muva-dark hover:text-muva-dark"
-            >
-              {showHistoria
-                ? t("collection3d.verMenos", locale)
-                : t("collection3d.verMas", locale)}
-              <ChevronDown
-                size={12}
-                className={`transition-transform duration-300 ${
-                  showHistoria ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-          )}
-          {(showHistoria || iconografia.length === 0) && (
-            <div>
-              <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-                {t("sculpture.labelHistoria", locale)}
-              </div>
-              {historia.map((paragraph, i) => (
-                <p key={i} className={i === 0 ? "mt-2" : "mt-3"}>
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          )}
-        </div>
+        {blocks ? (
+          <div className="mt-6 space-y-8">
+            {blocks.map((block, i) => {
+              const blockSubtitle = block.getSubtitle?.(locale);
+              const blockIconografia = block.getIconografia
+                ? toParagraphs(block.getIconografia(locale))
+                : [];
+              return (
+                <div
+                  key={block.titleKey}
+                  className={i > 0 ? "border-t border-muva-sand/50 pt-8" : ""}
+                >
+                  <h4 className="font-serif text-xl text-muva-dark md:text-2xl">
+                    {block.getTitle(locale)}
+                  </h4>
+                  {blockSubtitle && (
+                    <div className="mt-1 font-serif text-base italic text-muva-brown">
+                      {blockSubtitle}
+                    </div>
+                  )}
+                  <PieceTexts
+                    iconografia={blockIconografia}
+                    historia={toParagraphs(block.getDescription(locale))}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <PieceTexts iconografia={iconografia} historia={historia} />
+        )}
         {sculpture.getAudio && (
           <div className="mt-3">
             <AudioPlayer src={sculpture.getAudio(locale)} compact />
