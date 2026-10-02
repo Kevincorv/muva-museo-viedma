@@ -18,10 +18,6 @@ import {
   Move,
   AlertCircle,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ExternalLink,
-  X,
 } from "lucide-react";
 import * as THREE from "three";
 import { sculptures, type Sculpture } from "../data/sculptures";
@@ -31,7 +27,6 @@ import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
 import { shouldUseStatic3D, isSlowConnection } from "../lib/capabilities";
 import { fitCameraToModel } from "../lib/fitCamera";
-import { openSculptureViewer } from "../lib/viewer";
 import { useWebGLSlot } from "../lib/webglSlots";
 import AudioPlayer from "./AudioPlayer";
 import SculptureStaticTile from "./SculptureStaticTile";
@@ -180,8 +175,6 @@ function EmbeddedModel({
  * OrbitControls fuerza `touch-action: none`, lo que "traba" el scroll de la
  * página al deslizar el dedo sobre la escultura en un celular. Con `pan-y`
  * el deslizamiento vertical desplaza la página y el horizontal rota la pieza.
- * Cuando el canvas no es interactivo (carrusel en táctil) se restaura `auto`
- * para que el deslizamiento horizontal avance el carrusel.
  */
 function TouchScrollGuard({ interactive = true }: { interactive?: boolean }) {
   const { gl } = useThree();
@@ -480,76 +473,12 @@ function PieceTexts({
   );
 }
 
-function useCoarsePointer(): boolean {
-  const [coarse] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      typeof window.matchMedia === "function" &&
-      window.matchMedia("(pointer: coarse)").matches
-  );
-  return coarse;
-}
-
-function SculptureTexts({ sculpture }: { sculpture: Sculpture }) {
-  const { locale } = useLanguage();
-  const historia = toParagraphs(sculpture.getDescription(locale));
-  const iconografia = sculpture.getIconografia
-    ? toParagraphs(sculpture.getIconografia(locale))
-    : [];
-  const blocks = sculpture.blocks;
-
-  return (
-    <>
-      {blocks ? (
-        <div className="mt-6 space-y-8">
-          {blocks.map((block, i) => {
-            const blockSubtitle = block.getSubtitle?.(locale);
-            const blockIconografia = block.getIconografia
-              ? toParagraphs(block.getIconografia(locale))
-              : [];
-            return (
-              <div
-                key={block.titleKey}
-                className={i > 0 ? "border-t border-muva-sand/50 pt-8" : ""}
-              >
-                <h4 className="font-serif text-xl text-muva-dark md:text-2xl">
-                  {block.getTitle(locale)}
-                </h4>
-                {blockSubtitle && (
-                  <div className="mt-1 font-serif text-base italic text-muva-brown">
-                    {blockSubtitle}
-                  </div>
-                )}
-                <PieceTexts
-                  iconografia={blockIconografia}
-                  historia={toParagraphs(block.getDescription(locale))}
-                />
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        <PieceTexts iconografia={iconografia} historia={historia} />
-      )}
-      {sculpture.getAudio && (
-        <div className="mt-5 max-w-sm">
-          <AudioPlayer src={sculpture.getAudio(locale)} compact />
-        </div>
-      )}
-    </>
-  );
-}
-
-function CarouselSlide({
+function SculptureCard({
   sculpture,
   index,
-  isOpen,
-  onToggle,
 }: {
   sculpture: Sculpture;
   index: number;
-  isOpen: boolean;
-  onToggle: () => void;
 }) {
   const [modelError, setModelError] = useState(false);
   const reveal = useScrollReveal<HTMLDivElement>();
@@ -560,100 +489,8 @@ function CarouselSlide({
     hasModel && !staticMode && !modelError && !isSlowConnection();
   const near = useNearViewport(canvasContainerRef, "80px 0px", wantCanvas);
   const hasSlot = useWebGLSlot(near && wantCanvas);
-  const coarsePointer = useCoarsePointer();
   const { locale } = useLanguage();
 
-  const subtitle = sculpture.getSubtitle?.(locale);
-
-  return (
-    <div
-      ref={reveal.ref}
-      data-slide
-      className={`reveal-on-scroll ${
-        reveal.isVisible ? "is-visible" : ""
-      } w-full shrink-0 snap-start sm:w-[calc((100%_-_1.5rem)/2)] lg:w-[calc((100%_-_3rem)/3)]`}
-    >
-      <div
-        ref={canvasContainerRef}
-        className={`transition-shadow duration-300 ${
-          isOpen ? "ring-1 ring-muva-earth ring-offset-4 ring-offset-muva-ivory" : ""
-        }`}
-      >
-        {hasModel && hasSlot ? (
-          <SculptureCanvas
-            compact
-            interactive={!coarsePointer}
-            modelUrl={sculpture.model}
-            onError={() => setModelError(true)}
-          />
-        ) : (
-          <SculptureStaticTile
-            sculpture={sculpture}
-            compact
-            reason={modelError ? "error" : undefined}
-            showCta={hasModel && !modelError}
-            note={!hasModel ? t("collection3d.proximamente", locale) : undefined}
-          />
-        )}
-      </div>
-
-      <div className="mt-4">
-        <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-          {t("collection3d.pieza", locale)} {String(index + 1).padStart(2, "0")}
-          {sculpture.inventoryNumber && ` · ${sculpture.inventoryNumber}`}
-        </div>
-        <h3 className="mt-2 font-serif text-xl text-muva-dark md:text-2xl">
-          {sculpture.getTitle(locale)}
-        </h3>
-        {subtitle && (
-          <div className="mt-1 font-serif text-sm italic text-muva-brown">
-            {subtitle}
-          </div>
-        )}
-        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={isOpen}
-            className="inline-flex items-center gap-1.5 border-b border-muva-sand/60 pb-1 font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth transition-colors duration-300 hover:border-muva-dark hover:text-muva-dark"
-          >
-            {isOpen
-              ? t("collection3d.cerrarFicha", locale)
-              : t("collection3d.verFicha", locale)}
-            <ChevronDown
-              size={12}
-              className={`transition-transform duration-300 ${
-                isOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-          {hasModel && !modelError && (
-            <button
-              type="button"
-              onClick={() => openSculptureViewer(sculpture.id)}
-              className="inline-flex items-center gap-1.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-stone transition-colors duration-300 hover:text-muva-dark"
-            >
-              <ExternalLink size={12} aria-hidden="true" />
-              {t("collection3d.ver3d", locale)}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function FichaPanel({
-  sculpture,
-  index,
-  onClose,
-}: {
-  sculpture: Sculpture;
-  index: number;
-  onClose: () => void;
-}) {
-  const { locale } = useLanguage();
-  const panelRef = useRef<HTMLDivElement>(null);
   const subtitle = sculpture.getSubtitle?.(locale);
   const material = sculpture.materialKey
     ? t(sculpture.materialKey, locale)
@@ -661,90 +498,105 @@ function FichaPanel({
   const dimensions = sculpture.dimensionsKey
     ? t(sculpture.dimensionsKey, locale)
     : sculpture.dimensions;
-
-  useEffect(() => {
-    panelRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-    });
-  }, []);
+  const historia = toParagraphs(sculpture.getDescription(locale));
+  const iconografia = sculpture.getIconografia
+    ? toParagraphs(sculpture.getIconografia(locale))
+    : [];
+  const blocks = sculpture.blocks;
 
   return (
-    <div
-      ref={panelRef}
-      aria-live="polite"
-      className="mt-10 border-t border-muva-sand/60 pt-8 md:mt-12 md:pt-10"
+    <article
+      ref={reveal.ref}
+      className={`reveal-on-scroll ${
+        reveal.isVisible ? "is-visible" : ""
+      }`}
     >
-      <div className="flex flex-wrap items-start justify-between gap-6">
-        <div className="max-w-3xl">
-          <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
-            {t("collection3d.pieza", locale)} {String(index + 1).padStart(2, "0")}
-            {sculpture.inventoryNumber && ` · ${sculpture.inventoryNumber}`}
-          </div>
-          <h3 className="mt-2 font-serif text-3xl text-muva-dark md:text-4xl">
-            {sculpture.getTitle(locale)}
-          </h3>
-          {(subtitle || sculpture.artist) && (
-            <div className="mt-2 font-serif text-lg italic text-muva-brown">
-              {subtitle ?? sculpture.artist}
-              {sculpture.year && (
-                <span className="not-italic text-muva-stone">
-                  {" "}
-                  · {sculpture.year}
-                </span>
-              )}
-            </div>
-          )}
-          {(material || dimensions) && (
-            <div className="mt-3 font-sans text-[11px] uppercase tracking-extra-wide text-muva-stone">
-              {material}
-              {dimensions && <span> · {dimensions}</span>}
-            </div>
-          )}
-        </div>
-        <div className="flex items-center gap-3">
-          {sculpture.model && (
-            <button
-              type="button"
-              onClick={() => openSculptureViewer(sculpture.id)}
-              className="inline-flex items-center gap-2 border border-muva-dark/30 px-4 py-2.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-dark transition-all duration-300 hover:bg-muva-dark hover:text-muva-cream"
-            >
-              <ExternalLink size={13} aria-hidden="true" />
-              {t("collection3d.ver3d", locale)}
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex items-center gap-2 border border-muva-dark/30 px-4 py-2.5 font-sans text-[10px] uppercase tracking-extra-wide text-muva-dark transition-all duration-300 hover:bg-muva-dark hover:text-muva-cream"
-          >
-            <X size={13} aria-hidden="true" />
-            {t("collection3d.cerrarFicha", locale)}
-          </button>
-        </div>
+      <div ref={canvasContainerRef}>
+        {hasModel && hasSlot ? (
+          <SculptureCanvas
+            modelUrl={sculpture.model}
+            onError={() => setModelError(true)}
+          />
+        ) : (
+          <SculptureStaticTile
+            sculpture={sculpture}
+            reason={modelError ? "error" : undefined}
+            showCta={hasModel && !modelError}
+            note={!hasModel ? t("collection3d.proximamente", locale) : undefined}
+          />
+        )}
       </div>
 
-      <SculptureTexts sculpture={sculpture} />
-    </div>
+      <div className="mt-5">
+        <div className="font-sans text-[10px] uppercase tracking-extra-wide text-muva-earth">
+          {t("collection3d.pieza", locale)} {String(index + 1).padStart(2, "0")}
+          {sculpture.inventoryNumber &&
+            ` · ${sculpture.inventoryNumber}`}
+        </div>
+        <h3 className="mt-2 font-serif text-2xl text-muva-dark md:text-3xl">
+          {sculpture.getTitle(locale)}
+        </h3>
+        {(subtitle || sculpture.artist) && (
+          <div className="mt-1 font-serif text-base italic text-muva-brown">
+            {subtitle ?? sculpture.artist}
+            {sculpture.year && (
+              <span className="not-italic text-muva-stone">
+                {" "}
+                · {sculpture.year}
+              </span>
+            )}
+          </div>
+        )}
+        {(material || dimensions) && (
+          <div className="mt-2 font-sans text-[11px] uppercase tracking-extra-wide text-muva-stone">
+            {material}
+            {dimensions && <span> · {dimensions}</span>}
+          </div>
+        )}
+        {blocks ? (
+          <div className="mt-6 space-y-8">
+            {blocks.map((block, i) => {
+              const blockSubtitle = block.getSubtitle?.(locale);
+              const blockIconografia = block.getIconografia
+                ? toParagraphs(block.getIconografia(locale))
+                : [];
+              return (
+                <div
+                  key={block.titleKey}
+                  className={i > 0 ? "border-t border-muva-sand/50 pt-8" : ""}
+                >
+                  <h4 className="font-serif text-xl text-muva-dark md:text-2xl">
+                    {block.getTitle(locale)}
+                  </h4>
+                  {blockSubtitle && (
+                    <div className="mt-1 font-serif text-base italic text-muva-brown">
+                      {blockSubtitle}
+                    </div>
+                  )}
+                  <PieceTexts
+                    iconografia={blockIconografia}
+                    historia={toParagraphs(block.getDescription(locale))}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <PieceTexts iconografia={iconografia} historia={historia} />
+        )}
+        {sculpture.getAudio && (
+          <div className="mt-3">
+            <AudioPlayer src={sculpture.getAudio(locale)} compact />
+          </div>
+        )}
+      </div>
+    </article>
   );
 }
 
 export default function Collection3D() {
   const titleReveal = useScrollReveal<HTMLDivElement>();
   const { locale } = useLanguage();
-  const trackRef = useRef<HTMLDivElement>(null);
-  const [openId, setOpenId] = useState<string | null>(null);
-
-  const openIndex = sculptures.findIndex((s) => s.id === openId);
-  const openSculpture = openIndex >= 0 ? sculptures[openIndex] : null;
-
-  const scrollTrack = (direction: -1 | 1) => {
-    const track = trackRef.current;
-    if (!track) return;
-    const slide = track.querySelector<HTMLElement>("[data-slide]");
-    const step = slide ? slide.offsetWidth + 24 : track.clientWidth;
-    track.scrollBy({ left: direction * step, behavior: "smooth" });
-  };
 
   return (
     <section
@@ -768,50 +620,15 @@ export default function Collection3D() {
           </p>
         </div>
 
-        <div className="mt-14 flex items-center justify-end gap-3 md:mt-20">
-          <button
-            type="button"
-            onClick={() => scrollTrack(-1)}
-            aria-label={t("collection3d.anterior", locale)}
-            className="flex h-11 w-11 items-center justify-center border border-muva-dark/30 text-muva-dark transition-all duration-300 hover:bg-muva-dark hover:text-muva-cream"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => scrollTrack(1)}
-            aria-label={t("collection3d.siguiente", locale)}
-            className="flex h-11 w-11 items-center justify-center border border-muva-dark/30 text-muva-dark transition-all duration-300 hover:bg-muva-dark hover:text-muva-cream"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
-
-        <div
-          ref={trackRef}
-          className="no-scrollbar mt-6 flex snap-x snap-mandatory gap-6 overflow-x-auto pb-8"
-        >
+        <div className="mt-16 grid gap-12 sm:grid-cols-2 lg:grid-cols-3 md:mt-24 md:gap-10">
           {sculptures.map((sculpture, i) => (
-            <CarouselSlide
+            <SculptureCard
               key={sculpture.id}
               sculpture={sculpture}
               index={i}
-              isOpen={openId === sculpture.id}
-              onToggle={() =>
-                setOpenId((v) => (v === sculpture.id ? null : sculpture.id))
-              }
             />
           ))}
         </div>
-
-        {openSculpture && (
-          <FichaPanel
-            key={openSculpture.id}
-            sculpture={openSculpture}
-            index={openIndex}
-            onClose={() => setOpenId(null)}
-          />
-        )}
       </div>
     </section>
   );

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import AboutMuseum from "./components/AboutMuseum";
@@ -70,6 +70,7 @@ function App() {
           </Suspense>
         }
       />
+      <Route path="*" element={<Navigate to="/coleccion" replace />} />
     </Routes>
   );
 }
