@@ -169,7 +169,7 @@ export const sculptures: Sculpture[] = [
     descriptionKey: "sculpture.obra07.desc",
     iconografiaKey: "sculpture.obra07.icono",
     thumbnail: "/images/sculptures/obra-07.webp",
-    model: "",
+    model: "/models/sculptures/fray juan benardo.glb",
     getTitle: (locale) => t("sculpture.obra07.title", locale),
     getSubtitle: (locale) => t("sculpture.obra07.sub", locale),
     getDescription: (locale) => t("sculpture.obra07.desc", locale),
