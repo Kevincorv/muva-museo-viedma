@@ -58,19 +58,23 @@ function HomePage() {
   );
 }
 
+function CollectionRoute() {
+  return (
+    <Suspense fallback={null}>
+      <ColeccionPage />
+    </Suspense>
+  );
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HomePage />} />
-      <Route
-        path="/colección"
-        element={
-          <Suspense fallback={null}>
-            <ColeccionPage />
-          </Suspense>
-        }
-      />
-      <Route path="*" element={<Navigate to="/coleccion" replace />} />
+      {/* Se aceptan las dos grafías: con tilde (usada por los links internos)
+          y sin tilde (la que suele escribirse a mano o pegarse en un chat). */}
+      <Route path="/colección" element={<CollectionRoute />} />
+      <Route path="/coleccion" element={<CollectionRoute />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }

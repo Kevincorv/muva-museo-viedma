@@ -8,6 +8,20 @@ let limit = -1;
 let timer: ReturnType<typeof setTimeout> | null = null;
 const waiting = new Set<() => void>();
 
+/**
+ * Cuando el visor 3D a pantalla completa está abierto, los canvases embebidos
+ * de la página se liberan: en móvil conviene mantener un único contexto WebGL
+ * vivo a la vez (acumular contextos es lo que dispara la pérdida de contexto).
+ */
+let suspended = false;
+const suspendListeners = new Set<() => void>();
+
+export function setWebGLSuspended(next: boolean): void {
+  if (suspended === next) return;
+  suspended = next;
+  suspendListeners.forEach((listener) => listener());
+}
+
 /** Pausa entre grants para no decodificar varios .glb pesados a la vez. */
 const GRANT_INTERVAL_MS = 70;
 
@@ -70,9 +84,20 @@ export function acquireWebGLSlot(onGranted: (release: Release) => void): Release
 /** Hook: true cuando este componente posee un slot de WebGL activo. */
 export function useWebGLSlot(enabled: boolean): boolean {
   const [granted, setGranted] = useState(false);
+  const [isSuspended, setSuspended] = useState(suspended);
 
   useEffect(() => {
-    if (!enabled) {
+    const listener = () => setSuspended(suspended);
+    suspendListeners.add(listener);
+    return () => {
+      suspendListeners.delete(listener);
+    };
+  }, []);
+
+  const wanted = enabled && !isSuspended;
+
+  useEffect(() => {
+    if (!wanted) {
       setGranted(false);
       return;
     }
@@ -82,7 +107,7 @@ export function useWebGLSlot(enabled: boolean): boolean {
       setGranted(false);
       release();
     };
-  }, [enabled]);
+  }, [wanted]);
 
   return granted;
 }

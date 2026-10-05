@@ -8,6 +8,7 @@ import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
 import { hasWebGL, isConstrainedDevice, isSlowConnection } from "../lib/capabilities";
 import { fitCameraToModel } from "../lib/fitCamera";
+import { setWebGLSuspended } from "../lib/webglSlots";
 import AudioPlayer from "./AudioPlayer";
 
 const MUVA_BG = "#2a2018";
@@ -78,6 +79,15 @@ function SculptureModel({
     });
     return c;
   }, [scene]);
+
+  // Al cerrar la obra se libera la caché decodificada: si no, cada escultura
+  // revisada queda retenida en memoria y en móviles con poca RAM el navegador
+  // termina matando el contexto WebGL.
+  useEffect(() => {
+    return () => {
+      useGLTF.clear(url);
+    };
+  }, [url]);
 
   const fitToFrame = () => {
     const half = halfExtents.current;
@@ -181,6 +191,7 @@ export default function SculptureViewer() {
   const [showInfo, setShowInfo] = useState(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<any>(null);
+  const glRef = useRef<THREE.WebGLRenderer | null>(null);
   const { locale } = useLanguage();
 
   const sculpture = activeId ? sculptures.find((s) => s.id === activeId) : null;
@@ -219,6 +230,14 @@ export default function SculptureViewer() {
       window.removeEventListener("keydown", onKey);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeId]);
+
+  // Mientras el visor está abierto se liberan los canvases 3D embebidos en la
+  // página: en móviles así solo hay un contexto WebGL vivo a la vez.
+  useEffect(() => {
+    if (!activeId) return;
+    setWebGLSuspended(true);
+    return () => setWebGLSuspended(false);
   }, [activeId]);
 
   const close = () => {
@@ -298,12 +317,17 @@ export default function SculptureViewer() {
                   powerPreference: lightMode ? "low-power" : "high-performance",
                 }}
                 onCreated={({ gl, scene }) => {
+                  glRef.current = gl;
                   gl.setClearColor(new THREE.Color(MUVA_BG));
                   gl.toneMappingExposure = 1.4;
                   scene.fog = new THREE.Fog(MUVA_BG, 8, 18);
-                  gl.domElement.addEventListener(
+                  const el = gl.domElement;
+                  el.addEventListener(
                     "webglcontextlost",
                     (e: Event) => {
+                      // Ignora la pérdida de contexto del canvas anterior
+                      // (se libera a propósito al cambiar de obra/reintentar).
+                      if (glRef.current?.domElement !== el) return;
                       e.preventDefault();
                       setError(true);
                       setLoading(false);
