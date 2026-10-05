@@ -69,6 +69,18 @@ export const PASIONARIA_AUDIO: SculptureAudio = {
   pt: "/audio/sculptures/obra-13-pt.mp3",
 };
 
+const audioFor = (obra: string): SculptureAudio => ({
+  es: `/audio/sculptures/${obra}-es.mp3`,
+  en: `/audio/sculptures/${obra}-en.mp3`,
+  pt: `/audio/sculptures/${obra}-pt.mp3`,
+});
+
+const OBRA07_AUDIO = audioFor("obra-07");
+const OBRA08_AUDIO = audioFor("obra-08");
+const OBRA11_AUDIO = audioFor("obra-11");
+const OBRA12_AUDIO = audioFor("obra-12");
+const OBRA14_AUDIO = audioFor("obra-14");
+
 export const sculptures: Sculpture[] = [
   {
     id: "obra-01",
@@ -170,10 +182,12 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra07.icono",
     thumbnail: "/images/sculptures/obra-07.webp",
     model: "/models/sculptures/obra-07-fray-juan-bernardo.glb",
+    audio: OBRA07_AUDIO,
     getTitle: (locale) => t("sculpture.obra07.title", locale),
     getSubtitle: (locale) => t("sculpture.obra07.sub", locale),
     getDescription: (locale) => t("sculpture.obra07.desc", locale),
     getIconografia: (locale) => t("sculpture.obra07.icono", locale),
+    getAudio: (locale) => OBRA07_AUDIO[locale] ?? OBRA07_AUDIO.es,
   },
   {
     id: "obra-08",
@@ -183,10 +197,12 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra08.icono",
     thumbnail: "/images/sculptures/obra-08.webp",
     model: "/models/sculptures/obra-08-francisco-y-domingo.glb",
+    audio: OBRA08_AUDIO,
     getTitle: (locale) => t("sculpture.obra08.group", locale),
     getSubtitle: (locale) => t("sculpture.obra08.sub", locale),
     getDescription: (locale) => t("sculpture.obra08.desc", locale),
     getIconografia: (locale) => t("sculpture.obra08.icono", locale),
+    getAudio: (locale) => OBRA08_AUDIO[locale] ?? OBRA08_AUDIO.es,
   },
   {
     id: "obra-10",
@@ -209,10 +225,12 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra11.icono",
     thumbnail: "/images/sculptures/obra-11.webp",
     model: "/models/sculptures/obra-11-padre-pio.glb",
+    audio: OBRA11_AUDIO,
     getTitle: (locale) => t("sculpture.obra11.title", locale),
     getSubtitle: (locale) => t("sculpture.obra11.sub", locale),
     getDescription: (locale) => t("sculpture.obra11.desc", locale),
     getIconografia: (locale) => t("sculpture.obra11.icono", locale),
+    getAudio: (locale) => OBRA11_AUDIO[locale] ?? OBRA11_AUDIO.es,
   },
   {
     id: "obra-12",
@@ -222,10 +240,12 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra12.icono",
     thumbnail: "/images/sculptures/obra-12.webp",
     model: "/models/sculptures/obra-12-fray-luis-de-bolanos.glb",
+    audio: OBRA12_AUDIO,
     getTitle: (locale) => t("sculpture.obra12.title", locale),
     getSubtitle: (locale) => t("sculpture.obra12.sub", locale),
     getDescription: (locale) => t("sculpture.obra12.desc", locale),
     getIconografia: (locale) => t("sculpture.obra12.icono", locale),
+    getAudio: (locale) => OBRA12_AUDIO[locale] ?? OBRA12_AUDIO.es,
   },
   {
     id: "obra-13",
@@ -247,9 +267,11 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra14.icono",
     thumbnail: "/images/sculptures/obra-14.webp",
     model: "/models/sculptures/obra-14-nativa-arrodillada.glb",
+    audio: OBRA14_AUDIO,
     getTitle: (locale) => t("sculpture.obra14.title", locale),
     getSubtitle: (locale) => t("sculpture.obra14.sub", locale),
     getDescription: (locale) => t("sculpture.obra14.desc", locale),
     getIconografia: (locale) => t("sculpture.obra14.icono", locale),
+    getAudio: (locale) => OBRA14_AUDIO[locale] ?? OBRA14_AUDIO.es,
   },
 ];
