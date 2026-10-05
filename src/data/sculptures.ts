@@ -85,6 +85,7 @@ const OBRA16_AUDIO = audioFor("obra-16");
 const OBRA17_AUDIO = audioFor("obra-17");
 const OBRA18_AUDIO = audioFor("obra-18");
 const OBRA19_AUDIO = audioFor("obra-19");
+const OBRA20_AUDIO = audioFor("obra-20");
 
 export const sculptures: Sculpture[] = [
   {
@@ -361,5 +362,20 @@ export const sculptures: Sculpture[] = [
     getDescription: (locale) => t("sculpture.obra19.desc", locale),
     getIconografia: (locale) => t("sculpture.obra19.icono", locale),
     getAudio: (locale) => OBRA19_AUDIO[locale] ?? OBRA19_AUDIO.es,
+  },
+  {
+    id: "obra-20",
+    titleKey: "sculpture.obra20.title",
+    subtitleKey: "sculpture.obra20.sub",
+    descriptionKey: "sculpture.obra20.desc",
+    iconografiaKey: "sculpture.obra20.icono",
+    thumbnail: "/images/sculptures/obra-20.webp",
+    model: "",
+    audio: OBRA20_AUDIO,
+    getTitle: (locale) => t("sculpture.obra20.title", locale),
+    getSubtitle: (locale) => t("sculpture.obra20.sub", locale),
+    getDescription: (locale) => t("sculpture.obra20.desc", locale),
+    getIconografia: (locale) => t("sculpture.obra20.icono", locale),
+    getAudio: (locale) => OBRA20_AUDIO[locale] ?? OBRA20_AUDIO.es,
   },
 ];
