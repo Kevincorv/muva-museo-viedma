@@ -27,6 +27,7 @@ const MODELS = {
   "obra-10": "Tupasy Maria.glb",
   "obra-11": "Santo Padre Pio.glb",
   "obra-12": "Fray Luis de Bolanos.glb",
+  "obra-13": "La Pasionaria y San Ignacio.glb",
   "obra-14": "nativa_arrodillada_rezando.glb",
 };
 // nombres reales con tildes/ñ (el mapa de arriba es solo para depurar)

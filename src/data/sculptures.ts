@@ -233,7 +233,7 @@ export const sculptures: Sculpture[] = [
     artist: "Manuel Viedma",
     descriptionKey: "sculpture.obra13.desc",
     thumbnail: "/images/sculptures/obra-13.webp",
-    model: "",
+    model: "/models/sculptures/La Pasionaria y San Ignacio.glb",
     audio: PASIONARIA_AUDIO,
     getTitle: (locale) => t("sculpture.obra13.title", locale),
     getDescription: (locale) => t("sculpture.obra13.desc", locale),

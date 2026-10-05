@@ -19,6 +19,7 @@ const MAP = {
   "obra-10": "Tupãsy María.glb",
   "obra-11": "Santo Padre Pio.glb",
   "obra-12": "Fray Luis de Bolaños.glb",
+  "obra-13": "La Pasionaria y San Ignacio.glb",
   "obra-14": "nativa_arrodillada_rezando.glb",
 };
 
