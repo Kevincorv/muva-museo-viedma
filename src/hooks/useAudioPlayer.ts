@@ -8,7 +8,10 @@ export interface AudioPlayerState {
   hasError: boolean;
 }
 
-export function useAudioPlayer(src: string | undefined) {
+export function useAudioPlayer(
+  src: string | undefined,
+  preload: "none" | "metadata" = "none",
+) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [state, setState] = useState<AudioPlayerState>({
     isPlaying: false,
@@ -28,7 +31,7 @@ export function useAudioPlayer(src: string | undefined) {
     });
     if (!src) return;
     const audio = new Audio();
-    audio.preload = "none";
+    audio.preload = preload;
     audio.src = src;
     audioRef.current = audio;
 
@@ -75,7 +78,7 @@ export function useAudioPlayer(src: string | undefined) {
       audio.removeEventListener("error", onError);
       audioRef.current = null;
     };
-  }, [src]);
+  }, [src, preload]);
 
   const play = useCallback(() => {
     const audio = audioRef.current;
@@ -118,5 +121,14 @@ export function useAudioPlayer(src: string | undefined) {
     setState((s) => ({ ...s, isPlaying: false, currentTime: 0 }));
   }, []);
 
-  return { state, play, pause, toggle, seek, stop };
+  /** Vuelve al inicio: si estaba sonando sigue sonando desde 0, si no, arranca. */
+  const restart = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.currentTime = 0;
+    setState((s) => ({ ...s, currentTime: 0 }));
+    if (audio.paused) play();
+  }, [play]);
+
+  return { state, play, pause, toggle, seek, stop, restart };
 }

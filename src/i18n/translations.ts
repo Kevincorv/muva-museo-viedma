@@ -189,6 +189,7 @@ const es: TranslationKeys = {
   "audio.pause": "Pausar",
   "audio.guide": "Audioguía",
   "audio.seek": "Buscar",
+  "audio.restart": "Volver a iniciar",
 
   "langSelector.ariaLabel": "Seleccionar idioma",
 
@@ -524,6 +525,7 @@ const en: TranslationKeys = {
   "audio.pause": "Pause",
   "audio.guide": "Audio guide",
   "audio.seek": "Seek",
+  "audio.restart": "Restart",
 
   "langSelector.ariaLabel": "Select language",
 
@@ -859,6 +861,7 @@ const pt: TranslationKeys = {
   "audio.pause": "Pausar",
   "audio.guide": "Audioguia",
   "audio.seek": "Buscar",
+  "audio.restart": "Reiniciar",
 
   "langSelector.ariaLabel": "Selecionar idioma",
 
