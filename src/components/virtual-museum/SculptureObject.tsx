@@ -186,8 +186,8 @@ function SculptureModel({
   );
 }
 
-const PLAQUE_BASE_COLOR = new THREE.Color("#ffffff");
-const PLAQUE_DIM_COLOR = new THREE.Color("#8d857a");
+const PLAQUE_BASE_COLOR = new THREE.Color("#ded7cb");
+const PLAQUE_DIM_COLOR = new THREE.Color("#7e776b");
 
 function FallbackPlaque({ sculpture }: { sculpture: MuseumSculpture }) {
   const { locale } = useLanguage();

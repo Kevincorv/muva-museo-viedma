@@ -28,6 +28,9 @@ const FRAME_DEPTH = 0.05;
 const LINER_Z = FRAME_DEPTH + 0.001;
 const CANVAS_Z = FRAME_DEPTH + 0.003;
 const LIGHT_RISE = 0.13;
+const PAINTING_EMISSIVE = 0.25;
+const LENS_BASE_COLOR = new THREE.Color("#fff0d0");
+const LENS_DIM_COLOR = new THREE.Color("#6f6350");
 
 function paintingSize(spec: PaintingSpec): { w: number; h: number } {
   const h = spec.height ?? PAINTING_HEIGHT;
@@ -141,7 +144,7 @@ function PaintingCanvas({
       map: texture,
       emissiveMap: texture,
       emissive: new THREE.Color("#ffffff"),
-      emissiveIntensity: 0.3,
+      emissiveIntensity: PAINTING_EMISSIVE,
       roughness: 0.62,
       metalness: 0,
     });
@@ -176,10 +179,6 @@ function PaintingCanvas({
     </group>
   );
 }
-
-const PAINTING_EMISSIVE = 0.3;
-const LENS_BASE_COLOR = new THREE.Color("#fff0d0");
-const LENS_DIM_COLOR = new THREE.Color("#6f6350");
 
 export default function WallPaintings() {
   const merged = useMemo(() => buildMerged(paintings), []);

@@ -27,8 +27,8 @@ import MuseumProps from "./MuseumProps";
 import MuseumRoom from "./MuseumRoom";
 import WallPaintings from "./WallPaintings";
 
-const SIGN_BASE_COLOR = new THREE.Color("#ffffff");
-const SIGN_DIM_COLOR = new THREE.Color("#9a9184");
+const SIGN_BASE_COLOR = new THREE.Color("#d9d2c6");
+const SIGN_DIM_COLOR = new THREE.Color("#837c70");
 
 function SignPlaque({ sign, label }: { sign: SignSpec; label: string }) {
   const texture = useMemo(
@@ -91,8 +91,10 @@ const CEILING_Y = 3.6;
 const SPOT_OFFSET = 0.9;
 /** Longitud del accesorio: el cono nace en la boca del focal. */
 const SPOT_DROP = 0.16;
-/** Intensidad (canela, ~3000 K) de cada spotlight de obra. */
-const SPOT_INTENSITY = 13;
+/** Intensidad (canela, ~3000 K) de cada spotlight de obra: es la luz
+ *  principal de la sala — el resto de la galería queda a media penumbra.
+ *  El cono es estrecho para que la luz abrace la obra y no inunde el piso. */
+const SPOT_INTENSITY = 12;
 
 interface GallerySpotSpec {
   attach: [number, number, number];
@@ -198,11 +200,11 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
   const lightRef = useRef<THREE.SpotLight>(null);
   const { scene } = useThree();
 
-  // Se atenúa al enfocar una obra para que destaque la luminaria de foco.
+  // Al enfocar una obra, las demás luces bajan para que destaque la luminaria.
   useFrame(() => {
     const light = lightRef.current;
     if (light) {
-      light.intensity = SPOT_INTENSITY * (1 - 0.65 * focusDim.current);
+      light.intensity = SPOT_INTENSITY * (1 - 0.75 * focusDim.current);
     }
   });
 
@@ -221,10 +223,10 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
     <spotLight
       ref={lightRef}
       position={spec.origin}
-      angle={0.42}
-      penumbra={0.6}
+      angle={0.34}
+      penumbra={0.55}
       intensity={SPOT_INTENSITY}
-      distance={8}
+      distance={7}
       decay={1.6}
       color="#ffcf94"
     />
@@ -262,20 +264,12 @@ function computeFocusSpot(target: [number, number, number]): FocusSpotSpec {
   };
 }
 
-/** Valores base (sin foco) y atenuados (foco activo) de la ambientación. */
+/**
+ * Tono de sala (siempre activo): galería a media penumbra con luz cálida
+ * concentrada en las obras. `LIGHT_DIM` es el paso extra de oscuridad que se
+ * aplica al seleccionar una escultura (un punto más, sin exagerar).
+ */
 const LIGHT_BASE = {
-  ambient: 0.32,
-  hemi: 0.4,
-  key: 0.9,
-  fill: 0.22,
-  environment: 0.55,
-  background: new THREE.Color("#ddd0b4"),
-  panel: new THREE.Color("#ffe4b8"),
-  lens: new THREE.Color("#ffdfb0"),
-  haloOpacity: 1,
-} as const;
-
-const LIGHT_DIM = {
   ambient: 0.1,
   hemi: 0.12,
   key: 0.16,
@@ -287,18 +281,31 @@ const LIGHT_DIM = {
   haloOpacity: 0.3,
 } as const;
 
+const LIGHT_DIM = {
+  ambient: 0.065,
+  hemi: 0.08,
+  key: 0.11,
+  fill: 0.04,
+  environment: 0.17,
+  background: new THREE.Color("#3b3327"),
+  panel: new THREE.Color("#4e4331"),
+  lens: new THREE.Color("#4d4534"),
+  haloOpacity: 0.18,
+} as const;
+
 /**
  * Arquitectura del museo: pisos, muros generados desde el plano, molduras,
  * columnas, mobiliario, techos, paneles de luz, señalización e iluminación.
  *
- * Ambientación de galería:
- *  · IBL local (`RoomEnvironment`) para reflejos suaves: no descarga nada.
- *  · Luz base cálida (ambient + hemisférica): esquinas iluminadas, sin negros.
+ * Ambientación de galería (tono Prado a media penumbra):
+ *  · Luz base mínima (ambient + hemisférica tenues): la sala vive oscura.
+ *  · Un spotlight cálido (~3000 K) por obra es la fuente de luz principal.
+ *  · IBL local (`RoomEnvironment`) a baja intensidad para reflejos suaves.
  *  · Una luz clave con sombra suave; el mapa de sombra se dibuja una vez y
  *    solo se refresca cuando entra o sale una obra (`autoUpdate = false`).
- *  · Un spotlight cálido (~3000 K) por obra, derivado de `museumSculptures`
- *    (solo lectura): acento sobre forma, volumen y textura. Sin sombra.
  *  · Aparatos de techo fusionados (cuerpo + lente emisiva + halo).
+ *  · Al seleccionar una escultura todo baja un punto más y su luminaria de
+ *    foco enciende sobre la obra.
  *  · `refreshKey` avisa al sistema que hay que refrescar las sombras.
  */
 export default function MuseumEnvironment({
@@ -425,7 +432,7 @@ export default function MuseumEnvironment({
     const environment = new RoomEnvironment();
     const target = pmrem.fromScene(environment, 0.04);
     scene.environment = target.texture;
-    scene.environmentIntensity = 0.55;
+    scene.environmentIntensity = LIGHT_BASE.environment;
     return () => {
       scene.environment = null;
       target.dispose();
@@ -628,7 +635,7 @@ export default function MuseumEnvironment({
 
       <EntranceDoor />
 
-      {/* Luz base cálida dorada: ambiente del Prado. */}
+      {/* Luz base tenue: la sala queda a media penumbra. */}
       <ambientLight ref={ambientRef} intensity={LIGHT_BASE.ambient} color="#f5e6c8" />
       <hemisphereLight
         ref={hemiRef}
@@ -665,11 +672,11 @@ export default function MuseumEnvironment({
         <GallerySpot key={`spot-${index}`} spec={spot} />
       ))}
 
-      {/* Luminaria de foco: ilumina la escultura seleccionada. */}
+      {/* Luminaria de foco: ilumina solo la escultura seleccionada. */}
       <spotLight
         ref={focusSpotRef}
         position={focusSpec.origin}
-        angle={0.45}
+        angle={0.38}
         penumbra={0.65}
         intensity={0}
         distance={12}
