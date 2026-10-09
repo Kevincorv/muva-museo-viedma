@@ -23,6 +23,7 @@ import {
 import MuseumArchitecture from "./MuseumArchitecture";
 import MuseumProps from "./MuseumProps";
 import MuseumRoom from "./MuseumRoom";
+import WallPaintings from "./WallPaintings";
 
 function SignPlaque({ sign, label }: { sign: SignSpec; label: string }) {
   const texture = useMemo(
@@ -417,6 +418,7 @@ export default function MuseumEnvironment({
       ))}
 
       <MuseumArchitecture />
+      <WallPaintings />
       <MuseumProps />
 
       {/* Aparatos de galería: cuerpo + lente + halo (3 draw calls). */}

@@ -54,3 +54,6 @@ Thumbs.db
 .vm-*.err
 .vm-*.log
 .vm-shots*/
+
+# Fuentes originales de cuadros (ya copiadas a public/images/paintings/)
+/public/muvacuadros/
