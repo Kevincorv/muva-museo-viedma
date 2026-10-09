@@ -5,6 +5,7 @@ import { museum } from "../data/museum";
 import { useScrolled } from "../hooks/useScrollReveal";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
+import { vmText } from "./virtual-museum/texts";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
@@ -71,6 +72,12 @@ export default function Navbar() {
                 {t(link.labelKey, locale)}
               </a>
             ))}
+            <Link
+              to="/entorno-virtual"
+              className="relative whitespace-nowrap font-sans text-[11px] uppercase tracking-extra-wide text-muva-dark/80 transition-colors duration-300 hover:text-muva-earth xl:text-[12px]"
+            >
+              {vmText("hud.brand", locale)}
+            </Link>
           </nav>
 
           <div className="flex shrink-0 items-center gap-3">
@@ -144,6 +151,20 @@ export default function Navbar() {
                 {t(link.labelKey, locale)}
               </a>
             ))}
+            <Link
+              to="/entorno-virtual"
+              onClick={() => setOpen(false)}
+              className={`border-b border-muva-sand/30 py-5 font-serif text-3xl text-muva-dark transition-all duration-700 ${
+                open ? "translate-x-0 opacity-100" : "translate-x-6 opacity-0"
+              }`}
+              style={{
+                transitionDelay: open
+                  ? `${(museum.navLinks.length + 1) * 60 + 150}ms`
+                  : "0ms",
+              }}
+            >
+              {vmText("hud.brand", locale)}
+            </Link>
             <div className="mt-6">
               <LanguageSwitcher />
             </div>

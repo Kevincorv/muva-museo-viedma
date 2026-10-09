@@ -379,3 +379,244 @@ export const sculptures: Sculpture[] = [
     getAudio: (locale) => OBRA20_AUDIO[locale] ?? OBRA20_AUDIO.es,
   },
 ];
+
+/* ---------------------------------------------------------------------------
+ * ENTORNO VIRTUAL (museo 3D) — ver README-entorno-virtual.md
+ *
+ * Para colocar una obra dentro del recorrido 3D:
+ *   1. Copiar el .glb a /public/models/sculptures/  (o /public/models/museum/sculptures/)
+ *   2. Copiar la miniatura a /public/images/sculptures/
+ *   3. Agregar un objeto a `museumSculptures` con model / position / room.
+ *
+ * Si `ref` apunta a una obra de `sculptures`, el título, la descripción, la
+ * iconografía, el material y el audio se reutilizan ya traducidos (es/en/pt);
+ * si no, se usan los textos literales del propio objeto.
+ * ------------------------------------------------------------------------- */
+
+export interface MuseumSculpture {
+  /** Id único dentro del entorno virtual. */
+  id: string;
+  /** Opcional: obra de `sculptures` cuya ficha traducida se reutiliza. */
+  ref?: string;
+  /** Ficha manual (obras sin entrada en la colección). */
+  title?: string;
+  subtitle?: string;
+  artist?: string;
+  year?: string;
+  material?: string;
+  dimensions?: string;
+  inventoryNumber?: string;
+  description?: string;
+  historicalContext?: string;
+  /** Ruta de la imagen; si falta se toma la de `ref`. */
+  thumbnail?: string;
+  /** Ruta del .glb (vacío ⇒ se muestra una placa con la ficha). */
+  model: string;
+  /** Posición base sobre el piso: [x, y, z] (y = altura del piso). */
+  position: [number, number, number];
+  /** Rotación en radianes sobre el eje Y (para orientar la pieza). */
+  rotation?: [number, number, number];
+  /** Altura final deseada en metros (el .glb se ajusta solo). */
+  height?: number;
+  /** Multiplicador sobre el ajuste automático. */
+  scale?: number;
+  /** Id de la sala (ver museumLayout.ts). */
+  room: string;
+  /** Pedestal bajo la pieza (por defecto true). */
+  pedestal?: boolean;
+  /** Radio de colisión en metros (por defecto 0.6). */
+  collisionRadius?: number;
+}
+
+const sculptureById = new Map(sculptures.map((s) => [s.id, s]));
+
+export function museumSource(s: MuseumSculpture) {
+  return s.ref ? sculptureById.get(s.ref) : undefined;
+}
+
+export function museumTitle(s: MuseumSculpture, locale: Locale): string {
+  return museumSource(s)?.getTitle(locale) ?? s.title ?? s.id;
+}
+
+export function museumSubtitle(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  return museumSource(s)?.getSubtitle?.(locale) ?? s.subtitle;
+}
+
+export function museumArtist(s: MuseumSculpture): string | undefined {
+  return s.artist ?? museumSource(s)?.artist;
+}
+
+export function museumDescription(
+  s: MuseumSculpture,
+  locale: Locale
+): string {
+  return museumSource(s)?.getDescription(locale) ?? s.description ?? "";
+}
+
+export function museumIconografia(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  return museumSource(s)?.getIconografia?.(locale);
+}
+
+export function museumHistoricalContext(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  return museumSource(s)?.getHistoricalContext?.(locale) ??
+    s.historicalContext;
+}
+
+export function museumMaterial(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  const src = museumSource(s);
+  if (s.material) return s.material;
+  if (src?.materialKey) return t(src.materialKey, locale);
+  return src?.material;
+}
+
+export function museumDimensions(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  const src = museumSource(s);
+  if (s.dimensions) return s.dimensions;
+  if (src?.dimensionsKey) return t(src.dimensionsKey, locale);
+  return src?.dimensions;
+}
+
+export function museumThumbnail(s: MuseumSculpture): string | undefined {
+  return s.thumbnail ?? museumSource(s)?.thumbnail;
+}
+
+export function museumAudio(
+  s: MuseumSculpture,
+  locale: Locale
+): string | undefined {
+  return museumSource(s)?.getAudio?.(locale);
+}
+
+export function museumInventory(s: MuseumSculpture): string | undefined {
+  return s.inventoryNumber ?? museumSource(s)?.inventoryNumber;
+}
+
+export function museumSculptureById(id: string): MuseumSculpture | undefined {
+  return museumSculptures.find((s) => s.id === id);
+}
+
+/**
+ * Colocación de las obras dentro del plano de `museumLayout.ts`.
+ * `position` es el punto de apoyo sobre el piso; el modelo se escala solo
+ * para que mida `height` metros (por defecto 1,15 m) sobre el pedestal.
+ *
+ * Los `inventoryNumber` de esta lista son de ejemplo: reemplazarlos por los
+ * números reales del museo cuando estén disponibles.
+ */
+export const museumSculptures: MuseumSculpture[] = [
+  {
+    id: "ev-obra-01",
+    ref: "obra-01",
+    inventoryNumber: "MUVA-001",
+    model: "/models/sculptures/obra-01-sagrada-familia.glb",
+    position: [-2.8, 0, 9.4],
+    rotation: [0, 0.6, 0],
+    height: 1.15,
+    room: "entrada",
+  },
+  {
+    id: "ev-obra-05",
+    ref: "obra-05",
+    inventoryNumber: "MUVA-002",
+    model: "/models/sculptures/obra-05-san-joaquin.glb",
+    position: [2.8, 0, 9.4],
+    rotation: [0, -0.6, 0],
+    height: 1.15,
+    room: "entrada",
+  },
+  {
+    id: "ev-obra-07",
+    ref: "obra-07",
+    inventoryNumber: "MUVA-003",
+    model: "/models/sculptures/obra-07-fray-juan-bernardo.glb",
+    position: [-11.4, 0, 2.6],
+    rotation: [0, 1.35, 0],
+    height: 1.2,
+    room: "sala-1",
+  },
+  {
+    id: "ev-obra-11",
+    ref: "obra-11",
+    inventoryNumber: "MUVA-004",
+    model: "/models/sculptures/obra-11-padre-pio.glb",
+    position: [-6.6, 0, -1.6],
+    rotation: [0, -0.7, 0],
+    height: 1.15,
+    room: "sala-1",
+  },
+  {
+    id: "ev-obra-12",
+    ref: "obra-12",
+    inventoryNumber: "MUVA-005",
+    model: "/models/sculptures/obra-12-fray-luis-de-bolanos.glb",
+    position: [11.4, 0, 2.6],
+    rotation: [0, -1.35, 0],
+    height: 1.2,
+    room: "sala-2",
+  },
+  {
+    id: "ev-obra-08",
+    ref: "obra-08",
+    inventoryNumber: "MUVA-006",
+    model: "/models/sculptures/obra-08-francisco-y-domingo.glb",
+    position: [6.6, 0, -1.6],
+    rotation: [0, 0.7, 0],
+    height: 1.15,
+    room: "sala-2",
+  },
+  {
+    id: "ev-obra-14",
+    ref: "obra-14",
+    inventoryNumber: "MUVA-007",
+    model: "/models/sculptures/obra-14-nativa-arrodillada.glb",
+    position: [-11.2, 0, -6],
+    rotation: [0, 1.2, 0],
+    height: 1.1,
+    room: "sala-3",
+  },
+  {
+    id: "ev-obra-10",
+    ref: "obra-10",
+    inventoryNumber: "MUVA-008",
+    model: "/models/sculptures/obra-10-tupasy-maria.glb",
+    position: [-6.4, 0, -12.6],
+    rotation: [0, -0.6, 0],
+    height: 1.15,
+    room: "sala-3",
+  },
+  {
+    id: "ev-obra-03",
+    ref: "obra-03",
+    inventoryNumber: "MUVA-009",
+    model: "/models/sculptures/obra-03-virgen-maria.glb",
+    position: [0, 0, -13.2],
+    rotation: [0, 0, 0],
+    height: 1.5,
+    room: "sala-principal",
+  },
+  {
+    id: "ev-obra-02",
+    ref: "obra-02",
+    inventoryNumber: "MUVA-010",
+    model: "/models/sculptures/obra-02-nino-jesus.glb",
+    position: [9, 0, -11],
+    rotation: [0, -0.65, 0],
+    height: 1.1,
+    room: "sala-4",
+  },
+];

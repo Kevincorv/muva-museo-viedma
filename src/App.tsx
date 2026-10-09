@@ -18,6 +18,7 @@ import { useLanguage } from "./i18n/LanguageContext";
 
 const SculptureViewer = lazy(() => import("./components/SculptureViewer"));
 const ColeccionPage = lazy(() => import("./pages/ColeccionPage"));
+const VirtualMuseumPage = lazy(() => import("./pages/VirtualMuseumPage"));
 
 function HomePage() {
   const { locale } = useLanguage();
@@ -74,6 +75,14 @@ function App() {
           y sin tilde (la que suele escribirse a mano o pegarse en un chat). */}
       <Route path="/colección" element={<CollectionRoute />} />
       <Route path="/coleccion" element={<CollectionRoute />} />
+      <Route
+        path="/entorno-virtual"
+        element={
+          <Suspense fallback={null}>
+            <VirtualMuseumPage />
+          </Suspense>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

@@ -44,3 +44,13 @@ Thumbs.db
 
 .vercel
 .env*
+
+# Temporary/debug scripts and logs
+.serve.err
+.serve.log
+.shot-current.png
+.thumb-cdp.cjs
+.vm-*.cjs
+.vm-*.err
+.vm-*.log
+.vm-shots*/
