@@ -75,8 +75,15 @@ const audioFor = (obra: string): SculptureAudio => ({
   pt: `/audio/sculptures/${obra}-pt.mp3`,
 });
 
+const OBRA01_AUDIO = audioFor("obra-01");
+const OBRA02_AUDIO = audioFor("obra-02");
+const OBRA03_AUDIO = audioFor("obra-03");
+const OBRA04_AUDIO = audioFor("obra-04");
+const OBRA05_AUDIO = audioFor("obra-05");
+const OBRA06_AUDIO = audioFor("obra-06");
 const OBRA07_AUDIO = audioFor("obra-07");
 const OBRA08_AUDIO = audioFor("obra-08");
+const OBRA10_AUDIO = audioFor("obra-10");
 const OBRA11_AUDIO = audioFor("obra-11");
 const OBRA12_AUDIO = audioFor("obra-12");
 const OBRA14_AUDIO = audioFor("obra-14");
@@ -98,10 +105,12 @@ export const sculptures: Sculpture[] = [
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-01.webp",
     model: "/models/sculptures/obra-01-sagrada-familia.glb",
+    audio: OBRA01_AUDIO,
     getTitle: (locale) => t("sculpture.obra01.title", locale),
     getSubtitle: (locale) => t("sculpture.obra01.sub", locale),
     getDescription: (locale) => t("sculpture.obra01.desc", locale),
     getIconografia: (locale) => t("sculpture.obra01.icono", locale),
+    getAudio: (locale) => OBRA01_AUDIO[locale] ?? OBRA01_AUDIO.es,
   },
   {
     id: "obra-02",
@@ -113,10 +122,12 @@ export const sculptures: Sculpture[] = [
     materialKey: "sculpture.material.piedraPolicromada",
     thumbnail: "/images/sculptures/obra-02.webp",
     model: "/models/sculptures/obra-02-nino-jesus.glb",
+    audio: OBRA02_AUDIO,
     getTitle: (locale) => t("sculpture.obra02.title", locale),
     getSubtitle: (locale) => t("sculpture.obra02.sub", locale),
     getDescription: (locale) => t("sculpture.obra02.desc", locale),
     getIconografia: (locale) => t("sculpture.obra02.icono", locale),
+    getAudio: (locale) => OBRA02_AUDIO[locale] ?? OBRA02_AUDIO.es,
   },
   {
     id: "obra-03",
@@ -130,10 +141,12 @@ export const sculptures: Sculpture[] = [
     dimensionsKey: "sculpture.dimensions.altura11",
     thumbnail: "/images/sculptures/obra-03.webp",
     model: "/models/sculptures/obra-03-virgen-maria.glb",
+    audio: OBRA03_AUDIO,
     getTitle: (locale) => t("sculpture.obra03.title", locale),
     getSubtitle: (locale) => t("sculpture.obra03.sub", locale),
     getDescription: (locale) => t("sculpture.obra03.desc", locale),
     getIconografia: (locale) => t("sculpture.obra03.icono", locale),
+    getAudio: (locale) => OBRA03_AUDIO[locale] ?? OBRA03_AUDIO.es,
   },
   {
     id: "obra-04",
@@ -145,10 +158,12 @@ export const sculptures: Sculpture[] = [
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-04.webp",
     model: "/models/sculptures/SANTA ANA.glb",
+    audio: OBRA04_AUDIO,
     getTitle: (locale) => t("sculpture.obra04.title", locale),
     getSubtitle: (locale) => t("sculpture.obra04.sub", locale),
     getDescription: (locale) => t("sculpture.obra04.desc", locale),
     getIconografia: (locale) => t("sculpture.obra04.icono", locale),
+    getAudio: (locale) => OBRA04_AUDIO[locale] ?? OBRA04_AUDIO.es,
   },
   {
     id: "obra-05",
@@ -160,10 +175,12 @@ export const sculptures: Sculpture[] = [
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-05.webp",
     model: "/models/sculptures/obra-05-san-joaquin.glb",
+    audio: OBRA05_AUDIO,
     getTitle: (locale) => t("sculpture.obra05.title", locale),
     getSubtitle: (locale) => t("sculpture.obra05.sub", locale),
     getDescription: (locale) => t("sculpture.obra05.desc", locale),
     getIconografia: (locale) => t("sculpture.obra05.icono", locale),
+    getAudio: (locale) => OBRA05_AUDIO[locale] ?? OBRA05_AUDIO.es,
   },
   {
     id: "obra-06",
@@ -175,10 +192,12 @@ export const sculptures: Sculpture[] = [
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-06.webp",
     model: "/models/sculptures/obra-06-san-miguel-arcangel_nuevo.glb",
+    audio: OBRA06_AUDIO,
     getTitle: (locale) => t("sculpture.obra06.title", locale),
     getSubtitle: (locale) => t("sculpture.obra06.sub", locale),
     getDescription: (locale) => t("sculpture.obra06.desc", locale),
     getIconografia: (locale) => t("sculpture.obra06.icono", locale),
+    getAudio: (locale) => OBRA06_AUDIO[locale] ?? OBRA06_AUDIO.es,
   },
   {
     id: "obra-07",
@@ -218,10 +237,12 @@ export const sculptures: Sculpture[] = [
     iconografiaKey: "sculpture.obra10.icono",
     thumbnail: "/images/sculptures/obra-10.webp",
     model: "/models/sculptures/obra-10-tupasy-maria.glb",
+    audio: OBRA10_AUDIO,
     getTitle: (locale) => t("sculpture.obra10.title", locale),
     getSubtitle: (locale) => t("sculpture.obra10.sub", locale),
     getDescription: (locale) => t("sculpture.obra10.desc", locale),
     getIconografia: (locale) => t("sculpture.obra10.icono", locale),
+    getAudio: (locale) => OBRA10_AUDIO[locale] ?? OBRA10_AUDIO.es,
   },
   {
     id: "obra-11",
