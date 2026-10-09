@@ -376,7 +376,7 @@ export const sculptures: Sculpture[] = [
     material: "Escultura en piedra tallada",
     materialKey: "sculpture.material.piedraTallada",
     thumbnail: "/images/sculptures/obra-19.webp",
-    model: "",
+    model: "/models/sculptures/San Alonso Rodriguez.glb",
     audio: OBRA19_AUDIO,
     getTitle: (locale) => t("sculpture.obra19.title", locale),
     getSubtitle: (locale) => t("sculpture.obra19.sub", locale),
