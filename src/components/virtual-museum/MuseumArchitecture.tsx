@@ -149,37 +149,37 @@ export default function MuseumArchitecture() {
   const baseboardMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#5b4636",
-        roughness: 0.7,
-        metalness: 0.04,
-        envMapIntensity: 0.25,
+        color: "#2a2218",
+        roughness: 0.55,
+        metalness: 0.08,
+        envMapIntensity: 0.35,
       })
   );
   const corniceMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#f7f1e4",
-        roughness: 0.9,
+        color: "#e8dcc4",
+        roughness: 0.88,
         metalness: 0,
-        envMapIntensity: 0.18,
+        envMapIntensity: 0.15,
       })
   );
   const frameMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#7a6448",
-        roughness: 0.62,
-        metalness: 0.05,
-        envMapIntensity: 0.3,
+        color: "#5a4830",
+        roughness: 0.55,
+        metalness: 0.08,
+        envMapIntensity: 0.35,
       })
   );
   const columnMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#ece4d2",
-        roughness: 0.88,
+        color: "#e0d4bc",
+        roughness: 0.85,
         metalness: 0,
-        envMapIntensity: 0.16,
+        envMapIntensity: 0.14,
       })
   );
 

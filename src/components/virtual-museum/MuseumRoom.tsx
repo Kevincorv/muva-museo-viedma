@@ -47,11 +47,11 @@ export default function MuseumRoom({
         color: room.floorTone,
         map: floorTexture,
         bumpMap: floorTexture,
-        bumpScale: 0.014,
+        bumpScale: 0.008,
         roughnessMap: roughnessTexture,
-        roughness: 1,
-        metalness: 0,
-        envMapIntensity: 0.42,
+        roughness: 0.18,
+        metalness: 0.12,
+        envMapIntensity: 1.1,
       }),
     [room.floorTone, floorTexture, roughnessTexture]
   );
@@ -59,10 +59,10 @@ export default function MuseumRoom({
   const ceilingMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#f7f2e6",
-        roughness: 1,
+        color: "#e8dcc4",
+        roughness: 0.95,
         metalness: 0,
-        envMapIntensity: 0.08,
+        envMapIntensity: 0.06,
       }),
     []
   );

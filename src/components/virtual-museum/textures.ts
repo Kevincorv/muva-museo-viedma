@@ -6,94 +6,74 @@ import * as THREE from "three";
  */
 
 /** Metros que cubre una repetición de la textura de piso. */
-export const FLOOR_TILE_METERS = 2;
+export const FLOOR_TILE_METERS = 3;
 
 /**
- * Paleta de madera cálida de galería (tonos naranja-marrón, sin verdes).
+ * Mármol oscuro pulido estilo Prado: base grafito con vetas claras sutiles.
  * El `floorTone` de cada sala multiplica estos valores al renderizar.
  */
-const WOOD_TONES = [
-  [158, 114, 74],
-  [148, 106, 68],
-  [166, 124, 82],
-  [140, 100, 64],
-  [161, 119, 78],
-  [153, 111, 72],
-] as const;
+function fillMarbleFloor(ctx: CanvasRenderingContext2D, size: number) {
+  // Base de mármol grafito oscuro.
+  const gradient = ctx.createLinearGradient(0, 0, size, size);
+  gradient.addColorStop(0, "#1a1714");
+  gradient.addColorStop(0.3, "#211d19");
+  gradient.addColorStop(0.6, "#1e1a16");
+  gradient.addColorStop(1, "#181512");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, size, size);
 
-/**
- * Tablones de madera con juntas escalonadas, veta y brillo de barniz sutil.
- * La textura se repite cada 2 m (FLOOR_TILE_METERS); las filas abarcan el
- * ancho completo para que el patrón no muestre cortes verticales al repetir.
- */
-function fillWoodFloor(ctx: CanvasRenderingContext2D, size: number) {
-  const rows = 10;
-  const rowH = size / rows;
-
-  for (let r = 0; r < rows; r++) {
-    const y0 = r * rowH;
-    const tone = WOOD_TONES[Math.floor(Math.random() * WOOD_TONES.length)];
-    const jitter = Math.round((Math.random() - 0.5) * 14);
-    ctx.fillStyle = `rgb(${tone[0] + jitter}, ${tone[1] + jitter}, ${
-      tone[2] + jitter
-    })`;
-    ctx.fillRect(0, y0, size, rowH);
-
-    // Veta: trazos largos y ondulados a lo largo del tablón.
-    for (let i = 0; i < 24; i++) {
-      const gy = y0 + 2 + Math.random() * (rowH - 4);
-      const gx = Math.random() * size;
-      const len = 50 + Math.random() * 190;
-      const dark = Math.random() > 0.35;
-      ctx.strokeStyle = dark
-        ? `rgba(58, 34, 16, ${0.05 + Math.random() * 0.1})`
-        : `rgba(234, 192, 134, ${0.05 + Math.random() * 0.07})`;
-      ctx.lineWidth = 0.7 + Math.random() * 1.5;
-      ctx.beginPath();
-      ctx.moveTo(gx, gy);
-      ctx.bezierCurveTo(
-        gx + len * 0.3,
-        gy + (Math.random() - 0.5) * 3,
-        gx + len * 0.7,
-        gy + (Math.random() - 0.5) * 3,
-        Math.min(gx + len, size),
-        gy
-      );
-      ctx.stroke();
-    }
-
-    // Juntas verticales entre tablones (escalonadas por fila).
-    const joints = 2 + Math.floor(Math.random() * 2);
-    let previous = -1;
-    for (let j = 0; j < joints; j++) {
-      const jx = Math.round(
-        (j + 0.7 + Math.random() * 0.6) * (size / (joints + 1))
-      );
-      if (jx <= previous + 48 || jx >= size - 8) continue;
-      previous = jx;
-      ctx.fillStyle = "rgba(46, 27, 13, 0.62)";
-      ctx.fillRect(jx, y0, 2, rowH);
-      ctx.fillStyle = "rgba(236, 196, 142, 0.1)";
-      ctx.fillRect(jx + 2, y0, 1, rowH);
-    }
-
-    // Junta horizontal entre filas + leve bisel iluminado.
-    ctx.fillStyle = "rgba(44, 26, 12, 0.68)";
-    ctx.fillRect(0, y0, size, 2);
-    ctx.fillStyle = "rgba(238, 200, 148, 0.12)";
-    ctx.fillRect(0, y0 + 2, size, 1);
+  // Manchas suaves de variación del mármol.
+  for (let i = 0; i < 18; i++) {
+    const x = Math.random() * size;
+    const y = Math.random() * size;
+    const r = 60 + Math.random() * 140;
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    const tone = Math.random() > 0.5 ? "42, 36, 30" : "28, 24, 20";
+    g.addColorStop(0, `rgba(${tone}, 0.25)`);
+    g.addColorStop(1, `rgba(${tone}, 0)`);
+    ctx.fillStyle = g;
+    ctx.fillRect(x - r, y - r, r * 2, r * 2);
   }
 
-  // Grano fino del acabado barnizado.
-  for (let i = 0; i < 4800; i++) {
+  // Vetas de mármol: líneas finas onduladas en tono claro.
+  ctx.lineCap = "round";
+  for (let v = 0; v < 12; v++) {
+    const startX = Math.random() * size;
+    const startY = Math.random() * size;
+    const angle = Math.random() * Math.PI;
+    const length = 120 + Math.random() * 300;
+    const segments = 18;
+    ctx.strokeStyle = `rgba(160, 145, 120, ${0.04 + Math.random() * 0.08})`;
+    ctx.lineWidth = 0.4 + Math.random() * 1.2;
+    ctx.beginPath();
+    let cx = startX;
+    let cy = startY;
+    ctx.moveTo(cx, cy);
+    for (let s = 0; s < segments; s++) {
+      cx += (Math.cos(angle) * length) / segments + (Math.random() - 0.5) * 8;
+      cy += (Math.sin(angle) * length) / segments + (Math.random() - 0.5) * 8;
+      ctx.lineTo(cx, cy);
+    }
+    ctx.stroke();
+  }
+
+  // Brillo especular sutil del pulido.
+  for (let i = 0; i < 2200; i++) {
     const x = Math.random() * size;
     const y = Math.random() * size;
     ctx.fillStyle =
-      Math.random() > 0.5
-        ? "rgba(70, 42, 20, 0.05)"
-        : "rgba(255, 226, 178, 0.05)";
-    ctx.fillRect(x, y, 1.4, 1.4);
+      Math.random() > 0.6
+        ? "rgba(90, 80, 65, 0.06)"
+        : "rgba(50, 44, 36, 0.04)";
+    ctx.fillRect(x, y, 1.2, 1.2);
   }
+
+  // Juntas de losas de mármol (formato grande).
+  const jointColor = "rgba(12, 10, 8, 0.7)";
+  ctx.fillStyle = jointColor;
+  // Una junta horizontal y una vertical que dividen en 4 losas.
+  ctx.fillRect(0, size / 2 - 1, size, 2);
+  ctx.fillRect(size / 2 - 1, 0, 2, size);
 }
 
 export function createFloorTexture(): THREE.CanvasTexture {
@@ -102,7 +82,7 @@ export function createFloorTexture(): THREE.CanvasTexture {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext("2d");
-  if (ctx) fillWoodFloor(ctx, size);
+  if (ctx) fillMarbleFloor(ctx, size);
 
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
@@ -113,9 +93,8 @@ export function createFloorTexture(): THREE.CanvasTexture {
 }
 
 /**
- * Rugosidad del piso (canal gris) alineada a los tablones: el centro de cada
- * tablón tiene brillo sutil (≈0.45, reflejo cálido pero nunca espejo) y las
- * juntas quedan mates.
+ * Rugosidad del piso (canal gris): mármol pulido con brillo especular
+ * alto (≈0.15-0.25) para lograr el efecto espejo del Prado.
  */
 export function createFloorRoughnessTexture(): THREE.CanvasTexture {
   const size = 512;
@@ -124,44 +103,28 @@ export function createFloorRoughnessTexture(): THREE.CanvasTexture {
   canvas.height = size;
   const ctx = canvas.getContext("2d");
   if (ctx) {
-    const rows = 10;
-    const rowH = size / rows;
+    // Base oscura = muy reflectante (baja rugosidad).
+    ctx.fillStyle = "rgb(38, 34, 30)";
+    ctx.fillRect(0, 0, size, size);
 
-    for (let r = 0; r < rows; r++) {
-      const y0 = r * rowH;
-      const base = Math.round(106 + Math.random() * 20);
-      ctx.fillStyle = `rgb(${base}, ${base}, ${base})`;
-      ctx.fillRect(0, y0, size, rowH);
-
-      // Variación de barniz por tablón.
-      for (let i = 0; i < 5; i++) {
-        const value = Math.round(base + (Math.random() - 0.5) * 16);
-        ctx.fillStyle = `rgba(${value}, ${value}, ${value}, 0.5)`;
-        ctx.fillRect(
-          Math.random() * size,
-          y0 + Math.random() * rowH,
-          60 + Math.random() * 140,
-          4 + Math.random() * 8
-        );
-      }
-
-      // Juntas verticales: mates.
-      const joints = 2 + Math.floor(Math.random() * 2);
-      let previous = -1;
-      for (let j = 0; j < joints; j++) {
-        const jx = Math.round(
-          (j + 0.7 + Math.random() * 0.6) * (size / (joints + 1))
-        );
-        if (jx <= previous + 48 || jx >= size - 8) continue;
-        previous = jx;
-        ctx.fillStyle = "rgba(240, 240, 240, 0.95)";
-        ctx.fillRect(jx, y0, 2, rowH);
-      }
-
-      // Junta horizontal: mate.
-      ctx.fillStyle = "rgba(240, 240, 240, 0.95)";
-      ctx.fillRect(0, y0, size, 2);
+    // Variación sutil del pulido.
+    for (let i = 0; i < 30; i++) {
+      const value = Math.round(30 + Math.random() * 25);
+      ctx.fillStyle = `rgba(${value}, ${value}, ${value}, 0.4)`;
+      const x = Math.random() * size;
+      const y = Math.random() * size;
+      const r = 30 + Math.random() * 100;
+      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+      g.addColorStop(0, `rgba(${value}, ${value}, ${value}, 0.35)`);
+      g.addColorStop(1, `rgba(${value}, ${value}, ${value}, 0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(x - r, y - r, r * 2, r * 2);
     }
+
+    // Juntas de lasas: mates.
+    ctx.fillStyle = "rgba(180, 180, 180, 0.85)";
+    ctx.fillRect(0, size / 2 - 1, size, 2);
+    ctx.fillRect(size / 2 - 1, 0, 2, size);
   }
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;

@@ -201,7 +201,7 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
       intensity={SPOT_INTENSITY}
       distance={8}
       decay={1.6}
-      color="#ffd9a4"
+      color="#ffcf94"
     />
   );
 }
@@ -240,12 +240,12 @@ export default function MuseumEnvironment({
   const wallMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#f4eede",
-        roughness: 0.95,
+        color: "#e8dcc0",
+        roughness: 0.92,
         metalness: 0,
         bumpMap: wallBumpTexture,
-        bumpScale: 0.02,
-        envMapIntensity: 0.15,
+        bumpScale: 0.015,
+        envMapIntensity: 0.12,
       }),
     [wallBumpTexture]
   );
@@ -253,12 +253,12 @@ export default function MuseumEnvironment({
   const accentMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#efe6d0",
-        roughness: 0.95,
+        color: "#ddd0b0",
+        roughness: 0.92,
         metalness: 0,
         bumpMap: wallBumpTexture,
-        bumpScale: 0.02,
-        envMapIntensity: 0.15,
+        bumpScale: 0.015,
+        envMapIntensity: 0.12,
       }),
     [wallBumpTexture]
   );
@@ -436,19 +436,19 @@ export default function MuseumEnvironment({
 
       <EntranceDoor />
 
-      {/* Luz base cálida: esquinas iluminadas, sin negros. */}
-      <ambientLight intensity={0.36} color="#f8f0df" />
+      {/* Luz base cálida dorada: ambiente del Prado. */}
+      <ambientLight intensity={0.32} color="#f5e6c8" />
       <hemisphereLight
-        color="#fff6e6"
-        groundColor="#6b4f35"
-        intensity={0.44}
+        color="#fff0d0"
+        groundColor="#5a4028"
+        intensity={0.4}
       />
-      {/* Clave con sombra suave (mapa estático) + relleno. */}
+      {/* Clave cálida con sombra suave (mapa estático) + relleno. */}
       <directionalLight
         castShadow
         position={[7, 14, 9]}
-        intensity={1.0}
-        color="#fff2df"
+        intensity={0.9}
+        color="#ffe8c0"
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-18}
         shadow-camera-right={18}
@@ -459,7 +459,7 @@ export default function MuseumEnvironment({
         shadow-bias={-0.0004}
         shadow-normalBias={0.03}
       />
-      <directionalLight position={[-8, 9, -10]} intensity={0.28} color="#eadfc8" />
+      <directionalLight position={[-8, 9, -10]} intensity={0.22} color="#e8d4b0" />
 
       {/* Acento: un spotlight cálido por obra (sin sombra, sin costo de pass). */}
       {gallerySpots.map((spot, index) => (

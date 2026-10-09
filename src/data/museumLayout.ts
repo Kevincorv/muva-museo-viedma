@@ -54,7 +54,7 @@ export const rooms: MuseumRoom[] = [
     id: "entrada",
     nameKey: "room.entrada",
     bounds: { minX: -4, minZ: 6, maxX: 4, maxZ: 14 },
-    floorTone: "#e7dfcd",
+    floorTone: "#e0d8cc",
     edges: {
       north: { openings: [[-1.3, 1.3]] },
       south: {},
@@ -66,7 +66,7 @@ export const rooms: MuseumRoom[] = [
     id: "galeria",
     nameKey: "room.galeria",
     bounds: { minX: -4, minZ: -4, maxX: 4, maxZ: 6 },
-    floorTone: "#e4dbc8",
+    floorTone: "#d8d0c4",
     edges: {
       north: { openings: [[-1.3, 1.3]] },
       south: { wall: false },
@@ -78,7 +78,7 @@ export const rooms: MuseumRoom[] = [
     id: "sala-1",
     nameKey: "room.sala1",
     bounds: { minX: -13, minZ: -4, maxX: -4, maxZ: 6 },
-    floorTone: "#ece5d5",
+    floorTone: "#dcd4c8",
     edges: {
       north: { openings: [[-9.6, -7]] },
       east: { wall: false },
@@ -88,7 +88,7 @@ export const rooms: MuseumRoom[] = [
     id: "sala-2",
     nameKey: "room.sala2",
     bounds: { minX: 4, minZ: -4, maxX: 13, maxZ: 6 },
-    floorTone: "#ece5d5",
+    floorTone: "#dcd4c8",
     edges: {
       north: { openings: [[7, 9.6]] },
       west: { wall: false },
@@ -98,7 +98,7 @@ export const rooms: MuseumRoom[] = [
     id: "sala-3",
     nameKey: "room.sala3",
     bounds: { minX: -13, minZ: -16, maxX: -4, maxZ: -4 },
-    floorTone: "#eae2d1",
+    floorTone: "#d4ccc0",
     edges: {
       south: { wall: false },
       east: { openings: [[-10.6, -8]] },
@@ -108,7 +108,7 @@ export const rooms: MuseumRoom[] = [
     id: "sala-4",
     nameKey: "room.sala4",
     bounds: { minX: 4, minZ: -16, maxX: 13, maxZ: -4 },
-    floorTone: "#eae2d1",
+    floorTone: "#d4ccc0",
     edges: {
       south: { wall: false },
       west: { openings: [[-10.6, -8]] },
@@ -118,7 +118,7 @@ export const rooms: MuseumRoom[] = [
     id: "sala-principal",
     nameKey: "room.principal",
     bounds: { minX: -4, minZ: -16, maxX: 4, maxZ: -4 },
-    floorTone: "#e2d8c3",
+    floorTone: "#d0c8bc",
     edges: {
       north: {},
       south: { wall: false },
