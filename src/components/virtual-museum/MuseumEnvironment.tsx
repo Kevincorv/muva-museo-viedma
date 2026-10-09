@@ -264,7 +264,7 @@ export default function MuseumEnvironment({
   );
 
   const panelMaterial = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: "#fff8ec", toneMapped: false }),
+    () => new THREE.MeshBasicMaterial({ color: "#ffe4b8", toneMapped: false }),
     []
   );
 
@@ -280,7 +280,7 @@ export default function MuseumEnvironment({
   );
 
   const lensMaterial = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: "#ffeccb", toneMapped: false }),
+    () => new THREE.MeshBasicMaterial({ color: "#ffdfb0", toneMapped: false }),
     []
   );
 
