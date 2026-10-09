@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from "react";
-import { useThree } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
@@ -8,10 +8,12 @@ import {
   buildCeilingPanels,
   buildWallSegments,
   entranceDoor,
+  roomAt,
   rooms,
   signs,
   type SignSpec,
 } from "../../data/museumLayout";
+import { focusDim } from "./focusDim";
 import { useVmText } from "./texts";
 import {
   createFloorRoughnessTexture,
@@ -25,11 +27,24 @@ import MuseumProps from "./MuseumProps";
 import MuseumRoom from "./MuseumRoom";
 import WallPaintings from "./WallPaintings";
 
+const SIGN_BASE_COLOR = new THREE.Color("#ffffff");
+const SIGN_DIM_COLOR = new THREE.Color("#9a9184");
+
 function SignPlaque({ sign, label }: { sign: SignSpec; label: string }) {
   const texture = useMemo(
     () => createPlaqueTexture(label, sign.sub),
     [label, sign.sub]
   );
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
+
+  // Los carteles son emisivos (toneMapped=false): se atenúan con el foco.
+  useFrame(() => {
+    materialRef.current?.color.lerpColors(
+      SIGN_BASE_COLOR,
+      SIGN_DIM_COLOR,
+      focusDim.current
+    );
+  });
 
   useEffect(() => () => texture.dispose(), [texture]);
 
@@ -37,6 +52,7 @@ function SignPlaque({ sign, label }: { sign: SignSpec; label: string }) {
     <mesh position={sign.position} rotation={[0, sign.rotationY, 0]}>
       <planeGeometry args={[sign.width, sign.height]} />
       <meshBasicMaterial
+        ref={materialRef}
         map={texture}
         transparent
         side={THREE.DoubleSide}
@@ -182,6 +198,14 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
   const lightRef = useRef<THREE.SpotLight>(null);
   const { scene } = useThree();
 
+  // Se atenúa al enfocar una obra para que destaque la luminaria de foco.
+  useFrame(() => {
+    const light = lightRef.current;
+    if (light) {
+      light.intensity = SPOT_INTENSITY * (1 - 0.65 * focusDim.current);
+    }
+  });
+
   useEffect(() => {
     const light = lightRef.current;
     if (!light) return;
@@ -207,6 +231,62 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/* Luminaria de foco: spotlight cálido dedicado a la escultura         */
+/* seleccionada. Siempre está montada (intensidad 0 sin selección)     */
+/* para no recompilar shaders al abrir la ficha.                       */
+/* ------------------------------------------------------------------ */
+
+const FOCUS_SPOT_INTENSITY = 24;
+
+interface FocusSpotSpec {
+  origin: [number, number, number];
+  target: [number, number, number];
+}
+
+function computeFocusSpot(target: [number, number, number]): FocusSpotSpec {
+  const room = roomAt(target[0], target[2]);
+  const cx = room ? (room.bounds.minX + room.bounds.maxX) / 2 : 0;
+  const cz = room ? (room.bounds.minZ + room.bounds.maxZ) / 2 : 0;
+
+  // La luminaria se coloca hacia el centro de la sala (cara visible).
+  const dx = cx - target[0];
+  const dz = cz - target[2];
+  const len = Math.hypot(dx, dz);
+  const ux = len > 0.001 ? dx / len : 0;
+  const uz = len > 0.001 ? dz / len : 0;
+
+  return {
+    origin: [target[0] + ux * SPOT_OFFSET, CEILING_Y, target[2] + uz * SPOT_OFFSET],
+    target: [target[0], target[1], target[2]],
+  };
+}
+
+/** Valores base (sin foco) y atenuados (foco activo) de la ambientación. */
+const LIGHT_BASE = {
+  ambient: 0.32,
+  hemi: 0.4,
+  key: 0.9,
+  fill: 0.22,
+  environment: 0.55,
+  background: new THREE.Color("#ddd0b4"),
+  panel: new THREE.Color("#ffe4b8"),
+  lens: new THREE.Color("#ffdfb0"),
+  haloOpacity: 1,
+} as const;
+
+const LIGHT_DIM = {
+  ambient: 0.1,
+  hemi: 0.12,
+  key: 0.16,
+  fill: 0.06,
+  environment: 0.25,
+  background: new THREE.Color("#4f4436"),
+  panel: new THREE.Color("#6b5a40"),
+  lens: new THREE.Color("#6b5c46"),
+  haloOpacity: 0.3,
+} as const;
+
 /**
  * Arquitectura del museo: pisos, muros generados desde el plano, molduras,
  * columnas, mobiliario, techos, paneles de luz, señalización e iluminación.
@@ -223,11 +303,52 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
  */
 export default function MuseumEnvironment({
   refreshKey,
+  focus,
 }: {
   refreshKey: number;
+  /** Centro de la escultura seleccionada (atenúa el entorno y la ilumina). */
+  focus?: [number, number, number] | null;
 }) {
   const { gl, scene } = useThree();
   const t = useVmText();
+
+  const ambientRef = useRef<THREE.AmbientLight>(null);
+  const hemiRef = useRef<THREE.HemisphereLight>(null);
+  const keyRef = useRef<THREE.DirectionalLight>(null);
+  const fillRef = useRef<THREE.DirectionalLight>(null);
+  const focusSpotRef = useRef<THREE.SpotLight>(null);
+  const lastFocusRef = useRef<[number, number, number] | null>(null);
+
+  // Recuerda el último foco para que la luminaria no se teletransporte ni
+  // desaparezca al cerrar la ficha (se mantiene mientras se atenúa).
+  useEffect(() => {
+    if (focus) lastFocusRef.current = focus;
+  }, [focus]);
+
+  const focusSpec = useMemo(
+    () => computeFocusSpot(focus ?? lastFocusRef.current ?? [0, 1.5, 12]),
+    [focus]
+  );
+
+  useEffect(() => {
+    const light = focusSpotRef.current;
+    if (!light) return;
+    light.position.set(
+      focusSpec.origin[0],
+      focusSpec.origin[1],
+      focusSpec.origin[2]
+    );
+    light.target.position.set(
+      focusSpec.target[0],
+      focusSpec.target[1],
+      focusSpec.target[2]
+    );
+    light.target.updateMatrixWorld();
+    scene.add(light.target);
+    return () => {
+      scene.remove(light.target);
+    };
+  }, [scene, focusSpec]);
 
   const floorTexture = useMemo(() => createFloorTexture(), []);
   const roughnessTexture = useMemo(() => createFloorRoughnessTexture(), []);
@@ -367,6 +488,75 @@ export default function MuseumEnvironment({
     ]
   );
 
+  /**
+   * Transición de foco: atenúa luces, entorno IBL, fondo, niebla, paneles y
+   * halos mientras rampa el spotlight de la obra seleccionada. `damp` es
+   * exponencial (sin rebotes) y el delta se recorta para que una pestaña en
+   * segundo plano no provoque saltos al volver.
+   */
+  useFrame((_, rawDelta) => {
+    const delta = Math.min(rawDelta, 0.05);
+    const target = focus ? 1 : 0;
+    const dim = THREE.MathUtils.damp(focusDim.current, target, 5.5, delta);
+    focusDim.current = dim;
+
+    if (ambientRef.current) {
+      ambientRef.current.intensity = THREE.MathUtils.lerp(
+        LIGHT_BASE.ambient,
+        LIGHT_DIM.ambient,
+        dim
+      );
+    }
+    if (hemiRef.current) {
+      hemiRef.current.intensity = THREE.MathUtils.lerp(
+        LIGHT_BASE.hemi,
+        LIGHT_DIM.hemi,
+        dim
+      );
+    }
+    if (keyRef.current) {
+      keyRef.current.intensity = THREE.MathUtils.lerp(
+        LIGHT_BASE.key,
+        LIGHT_DIM.key,
+        dim
+      );
+    }
+    if (fillRef.current) {
+      fillRef.current.intensity = THREE.MathUtils.lerp(
+        LIGHT_BASE.fill,
+        LIGHT_DIM.fill,
+        dim
+      );
+    }
+    if (focusSpotRef.current) {
+      focusSpotRef.current.intensity = FOCUS_SPOT_INTENSITY * dim;
+    }
+
+    scene.environmentIntensity = THREE.MathUtils.lerp(
+      LIGHT_BASE.environment,
+      LIGHT_DIM.environment,
+      dim
+    );
+    if (scene.background instanceof THREE.Color) {
+      scene.background.lerpColors(
+        LIGHT_BASE.background,
+        LIGHT_DIM.background,
+        dim
+      );
+    }
+    if (scene.fog) {
+      scene.fog.color.lerpColors(LIGHT_BASE.background, LIGHT_DIM.background, dim);
+    }
+
+    panelMaterial.color.lerpColors(LIGHT_BASE.panel, LIGHT_DIM.panel, dim);
+    lensMaterial.color.lerpColors(LIGHT_BASE.lens, LIGHT_DIM.lens, dim);
+    haloMaterial.opacity = THREE.MathUtils.lerp(
+      LIGHT_BASE.haloOpacity,
+      LIGHT_DIM.haloOpacity,
+      dim
+    );
+  });
+
   return (
     <group>
       {rooms.map((room) => (
@@ -439,17 +629,19 @@ export default function MuseumEnvironment({
       <EntranceDoor />
 
       {/* Luz base cálida dorada: ambiente del Prado. */}
-      <ambientLight intensity={0.32} color="#f5e6c8" />
+      <ambientLight ref={ambientRef} intensity={LIGHT_BASE.ambient} color="#f5e6c8" />
       <hemisphereLight
+        ref={hemiRef}
         color="#fff0d0"
         groundColor="#5a4028"
-        intensity={0.4}
+        intensity={LIGHT_BASE.hemi}
       />
       {/* Clave cálida con sombra suave (mapa estático) + relleno. */}
       <directionalLight
+        ref={keyRef}
         castShadow
         position={[7, 14, 9]}
-        intensity={0.9}
+        intensity={LIGHT_BASE.key}
         color="#ffe8c0"
         shadow-mapSize={[2048, 2048]}
         shadow-camera-left={-18}
@@ -461,12 +653,29 @@ export default function MuseumEnvironment({
         shadow-bias={-0.0004}
         shadow-normalBias={0.03}
       />
-      <directionalLight position={[-8, 9, -10]} intensity={0.22} color="#e8d4b0" />
+      <directionalLight
+        ref={fillRef}
+        position={[-8, 9, -10]}
+        intensity={LIGHT_BASE.fill}
+        color="#e8d4b0"
+      />
 
       {/* Acento: un spotlight cálido por obra (sin sombra, sin costo de pass). */}
       {gallerySpots.map((spot, index) => (
         <GallerySpot key={`spot-${index}`} spec={spot} />
       ))}
+
+      {/* Luminaria de foco: ilumina la escultura seleccionada. */}
+      <spotLight
+        ref={focusSpotRef}
+        position={focusSpec.origin}
+        angle={0.45}
+        penumbra={0.65}
+        intensity={0}
+        distance={12}
+        decay={1.4}
+        color="#ffd6a6"
+      />
     </group>
   );
 }

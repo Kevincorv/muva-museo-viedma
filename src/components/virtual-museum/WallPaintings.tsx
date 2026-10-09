@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { mergeGeometries } from "three/examples/jsm/utils/BufferGeometryUtils.js";
 import {
@@ -6,6 +7,7 @@ import {
   paintings,
   type PaintingSpec,
 } from "../../data/paintings";
+import { focusDim } from "./focusDim";
 
 /**
  * Cuadros colgados de los muros: marco de madera oscura con filo dorado,
@@ -100,7 +102,13 @@ function buildMerged(specs: readonly PaintingSpec[]): MergedPaintings {
 }
 
 /** Lienzo con su textura (carga tolerante a fallos). */
-function PaintingCanvas({ spec }: { spec: PaintingSpec }) {
+function PaintingCanvas({
+  spec,
+  registry,
+}: {
+  spec: PaintingSpec;
+  registry: { current: THREE.MeshStandardMaterial[] };
+}) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const { w, h } = paintingSize(spec);
 
@@ -139,6 +147,17 @@ function PaintingCanvas({ spec }: { spec: PaintingSpec }) {
     });
   }, [texture]);
 
+  // Registra el material para que el padre lo atenúe con el foco.
+  useEffect(() => {
+    if (!material) return;
+    const list = registry.current;
+    list.push(material);
+    return () => {
+      const index = list.indexOf(material);
+      if (index >= 0) list.splice(index, 1);
+    };
+  }, [material, registry]);
+
   useEffect(
     () => () => {
       texture?.dispose();
@@ -158,8 +177,23 @@ function PaintingCanvas({ spec }: { spec: PaintingSpec }) {
   );
 }
 
+const PAINTING_EMISSIVE = 0.3;
+const LENS_BASE_COLOR = new THREE.Color("#fff0d0");
+const LENS_DIM_COLOR = new THREE.Color("#6f6350");
+
 export default function WallPaintings() {
   const merged = useMemo(() => buildMerged(paintings), []);
+  const canvasMaterials = useRef<THREE.MeshStandardMaterial[]>([]);
+
+  // Sincroniza el atenuado de los lienzos y lentes con el foco de obra.
+  useFrame(() => {
+    const dim = focusDim.current;
+    const emissive = PAINTING_EMISSIVE * (1 - 0.8 * dim);
+    for (const material of canvasMaterials.current) {
+      material.emissiveIntensity = emissive;
+    }
+    lensMaterial.color.lerpColors(LENS_BASE_COLOR, LENS_DIM_COLOR, dim);
+  });
 
   const frameMaterial = useMemo(
     () =>
@@ -223,7 +257,7 @@ export default function WallPaintings() {
       <mesh geometry={merged.lensGeometry} material={lensMaterial} />
 
       {paintings.map((spec) => (
-        <PaintingCanvas key={spec.id} spec={spec} />
+        <PaintingCanvas key={spec.id} spec={spec} registry={canvasMaterials} />
       ))}
     </group>
   );

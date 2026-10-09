@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { MuseumSculpture } from "../../data/sculptures";
@@ -15,6 +16,7 @@ import { useLanguage } from "../../i18n/LanguageContext";
 import { DRACO_PATH, releaseModel, retainModel } from "./modelCache";
 import { registerInteractable, unregisterInteractable } from "./state";
 import { createPlaqueTexture, createShadowTexture } from "./textures";
+import { focusDim } from "./focusDim";
 
 /** Altura útil del pedestal (plinto + cuerpo). */
 export const PEDESTAL_TOP = 1.05;
@@ -184,10 +186,24 @@ function SculptureModel({
   );
 }
 
+const PLAQUE_BASE_COLOR = new THREE.Color("#ffffff");
+const PLAQUE_DIM_COLOR = new THREE.Color("#8d857a");
+
 function FallbackPlaque({ sculpture }: { sculpture: MuseumSculpture }) {
   const { locale } = useLanguage();
   const title = museumTitle(sculpture, locale);
   const texture = useMemo(() => createPlaqueTexture(title), [title]);
+  const materialRef = useRef<THREE.MeshBasicMaterial>(null);
+
+  // Placa emisiva: se atenúa junto con el entorno al enfocar la obra.
+  useFrame(() => {
+    materialRef.current?.color.lerpColors(
+      PLAQUE_BASE_COLOR,
+      PLAQUE_DIM_COLOR,
+      focusDim.current
+    );
+  });
+
   useEffect(() => () => texture.dispose(), [texture]);
 
   return (
@@ -196,7 +212,12 @@ function FallbackPlaque({ sculpture }: { sculpture: MuseumSculpture }) {
       rotation={[-Math.PI / 2, 0, 0]}
     >
       <planeGeometry args={[0.64, 0.36]} />
-      <meshBasicMaterial map={texture} transparent toneMapped={false} />
+      <meshBasicMaterial
+        ref={materialRef}
+        map={texture}
+        transparent
+        toneMapped={false}
+      />
     </mesh>
   );
 }

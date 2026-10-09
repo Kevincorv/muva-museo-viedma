@@ -356,7 +356,18 @@ export default function VirtualMuseum() {
             <MuseumErrorBoundary onError={() => setErrored(true)}>
               <color attach="background" args={["#ddd0b4"]} />
               <fog attach="fog" args={["#ddd0b4", 28, 75]} />
-              <MuseumEnvironment refreshKey={loadedSet.size} />
+              <MuseumEnvironment
+                refreshKey={loadedSet.size}
+                focus={
+                  selected
+                    ? [
+                        selected.position[0],
+                        selected.position[1] + 1.5,
+                        selected.position[2],
+                      ]
+                    : null
+                }
+              />
               {museumSculptures.map((sculpture) => (
                 <SculptureObject
                   key={sculpture.id}
