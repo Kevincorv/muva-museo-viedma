@@ -8,9 +8,6 @@ import * as THREE from "three";
 /** Metros que cubre una repetición de la textura de piso. */
 export const FLOOR_TILE_METERS = 3;
 
-/** Metros que cubre una repetición de la textura de madera del techo. */
-export const WOOD_TILE_METERS = 1.8;
-
 /**
  * Mármol oscuro pulido estilo Prado: base grafito con vetas claras sutiles.
  * El `floorTone` de cada sala multiplica estos valores al renderizar.
@@ -176,86 +173,6 @@ export function createWallBumpTexture(): THREE.CanvasTexture {
   const texture = new THREE.CanvasTexture(canvas);
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
-  texture.needsUpdate = true;
-  return texture;
-}
-
-/**
- * Tablas de madera de techo (nogal oscuro): tablones verticales con vetas
- * largas, juntas oscuras entre tablas y nudos ocasionales. Las tablas corren
- * a lo largo del eje vertical del canvas, que se mapa sobre la Z del mundo.
- */
-export function createWoodPlankTexture(): THREE.CanvasTexture {
-  const size = 512;
-  const canvas = document.createElement("canvas");
-  canvas.width = size;
-  canvas.height = size;
-  const ctx = canvas.getContext("2d");
-  if (ctx) {
-    // Base del nogal.
-    const base = ctx.createLinearGradient(0, 0, size, 0);
-    base.addColorStop(0, "#5c3d26");
-    base.addColorStop(0.5, "#6b4830");
-    base.addColorStop(1, "#5a3b25");
-    ctx.fillStyle = base;
-    ctx.fillRect(0, 0, size, size);
-
-    const boards = 6;
-    const boardW = size / boards;
-
-    for (let b = 0; b < boards; b++) {
-      const x0 = b * boardW;
-
-      // Tono propio de cada tabla (más clara u más oscura).
-      const toneShift = (Math.random() - 0.5) * 26;
-      ctx.fillStyle = `rgba(${toneShift > 0 ? "210, 170, 120" : "30, 18, 10"}, ${Math.abs(toneShift) / 255})`;
-      ctx.fillRect(x0, 0, boardW, size);
-
-      // Vetas largas siguiendo la tabla.
-      const grains = 16;
-      for (let g = 0; g < grains; g++) {
-        const gx = x0 + 3 + Math.random() * (boardW - 6);
-        const dark = Math.random() > 0.45;
-        ctx.strokeStyle = dark
-          ? `rgba(38, 22, 12, ${0.1 + Math.random() * 0.16})`
-          : `rgba(168, 128, 84, ${0.05 + Math.random() * 0.1})`;
-        ctx.lineWidth = 0.6 + Math.random() * 1.6;
-        ctx.beginPath();
-        let px = gx;
-        ctx.moveTo(px, -4);
-        for (let y = 0; y <= size + 4; y += 24) {
-          px = gx + Math.sin((y / size) * Math.PI * (1 + Math.random())) * 2.2;
-          ctx.lineTo(px, y);
-        }
-        ctx.stroke();
-      }
-
-      // Nudos ocasionales.
-      if (Math.random() > 0.55) {
-        const kx = x0 + boardW * (0.3 + Math.random() * 0.4);
-        const ky = Math.random() * size;
-        for (let ring = 4; ring >= 1; ring--) {
-          ctx.strokeStyle = `rgba(34, 20, 10, ${0.06 * ring})`;
-          ctx.lineWidth = 1.4;
-          ctx.beginPath();
-          ctx.ellipse(kx, ky, 3 * ring, 6 * ring, 0, 0, Math.PI * 2);
-          ctx.stroke();
-        }
-      }
-
-      // Junta oscura entre tablas.
-      ctx.fillStyle = "rgba(22, 12, 6, 0.85)";
-      ctx.fillRect(x0 - 1, 0, 2.2, size);
-      // Cantos iluminados de la tabla (perfil).
-      ctx.fillStyle = "rgba(190, 148, 100, 0.16)";
-      ctx.fillRect(x0 + 1, 0, 1.6, size);
-    }
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.colorSpace = THREE.SRGBColorSpace;
   texture.needsUpdate = true;
   return texture;
 }
