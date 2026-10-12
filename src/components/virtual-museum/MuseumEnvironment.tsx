@@ -8,8 +8,11 @@ import {
   buildCeilingPanels,
   buildWallSegments,
   entranceDoor,
+  roofHeightAt,
   roomAt,
+  roomRoof,
   rooms,
+  ROOF_RISE,
   signs,
   type SignSpec,
 } from "../../data/museumLayout";
@@ -21,8 +24,10 @@ import {
   createHaloTexture,
   createPlaqueTexture,
   createWallBumpTexture,
+  createWoodPlankTexture,
 } from "./textures";
 import MuseumArchitecture from "./MuseumArchitecture";
+import MuseumCeiling from "./MuseumCeiling";
 import MuseumProps from "./MuseumProps";
 import MuseumRoom from "./MuseumRoom";
 import WallPaintings from "./WallPaintings";
@@ -91,10 +96,15 @@ const CEILING_Y = 3.6;
 const SPOT_OFFSET = 0.9;
 /** Longitud del accesorio: el cono nace en la boca del focal. */
 const SPOT_DROP = 0.16;
+/** Desplazamiento del punto de anclaje bajo el tablón del techo a dos aguas
+ *  (queda colgado de las vigas, nunca en el aire). */
+const SPOT_MOUNT_DROP = 0.16;
 /** Intensidad (canela, ~3000 K) de cada spotlight de obra: es la luz
  *  principal de la sala — el resto de la galería queda a media penumbra.
- *  El cono es estrecho para que la luz abrace la obra y no inunde el piso. */
-const SPOT_INTENSITY = 12;
+ *  El cono es estrecho para que la luz abrace la obra y no inunde el piso.
+ *  Sube un punto respecto a la versión de techo plano porque los focos
+ *  cuelgan ahora del techo a dos aguas (más altos en el centro). */
+const SPOT_INTENSITY = 14;
 
 interface GallerySpotSpec {
   attach: [number, number, number];
@@ -109,6 +119,16 @@ function buildGallerySpots(): GallerySpotSpec[] {
   for (const sculpture of museumSculptures) {
     if (!sculpture.model) continue;
     const room = rooms.find((entry) => entry.id === sculpture.room);
+    const roof = room
+      ? roomRoof(room)
+      : {
+          centerX: 0,
+          centerZ: 0,
+          halfSpan: 4,
+          depth: 10,
+          eaveY: CEILING_Y,
+          rise: ROOF_RISE,
+        };
     const cx = room ? (room.bounds.minX + room.bounds.maxX) / 2 : 0;
     const cz = room ? (room.bounds.minZ + room.bounds.maxZ) / 2 : 0;
 
@@ -120,17 +140,19 @@ function buildGallerySpots(): GallerySpotSpec[] {
     const ax = sculpture.position[0] + ux * SPOT_OFFSET;
     const az = sculpture.position[2] + uz * SPOT_OFFSET;
 
+    // El accesorio se cuela del techo a dos aguas de su sala.
+    const attachY = roofHeightAt(roof, ax, az) - SPOT_MOUNT_DROP;
     const tx = sculpture.position[0] - ax;
-    const ty = 1.45 - CEILING_Y;
+    const ty = 1.45 - attachY;
     const tz = sculpture.position[2] - az;
     const tlen = Math.hypot(tx, ty, tz) || 1;
     const dir: [number, number, number] = [tx / tlen, ty / tlen, tz / tlen];
 
     spots.push({
-      attach: [ax, CEILING_Y, az],
+      attach: [ax, attachY, az],
       origin: [
         ax + dir[0] * SPOT_DROP,
-        CEILING_Y + dir[1] * SPOT_DROP,
+        attachY + dir[1] * SPOT_DROP,
         az + dir[2] * SPOT_DROP,
       ],
       target: [sculpture.position[0], 1.45, sculpture.position[2]],
@@ -226,7 +248,7 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
       angle={0.34}
       penumbra={0.55}
       intensity={SPOT_INTENSITY}
-      distance={7}
+      distance={8}
       decay={1.6}
       color="#ffcf94"
     />
@@ -248,6 +270,16 @@ interface FocusSpotSpec {
 
 function computeFocusSpot(target: [number, number, number]): FocusSpotSpec {
   const room = roomAt(target[0], target[2]);
+  const roof = room
+    ? roomRoof(room)
+    : {
+        centerX: 0,
+        centerZ: 0,
+        halfSpan: 4,
+        depth: 10,
+        eaveY: CEILING_Y,
+        rise: ROOF_RISE,
+      };
   const cx = room ? (room.bounds.minX + room.bounds.maxX) / 2 : 0;
   const cz = room ? (room.bounds.minZ + room.bounds.maxZ) / 2 : 0;
 
@@ -257,9 +289,12 @@ function computeFocusSpot(target: [number, number, number]): FocusSpotSpec {
   const len = Math.hypot(dx, dz);
   const ux = len > 0.001 ? dx / len : 0;
   const uz = len > 0.001 ? dz / len : 0;
+  const ox = target[0] + ux * SPOT_OFFSET;
+  const oz = target[2] + uz * SPOT_OFFSET;
 
+  // Anclada al techo a dos aguas de la sala.
   return {
-    origin: [target[0] + ux * SPOT_OFFSET, CEILING_Y, target[2] + uz * SPOT_OFFSET],
+    origin: [ox, roofHeightAt(roof, ox, oz) - SPOT_MOUNT_DROP, oz],
     target: [target[0], target[1], target[2]],
   };
 }
@@ -361,6 +396,7 @@ export default function MuseumEnvironment({
   const roughnessTexture = useMemo(() => createFloorRoughnessTexture(), []);
   const wallBumpTexture = useMemo(() => createWallBumpTexture(), []);
   const haloTexture = useMemo(() => createHaloTexture(), []);
+  const woodTexture = useMemo(() => createWoodPlankTexture(), []);
   const wallSegments = useMemo(() => buildWallSegments(), []);
   const ceilingPanels = useMemo(() => buildCeilingPanels(), []);
   const gallerySpots = useMemo(() => buildGallerySpots(), []);
@@ -462,7 +498,9 @@ export default function MuseumEnvironment({
     const maxAnisotropy = gl.capabilities.getMaxAnisotropy();
     floorTexture.anisotropy = Math.min(8, maxAnisotropy);
     floorTexture.needsUpdate = true;
-  }, [gl, floorTexture]);
+    woodTexture.anisotropy = Math.min(8, maxAnisotropy);
+    woodTexture.needsUpdate = true;
+  }, [gl, floorTexture, woodTexture]);
 
   useEffect(
     () => () => {
@@ -470,6 +508,7 @@ export default function MuseumEnvironment({
       roughnessTexture.dispose();
       wallBumpTexture.dispose();
       haloTexture.dispose();
+      woodTexture.dispose();
       wallMaterial.dispose();
       accentMaterial.dispose();
       panelMaterial.dispose();
@@ -485,6 +524,7 @@ export default function MuseumEnvironment({
       roughnessTexture,
       wallBumpTexture,
       haloTexture,
+      woodTexture,
       wallMaterial,
       accentMaterial,
       panelMaterial,
@@ -574,6 +614,9 @@ export default function MuseumEnvironment({
           roughnessTexture={roughnessTexture}
         />
       ))}
+
+      {/* Techo a dos aguas de madera (tablas + vigas + aletas, 3 draw calls). */}
+      <MuseumCeiling woodTexture={woodTexture} bumpTexture={wallBumpTexture} />
 
       {wallSegments.map((segment, index) => {
         // La sala principal usa un tono ligeramente distinto en sus muros.

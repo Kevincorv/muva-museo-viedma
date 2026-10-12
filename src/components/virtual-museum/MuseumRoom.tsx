@@ -1,11 +1,12 @@
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
-import { WALL_HEIGHT, type MuseumRoom } from "../../data/museumLayout";
+import { type MuseumRoom } from "../../data/museumLayout";
 import { FLOOR_TILE_METERS } from "./textures";
 
 /**
- * Piso y techo de una sala. La textura del piso se repite en unidades de
- * mundo (FLOOR_TILE_METERS) escalando los UV de cada plano.
+ * Piso de una sala. La textura se repite en unidades de mundo
+ * (FLOOR_TILE_METERS) escalando los UV de cada plano.
+ * El techo a dos aguas lo genera `MuseumCeiling`.
  */
 export default function MuseumRoom({
   room,
@@ -36,11 +37,6 @@ export default function MuseumRoom({
     return geometry;
   }, [width, depth]);
 
-  const ceilingGeometry = useMemo(
-    () => new THREE.PlaneGeometry(width, depth),
-    [width, depth]
-  );
-
   const floorMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -56,42 +52,21 @@ export default function MuseumRoom({
     [room.floorTone, floorTexture, roughnessTexture]
   );
 
-  const ceilingMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        color: "#e8dcc4",
-        roughness: 0.95,
-        metalness: 0,
-        envMapIntensity: 0.06,
-      }),
-    []
-  );
-
   useEffect(
     () => () => {
       floorGeometry.dispose();
-      ceilingGeometry.dispose();
       floorMaterial.dispose();
-      ceilingMaterial.dispose();
     },
-    [floorGeometry, ceilingGeometry, floorMaterial, ceilingMaterial]
+    [floorGeometry, floorMaterial]
   );
 
   return (
-    <group>
-      <mesh
-        position={[centerX, 0, centerZ]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        geometry={floorGeometry}
-        material={floorMaterial}
-        receiveShadow
-      />
-      <mesh
-        position={[centerX, WALL_HEIGHT, centerZ]}
-        rotation={[Math.PI / 2, 0, 0]}
-        geometry={ceilingGeometry}
-        material={ceilingMaterial}
-      />
-    </group>
+    <mesh
+      position={[centerX, 0, centerZ]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      geometry={floorGeometry}
+      material={floorMaterial}
+      receiveShadow
+    />
   );
 }

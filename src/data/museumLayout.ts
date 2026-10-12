@@ -441,6 +441,57 @@ export function roomById(id: string): MuseumRoom | undefined {
   return rooms.find((r) => r.id === id);
 }
 
+/* ---------------------------------------------------------------------------
+ * TECHO A DOS AGUAS DE MADERA
+ *
+ * Todas las salas comparten la misma lógica: la cumbrera corre a lo largo
+ * del eje Z (eje largo de todas las salas) y los aleros caen sobre los
+ * muros largos, a la altura exacta del muro (WALL_HEIGHT). Cada sala adapta
+ * su propia altura, anchura e inclinación a partir de sus `bounds`.
+ * ------------------------------------------------------------------------- */
+
+/** Altura de la cumbrera sobre los aleros (común a todas las salas). */
+export const ROOF_RISE = 0.9;
+
+export interface RoomRoof {
+  /** Centro de la cumbrera (X del eje de la sala). */
+  centerX: number;
+  centerZ: number;
+  /** Mitad del ancho de la sala: la pendiente cubre hasta el muro largo. */
+  halfSpan: number;
+  /** Longitud de la sala a lo largo del eje Z. */
+  depth: number;
+  /** Altura de los aleros (= altura del muro). */
+  eaveY: number;
+  /** Altura de la cumbrera sobre los aleros. */
+  rise: number;
+}
+
+/** Techo adaptado a las dimensiones de una sala (cumbrera sobre el eje Z). */
+export function roomRoof(room: Pick<MuseumRoom, "bounds">): RoomRoof {
+  const { minX, minZ, maxX, maxZ } = room.bounds;
+  return {
+    centerX: (minX + maxX) / 2,
+    centerZ: (minZ + maxZ) / 2,
+    halfSpan: (maxX - minX) / 2,
+    depth: maxZ - minZ,
+    eaveY: WALL_HEIGHT,
+    rise: ROOF_RISE,
+  };
+}
+
+/** Altura del plano del techo en un punto (x, z) — se usa para colgar
+ *  focos, luminarias y vigas de forma que todo quede pegado a la madera. */
+export function roofHeightAt(roof: RoomRoof, x: number, _z: number): number {
+  const t = Math.min(1, Math.abs(x - roof.centerX) / roof.halfSpan);
+  return roof.eaveY + roof.rise * (1 - t);
+}
+
+/** Altura de la cumbrera de una sala. */
+export function ridgeY(roof: RoomRoof): number {
+  return roof.eaveY + roof.rise;
+}
+
 /**
  * Señalización: carteles con el nombre de cada sala sobre las puertas.
  * `rotationY` hace que el cartel mire hacia la sala desde la que se llega.
@@ -530,7 +581,8 @@ export const entranceDoor = {
 
 /**
  * Paneles de luz de techo (emisivos, sin costo de iluminación dinámica).
- * Se generan a partir del centro de cada sala.
+ * Se generan a partir del centro de cada sala y cuelgan bajo la cumbrera
+ * del techo a dos aguas, así quedan montados sobre la madera.
  */
 export function buildCeilingPanels(): {
   position: [number, number, number];
@@ -547,6 +599,9 @@ export function buildCeilingPanels(): {
     const d = maxZ - minZ;
     const cx = (minX + maxX) / 2;
     const cz = (minZ + maxZ) / 2;
+    const roof = roomRoof(room);
+    // Suspensos justo bajo la viga de la cumbrera (barbones visibles).
+    const y = ridgeY(roof) - 0.42;
     const along = d >= w ? "z" : "x";
     const long = Math.max(w, d);
 
@@ -555,20 +610,20 @@ export function buildCeilingPanels(): {
       panels.push({
         position:
           along === "z"
-            ? [cx, WALL_HEIGHT - 0.04, cz - offset]
-            : [cx - offset, WALL_HEIGHT - 0.04, cz],
+            ? [cx, y, cz - offset]
+            : [cx - offset, y, cz],
         size: [2.4, 1.1],
       });
       panels.push({
         position:
           along === "z"
-            ? [cx, WALL_HEIGHT - 0.04, cz + offset]
-            : [cx + offset, WALL_HEIGHT - 0.04, cz],
+            ? [cx, y, cz + offset]
+            : [cx + offset, y, cz],
         size: [2.4, 1.1],
       });
     } else {
       panels.push({
-        position: [cx, WALL_HEIGHT - 0.04, cz],
+        position: [cx, y, cz],
         size: [2.4, 1.1],
       });
     }
