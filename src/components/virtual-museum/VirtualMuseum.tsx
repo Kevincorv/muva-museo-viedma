@@ -354,8 +354,8 @@ export default function VirtualMuseum() {
             }}
           >
             <MuseumErrorBoundary onError={() => setErrored(true)}>
-              <color attach="background" args={["#4f4436"]} />
-              <fog attach="fog" args={["#4f4436", 28, 75]} />
+              <color attach="background" args={["#d4c6ab"]} />
+              <fog attach="fog" args={["#d4c6ab", 30, 90]} />
               <MuseumEnvironment
                 refreshKey={loadedSet.size}
                 focus={

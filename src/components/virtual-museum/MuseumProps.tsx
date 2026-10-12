@@ -123,7 +123,7 @@ function DustParticles() {
         map: texture,
         color: "#fff6e2",
         transparent: true,
-        opacity: 0.3,
+        opacity: 0.24,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
         sizeAttenuation: true,
@@ -215,10 +215,10 @@ export default function MuseumProps() {
   const brassMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#9a8a6a",
-        roughness: 0.34,
-        metalness: 0.72,
-        envMapIntensity: 0.9,
+        color: "#a8946e",
+        roughness: 0.32,
+        metalness: 0.74,
+        envMapIntensity: 1,
       }),
     []
   );

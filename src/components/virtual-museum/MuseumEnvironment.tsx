@@ -91,10 +91,10 @@ const CEILING_Y = 3.6;
 const SPOT_OFFSET = 0.9;
 /** Longitud del accesorio: el cono nace en la boca del focal. */
 const SPOT_DROP = 0.16;
-/** Intensidad (canela, ~3000 K) de cada spotlight de obra: es la luz
- *  principal de la sala — el resto de la galería queda a media penumbra.
- *  El cono es estrecho para que la luz abrace la obra y no inunde el piso. */
-const SPOT_INTENSITY = 12;
+/** Intensidad (canela, ~3000 K) de cada spotlight de obra: aporta el
+ *  acento cálido que modela cada pieza sobre la luz ambiental luminosa
+ *  de la galería. El cono es estrecho para que la luz abrace la obra. */
+const SPOT_INTENSITY = 16;
 
 interface GallerySpotSpec {
   attach: [number, number, number];
@@ -223,8 +223,8 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
     <spotLight
       ref={lightRef}
       position={spec.origin}
-      angle={0.34}
-      penumbra={0.55}
+      angle={0.36}
+      penumbra={0.62}
       intensity={SPOT_INTENSITY}
       distance={7}
       decay={1.6}
@@ -239,7 +239,7 @@ function GallerySpot({ spec }: { spec: GallerySpotSpec }) {
 /* para no recompilar shaders al abrir la ficha.                       */
 /* ------------------------------------------------------------------ */
 
-const FOCUS_SPOT_INTENSITY = 24;
+const FOCUS_SPOT_INTENSITY = 28;
 
 interface FocusSpotSpec {
   origin: [number, number, number];
@@ -265,31 +265,31 @@ function computeFocusSpot(target: [number, number, number]): FocusSpotSpec {
 }
 
 /**
- * Tono de sala (siempre activo): galería a media penumbra con luz cálida
- * concentrada en las obras. `LIGHT_DIM` es el paso extra de oscuridad que se
- * aplica al seleccionar una escultura (un punto más, sin exagerar).
+ * Tono de sala (siempre activo): galería luminosa con luz cálida uniforme
+ * y acentos cálidos sobre las obras. `LIGHT_DIM` es el paso de oscuridad
+ * que se aplica al seleccionar una escultura (elegante, sin exagerar).
  */
 const LIGHT_BASE = {
-  ambient: 0.1,
-  hemi: 0.12,
-  key: 0.16,
-  fill: 0.06,
-  environment: 0.25,
-  background: new THREE.Color("#4f4436"),
-  panel: new THREE.Color("#6b5a40"),
-  lens: new THREE.Color("#6b5c46"),
-  haloOpacity: 0.3,
+  ambient: 0.35,
+  hemi: 0.55,
+  key: 0.55,
+  fill: 0.25,
+  environment: 0.7,
+  background: new THREE.Color("#d4c6ab"),
+  panel: new THREE.Color("#fff0d2"),
+  lens: new THREE.Color("#ffedcc"),
+  haloOpacity: 0.36,
 } as const;
 
 const LIGHT_DIM = {
-  ambient: 0.065,
-  hemi: 0.08,
-  key: 0.11,
-  fill: 0.04,
-  environment: 0.17,
-  background: new THREE.Color("#3b3327"),
-  panel: new THREE.Color("#4e4331"),
-  lens: new THREE.Color("#4d4534"),
+  ambient: 0.16,
+  hemi: 0.24,
+  key: 0.24,
+  fill: 0.1,
+  environment: 0.34,
+  background: new THREE.Color("#93856c"),
+  panel: new THREE.Color("#a08f70"),
+  lens: new THREE.Color("#9e8e6e"),
   haloOpacity: 0.18,
 } as const;
 
@@ -297,15 +297,15 @@ const LIGHT_DIM = {
  * Arquitectura del museo: pisos, muros generados desde el plano, molduras,
  * columnas, mobiliario, techos, paneles de luz, señalización e iluminación.
  *
- * Ambientación de galería (tono Prado a media penumbra):
- *  · Luz base mínima (ambient + hemisférica tenues): la sala vive oscura.
- *  · Un spotlight cálido (~3000 K) por obra es la fuente de luz principal.
- *  · IBL local (`RoomEnvironment`) a baja intensidad para reflejos suaves.
+ * Ambientación de galería de arte contemporánea (cálida y luminosa):
+ *  · Luz ambiental y hemisférica equilibradas: la sala se recorre luminosa.
+ *  · Focos cálidos (~3000 K) por obra que modelan volúmenes y detalles.
+ *  · IBL local (`RoomEnvironment`) para reflejos suaves en muros y molduras.
  *  · Una luz clave con sombra suave; el mapa de sombra se dibuja una vez y
  *    solo se refresca cuando entra o sale una obra (`autoUpdate = false`).
  *  · Aparatos de techo fusionados (cuerpo + lente emisiva + halo).
  *  · Al seleccionar una escultura todo baja un punto más y su luminaria de
- *    foco enciende sobre la obra.
+ *    foco enciende sobre la obra (transición suave, sin parpadeos).
  *  · `refreshKey` avisa al sistema que hay que refrescar las sombras.
  */
 export default function MuseumEnvironment({
@@ -369,12 +369,12 @@ export default function MuseumEnvironment({
   const wallMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#e8dcc0",
-        roughness: 0.92,
+        color: "#ece2ce",
+        roughness: 0.88,
         metalness: 0,
         bumpMap: wallBumpTexture,
-        bumpScale: 0.015,
-        envMapIntensity: 0.12,
+        bumpScale: 0.012,
+        envMapIntensity: 0.2,
       }),
     [wallBumpTexture]
   );
@@ -382,18 +382,18 @@ export default function MuseumEnvironment({
   const accentMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#ddd0b0",
-        roughness: 0.92,
+        color: "#e6dcc6",
+        roughness: 0.88,
         metalness: 0,
         bumpMap: wallBumpTexture,
-        bumpScale: 0.015,
-        envMapIntensity: 0.12,
+        bumpScale: 0.012,
+        envMapIntensity: 0.2,
       }),
     [wallBumpTexture]
   );
 
   const panelMaterial = useMemo(
-    () => new THREE.MeshBasicMaterial({ color: "#ffe4b8", toneMapped: false }),
+    () => new THREE.MeshBasicMaterial({ color: "#fff0d2", toneMapped: false }),
     []
   );
 
@@ -498,13 +498,13 @@ export default function MuseumEnvironment({
   /**
    * Transición de foco: atenúa luces, entorno IBL, fondo, niebla, paneles y
    * halos mientras rampa el spotlight de la obra seleccionada. `damp` es
-   * exponencial (sin rebotes) y el delta se recorta para que una pestaña en
-   * segundo plano no provoque saltos al volver.
+   * exponencial (sin rebotes, ritmo cinematográfico) y el delta se recorta
+   * para que una pestaña en segundo plano no provoque saltos al volver.
    */
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, 0.05);
     const target = focus ? 1 : 0;
-    const dim = THREE.MathUtils.damp(focusDim.current, target, 5.5, delta);
+    const dim = THREE.MathUtils.damp(focusDim.current, target, 4.6, delta);
     focusDim.current = dim;
 
     if (ambientRef.current) {
@@ -635,12 +635,12 @@ export default function MuseumEnvironment({
 
       <EntranceDoor />
 
-      {/* Luz base tenue: la sala queda a media penumbra. */}
+      {/* Luz base cálida y equilibrada: la sala se recorre luminosa. */}
       <ambientLight ref={ambientRef} intensity={LIGHT_BASE.ambient} color="#f5e6c8" />
       <hemisphereLight
         ref={hemiRef}
         color="#fff0d0"
-        groundColor="#5a4028"
+        groundColor="#6a4c30"
         intensity={LIGHT_BASE.hemi}
       />
       {/* Clave cálida con sombra suave (mapa estático) + relleno. */}
@@ -676,12 +676,12 @@ export default function MuseumEnvironment({
       <spotLight
         ref={focusSpotRef}
         position={focusSpec.origin}
-        angle={0.38}
-        penumbra={0.65}
+        angle={0.42}
+        penumbra={0.72}
         intensity={0}
-        distance={12}
-        decay={1.4}
-        color="#ffd6a6"
+        distance={14}
+        decay={1.3}
+        color="#ffd9ad"
       />
     </group>
   );

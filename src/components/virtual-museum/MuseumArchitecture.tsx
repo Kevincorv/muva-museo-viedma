@@ -158,10 +158,10 @@ export default function MuseumArchitecture() {
   const corniceMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#e8dcc4",
-        roughness: 0.88,
+        color: "#f0e8d6",
+        roughness: 0.86,
         metalness: 0,
-        envMapIntensity: 0.15,
+        envMapIntensity: 0.18,
       })
   );
   const frameMaterial = useMaterial(
@@ -176,10 +176,10 @@ export default function MuseumArchitecture() {
   const columnMaterial = useMaterial(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#e0d4bc",
-        roughness: 0.85,
+        color: "#ebe1cc",
+        roughness: 0.84,
         metalness: 0,
-        envMapIntensity: 0.14,
+        envMapIntensity: 0.16,
       })
   );
 

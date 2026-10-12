@@ -91,7 +91,7 @@ export default function SculptureInfoPanel({
       role="dialog"
       aria-modal="false"
       aria-label={`${t("panel.ariaLabel")} – ${title}`}
-      className={`pointer-events-auto absolute inset-x-0 bottom-0 z-40 flex max-h-[76vh] flex-col bg-muva-cream shadow-[0_-12px_40px_rgba(26,20,16,0.25)] transition-transform duration-[380ms] ease-out md:inset-y-0 md:left-auto md:right-0 md:top-0 md:h-full md:max-h-none md:w-[min(92vw,440px)] md:shadow-[-12px_0_40px_rgba(26,20,16,0.25)] ${
+      className={`pointer-events-auto absolute inset-x-0 bottom-0 z-40 flex max-h-[76vh] flex-col bg-muva-cream shadow-[0_-16px_48px_rgba(26,20,16,0.32)] transition-transform duration-[380ms] ease-out md:inset-y-0 md:left-auto md:right-0 md:top-0 md:h-full md:max-h-none md:w-[min(92vw,440px)] md:border-l md:border-muva-sand/60 md:shadow-[-16px_0_48px_rgba(26,20,16,0.3)] ${
         visible
           ? "translate-y-0 md:translate-x-0"
           : "translate-y-full md:translate-y-0 md:translate-x-full"
@@ -134,9 +134,11 @@ export default function SculptureInfoPanel({
             </div>
           )}
           <div className="pointer-events-none absolute inset-0 ring-1 ring-inset ring-muva-dark/10" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-muva-dark/12 via-transparent to-transparent" />
         </div>
 
         <div className="mt-6">
+          <div className="mb-4 h-px w-10 bg-muva-sand" />
           <h2 className="font-serif text-3xl font-light leading-tight text-muva-dark">
             {title}
           </h2>

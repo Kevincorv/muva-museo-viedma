@@ -59,10 +59,10 @@ export default function MuseumRoom({
   const ceilingMaterial = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
-        color: "#e8dcc4",
-        roughness: 0.95,
+        color: "#f2ebdc",
+        roughness: 0.94,
         metalness: 0,
-        envMapIntensity: 0.06,
+        envMapIntensity: 0.1,
       }),
     []
   );
