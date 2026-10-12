@@ -95,6 +95,7 @@ const OBRA18_AUDIO = audioFor("obra-18");
 const OBRA19_AUDIO = audioFor("obra-19");
 const OBRA20_AUDIO = audioFor("obra-20");
 const OBRA21_AUDIO = audioFor("obra-21");
+const OBRA26_AUDIO = audioFor("obra-26");
 
 export const sculptures: Sculpture[] = [
   {
@@ -462,6 +463,21 @@ export const sculptures: Sculpture[] = [
     getDescription: (locale) => t("sculpture.obra25.desc", locale),
     getIconografia: (locale) => t("sculpture.obra25.icono", locale),
     getAudio: (locale) => ORANTES_AUDIO[locale] ?? ORANTES_AUDIO.es,
+  },
+  {
+    id: "obra-26",
+    titleKey: "sculpture.obra26.title",
+    subtitleKey: "sculpture.obra26.sub",
+    descriptionKey: "sculpture.obra26.desc",
+    iconografiaKey: "sculpture.obra26.icono",
+    thumbnail: "/images/sculptures/obra-26.webp",
+    model: "/models/sculptures/Virgen del Rosario.glb",
+    audio: OBRA26_AUDIO,
+    getTitle: (locale) => t("sculpture.obra26.title", locale),
+    getSubtitle: (locale) => t("sculpture.obra26.sub", locale),
+    getDescription: (locale) => t("sculpture.obra26.desc", locale),
+    getIconografia: (locale) => t("sculpture.obra26.icono", locale),
+    getAudio: (locale) => OBRA26_AUDIO[locale] ?? OBRA26_AUDIO.es,
   },
 ];
 
