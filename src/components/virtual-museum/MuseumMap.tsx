@@ -1,9 +1,14 @@
 ﻿import { useEffect, useState } from "react";
 import { X } from "lucide-react";
 import {
+  buildCollisionBoxes,
+  buildDoorFrames,
+  buildPropColliders,
   buildWallSegments,
+  museumBounds,
   rooms,
   WALL_HEIGHT,
+  type MuseumRoom,
 } from "../../data/museumLayout";
 import { museumSculptures } from "../../data/sculptures";
 import { playerState } from "./state";
@@ -22,6 +27,122 @@ const walls = buildWallSegments().filter(
   (segment) => segment.position[1] < WALL_HEIGHT / 2
 );
 
+/** Mismos valores que FirstPersonControls. */
+const PLAYER_RADIUS = 0.34;
+
+const solidBoxes = [
+  ...buildCollisionBoxes(),
+  ...buildPropColliders(museumSculptures),
+];
+
+const sculptureColliders = museumSculptures.map((s) => ({
+  x: s.position[0],
+  z: s.position[2],
+  r: s.collisionRadius ?? 0.6,
+}));
+
+const doorFrames = buildDoorFrames();
+
+/** ¿Puede pararse el jugador en (x, z)? (mismas reglas que FirstPersonControls) */
+function isFree(x: number, z: number): boolean {
+  if (
+    x < museumBounds.minX ||
+    x > museumBounds.maxX ||
+    z < museumBounds.minZ ||
+    z > museumBounds.maxZ
+  ) {
+    return false;
+  }
+  for (const box of solidBoxes) {
+    if (
+      x > box.minX - PLAYER_RADIUS &&
+      x < box.maxX + PLAYER_RADIUS &&
+      z > box.minZ - PLAYER_RADIUS &&
+      z < box.maxZ + PLAYER_RADIUS
+    ) {
+      return false;
+    }
+  }
+  for (const s of sculptureColliders) {
+    const dx = x - s.x;
+    const dz = z - s.z;
+    const radius = s.r + PLAYER_RADIUS;
+    if (dx * dx + dz * dz < radius * radius) return false;
+  }
+  return true;
+}
+
+/** Vanos de puerta que tocan la sala, con la dirección hacia su interior. */
+function doorsForRoom(room: MuseumRoom) {
+  const { minX, minZ, maxX, maxZ } = room.bounds;
+  const eps = 0.01;
+  const result: { x: number; z: number; nx: number; nz: number }[] = [];
+  for (const frame of doorFrames) {
+    const [dx, dz] = frame.center;
+    if (
+      Math.abs(dz - minZ) < eps &&
+      dx >= minX - eps &&
+      dx <= maxX + eps
+    ) {
+      result.push({ x: dx, z: dz, nx: 0, nz: 1 });
+    } else if (
+      Math.abs(dz - maxZ) < eps &&
+      dx >= minX - eps &&
+      dx <= maxX + eps
+    ) {
+      result.push({ x: dx, z: dz, nx: 0, nz: -1 });
+    } else if (
+      Math.abs(dx - minX) < eps &&
+      dz >= minZ - eps &&
+      dz <= maxZ + eps
+    ) {
+      result.push({ x: dx, z: dz, nx: 1, nz: 0 });
+    } else if (
+      Math.abs(dx - maxX) < eps &&
+      dz >= minZ - eps &&
+      dz <= maxZ + eps
+    ) {
+      result.push({ x: dx, z: dz, nx: -1, nz: 0 });
+    }
+  }
+  return result;
+}
+
+/**
+ * Punto libre para aparecer en la sala: entra por una puerta hacia el
+ * interior; si no hay sitio, cae en una malla radial alrededor del centro.
+ */
+function findSpawn(room: MuseumRoom) {
+  const { minX, minZ, maxX, maxZ } = room.bounds;
+  const inside = (x: number, z: number) =>
+    x > minX + 0.4 &&
+    x < maxX - 0.4 &&
+    z > minZ + 0.4 &&
+    z < maxZ - 0.4;
+
+  for (const door of doorsForRoom(room)) {
+    for (const dist of [1.2, 1.8, 2.4, 3.0, 3.6]) {
+      for (const lat of [0, 0.7, -0.7, 1.4, -1.4]) {
+        const x = door.x + door.nx * dist + (door.nx === 0 ? lat : 0);
+        const z = door.z + door.nz * dist + (door.nz === 0 ? lat : 0);
+        if (inside(x, z) && isFree(x, z)) return { x, z };
+      }
+    }
+  }
+
+  const cx = (minX + maxX) / 2;
+  const cz = (minZ + maxZ) / 2;
+  for (const dist of [0, 1, 2, 3, 4, 5]) {
+    for (let i = 0; i < 16; i++) {
+      const angle = (i / 16) * Math.PI * 2;
+      const x = cx + Math.cos(angle) * dist;
+      const z = cz + Math.sin(angle) * dist;
+      if (inside(x, z) && isFree(x, z)) return { x, z };
+    }
+  }
+  return null;
+}
+
 /** Plano cenital del museo con la posiciÃ³n del visitante en tiempo real. */
 export default function MuseumMap({
   currentRoomId,
@@ -36,6 +157,22 @@ export default function MuseumMap({
     z: playerState.position.z,
     yaw: playerState.yaw,
   });
+  const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
+
+  /** Lleva al visitante a la entrada de la sala, mirando hacia su interior. */
+  const goToRoom = (room: MuseumRoom) => {
+    const spawn = findSpawn(room);
+    if (!spawn) return;
+    const { minX, minZ, maxX, maxZ } = room.bounds;
+    const cx = (minX + maxX) / 2;
+    const cz = (minZ + maxZ) / 2;
+    playerState.position.x = spawn.x;
+    playerState.position.z = spawn.z;
+    playerState.yaw = Math.atan2(-(cx - spawn.x), -(cz - spawn.z));
+    playerState.pitch = 0;
+    playerState.moving = false;
+    onClose();
+  };
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -99,25 +236,55 @@ export default function MuseumMap({
 
             {rooms.map((room) => {
               const active = room.id === currentRoomId;
+              const hovered = room.id === hoveredRoom;
               return (
-                <g key={room.id}>
+                <g
+                  key={room.id}
+                  className="cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  aria-label={t(room.nameKey)}
+                  onMouseEnter={() => setHoveredRoom(room.id)}
+                  onMouseLeave={() =>
+                    setHoveredRoom((current) =>
+                      current === room.id ? null : current
+                    )
+                  }
+                  onClick={() => goToRoom(room)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      goToRoom(room);
+                    }
+                  }}
+                >
+                  <title>{t(room.nameKey)}</title>
                   <rect
                     x={toX(room.bounds.minX)}
                     y={toY(room.bounds.minZ)}
                     width={(room.bounds.maxX - room.bounds.minX) * SCALE}
                     height={(room.bounds.maxZ - room.bounds.minZ) * SCALE}
-                    fill={active ? "#e6dcc4" : "#efe8d8"}
+                    fill={
+                      active
+                        ? "#e6dcc4"
+                        : hovered
+                          ? "#ded2b6"
+                          : "#efe8d8"
+                    }
+                    stroke={hovered && !active ? "#8a7560" : "none"}
+                    strokeWidth={hovered && !active ? 1 : 0}
                   />
                   <text
                     x={toX((room.bounds.minX + room.bounds.maxX) / 2)}
                     y={toY((room.bounds.minZ + room.bounds.maxZ) / 2)}
                     textAnchor="middle"
                     dominantBaseline="middle"
-                    fill={active ? "#3d2f22" : "#8a7560"}
+                    fill={active ? "#3d2f22" : hovered ? "#5c4a38" : "#8a7560"}
                     style={{
                       fontFamily: '"Cormorant Garamond", Georgia, serif',
                       fontSize: active ? 11 : 10,
                       fontWeight: 500,
+                      pointerEvents: "none",
                     }}
                   >
                     {t(room.nameKey)}
@@ -134,6 +301,7 @@ export default function MuseumMap({
                 width={segment.size[0] * SCALE}
                 height={segment.size[2] * SCALE}
                 fill="#3d2f22"
+                style={{ pointerEvents: "none" }}
               />
             ))}
 
@@ -145,11 +313,13 @@ export default function MuseumMap({
                 r={3.4}
                 fill="#6b4f35"
                 opacity={0.75}
+                style={{ pointerEvents: "none" }}
               />
             ))}
 
             <g
               transform={`translate(${toX(marker.x)} ${toY(marker.z)}) rotate(${heading})`}
+              style={{ pointerEvents: "none" }}
             >
               <circle r={6} fill="#1a1410" stroke="#faf6ee" strokeWidth={2} />
               <path d="M 0 -13 L 4.5 -5 L -4.5 -5 Z" fill="#1a1410" />
