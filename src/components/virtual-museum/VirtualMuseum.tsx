@@ -15,6 +15,7 @@ import {
   museumTitle,
 } from "../../data/sculptures";
 import { playerSpawn, roomAt, roomById } from "../../data/museumLayout";
+import { isConstrainedDevice } from "../../lib/capabilities";
 import { useLanguage } from "../../i18n/LanguageContext";
 import ControlsHelp from "./ControlsHelp";
 import FirstPersonControls from "./FirstPersonControls";
@@ -31,8 +32,9 @@ import { HudIconButton, useDeviceFlags } from "./hud";
 import { useVmText } from "./texts";
 
 /** Distancia a la que una obra empieza a descargarse de memoria. */
-const LOAD_DISTANCE = 24;
-const UNLOAD_DISTANCE = 42;
+const LIGHT_DEVICE = isConstrainedDevice();
+const LOAD_DISTANCE = LIGHT_DEVICE ? 11 : 24;
+const UNLOAD_DISTANCE = LIGHT_DEVICE ? 24 : 42;
 const EYE_HEIGHT = 1.65;
 const READY_TIMEOUT = 12000;
 const PANEL_CLOSE_MS = 340;

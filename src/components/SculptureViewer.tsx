@@ -3,7 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, OrbitControls, useGLTF } from "@react-three/drei";
 import { AlertCircle, Loader2, RefreshCw, X, ZoomIn, ZoomOut, RotateCcw, Maximize2, Minimize2, Box, ChevronUp } from "lucide-react";
 import * as THREE from "three";
-import { sculptures } from "../data/sculptures";
+import { modelForDevice, sculptures } from "../data/sculptures";
 import { useLanguage } from "../i18n/LanguageContext";
 import { t } from "../i18n/translations";
 import { hasWebGL, isConstrainedDevice, isSlowConnection } from "../lib/capabilities";
@@ -62,7 +62,8 @@ function SculptureModel({
   onLoaded: () => void;
   orbitRef: React.MutableRefObject<any>;
 }) {
-  const { scene } = useGLTF(url, "/draco/");
+  const modelUrl = useMemo(() => modelForDevice(url), [url]);
+  const { scene } = useGLTF(modelUrl, "/draco/");
   const ref = useRef<THREE.Group>(null);
   const { camera, size: canvasSize, invalidate } = useThree();
   const halfExtents = useRef<THREE.Vector3 | null>(null);
@@ -85,9 +86,9 @@ function SculptureModel({
   // termina matando el contexto WebGL.
   useEffect(() => {
     return () => {
-      useGLTF.clear(url);
+      useGLTF.clear(modelUrl);
     };
-  }, [url]);
+  }, [modelUrl]);
 
   const fitToFrame = () => {
     const half = halfExtents.current;

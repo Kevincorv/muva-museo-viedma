@@ -11,7 +11,7 @@ import { useFrame } from "@react-three/fiber";
 import { useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { MuseumSculpture } from "../../data/sculptures";
-import { museumTitle } from "../../data/sculptures";
+import { modelForDevice, museumTitle } from "../../data/sculptures";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { DRACO_PATH, releaseModel, retainModel } from "./modelCache";
 import { registerInteractable, unregisterInteractable } from "./state";
@@ -134,7 +134,7 @@ function SculptureModel({
 }: {
   sculpture: MuseumSculpture;
 }) {
-  const url = sculpture.model;
+  const url = modelForDevice(sculpture.model);
   const { scene } = useGLTF(url, DRACO_PATH);
   const fitRef = useRef<THREE.Group>(null);
   const height = sculpture.height ?? DEFAULT_HEIGHT;

@@ -19,7 +19,7 @@ import {
   ZoomOut,
 } from "lucide-react";
 import * as THREE from "three";
-import { museumTitle, type MuseumSculpture } from "../../data/sculptures";
+import { modelForDevice, museumTitle, type MuseumSculpture } from "../../data/sculptures";
 import { useLanguage } from "../../i18n/LanguageContext";
 import { fitCameraToModel } from "../../lib/fitCamera";
 import { DRACO_PATH, releaseModel, retainModel } from "./modelCache";
@@ -56,7 +56,7 @@ function Model360({
   onLoaded: () => void;
   orbitRef: MutableRefObject<any>;
 }) {
-  const url = sculpture.model;
+  const url = modelForDevice(sculpture.model);
   const { scene } = useGLTF(url, DRACO_PATH);
   const groupRef = useRef<THREE.Group>(null);
   const loadedRef = useRef(false);

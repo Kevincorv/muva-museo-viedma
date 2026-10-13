@@ -20,7 +20,7 @@ import {
   ChevronDown,
 } from "lucide-react";
 import * as THREE from "three";
-import { sculptures, type Sculpture } from "../data/sculptures";
+import { modelForDevice, sculptures, type Sculpture } from "../data/sculptures";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import { useNearViewport } from "../hooks/useNearViewport";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -89,7 +89,8 @@ function EmbeddedModel({
   onLoaded: () => void;
   orbitRef: React.MutableRefObject<any>;
 }) {
-  const { scene } = useGLTF(url, "/draco/");
+  const modelUrl = useMemo(() => modelForDevice(url), [url]);
+  const { scene } = useGLTF(modelUrl, "/draco/");
   const ref = useRef<THREE.Group>(null);
   const loadedRef = useRef(false);
   const { camera, size: canvasSize, invalidate } = useThree();
@@ -160,9 +161,9 @@ function EmbeddedModel({
 
   useEffect(() => {
     return () => {
-      useGLTF.clear(url);
+      useGLTF.clear(modelUrl);
     };
-  }, [url]);
+  }, [modelUrl]);
 
   return (
     <group ref={ref}>

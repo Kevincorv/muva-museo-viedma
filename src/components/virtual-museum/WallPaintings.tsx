@@ -7,6 +7,7 @@ import {
   paintings,
   type PaintingSpec,
 } from "../../data/paintings";
+import { isConstrainedDevice } from "../../lib/capabilities";
 import { focusDim } from "./focusDim";
 
 /**
@@ -31,6 +32,15 @@ const LIGHT_RISE = 0.13;
 const PAINTING_EMISSIVE = 0.25;
 const LENS_BASE_COLOR = new THREE.Color("#fff0d0");
 const LENS_DIM_COLOR = new THREE.Color("#6f6350");
+
+/**
+ * En dispositivos con poca RAM solo se mantienen decodificadas las texturas
+ * de los lienzos cercanos: 21 imágenes en simultáneo superan los 100 MB de
+ * memoria de textura y, junto con los modelos, tumban el tab del navegador.
+ */
+const GATED = isConstrainedDevice();
+const PAINTING_LOAD_DISTANCE = 16;
+const PAINTING_UNLOAD_DISTANCE = 19;
 
 function paintingSize(spec: PaintingSpec): { w: number; h: number } {
   const h = spec.height ?? PAINTING_HEIGHT;
@@ -183,15 +193,46 @@ function PaintingCanvas({
 export default function WallPaintings() {
   const merged = useMemo(() => buildMerged(paintings), []);
   const canvasMaterials = useRef<THREE.MeshStandardMaterial[]>([]);
+  const nearRef = useRef<Set<string> | null>(GATED ? new Set() : null);
+  const [nearIds, setNearIds] = useState<Set<string> | null>(nearRef.current);
+  const sampleAcc = useRef(0);
 
   // Sincroniza el atenuado de los lienzos y lentes con el foco de obra.
-  useFrame(() => {
+  // En móviles, muestrea ~2 veces por segundo qué lienzos están cerca.
+  useFrame((_state, delta) => {
     const dim = focusDim.current;
     const emissive = PAINTING_EMISSIVE * (1 - 0.8 * dim);
     for (const material of canvasMaterials.current) {
       material.emissiveIntensity = emissive;
     }
     lensMaterial.color.lerpColors(LENS_BASE_COLOR, LENS_DIM_COLOR, dim);
+
+    if (!GATED) return;
+    sampleAcc.current += Math.min(delta, 0.5);
+    if (sampleAcc.current < 0.5) return;
+    sampleAcc.current = 0;
+    const previous = nearRef.current;
+    if (!previous) return;
+    const { x, y, z } = _state.camera.position;
+    const next = new Set<string>();
+    let changed = false;
+    for (const spec of paintings) {
+      const distance = Math.hypot(
+        spec.position[0] - x,
+        spec.position[1] - y,
+        spec.position[2] - z
+      );
+      const wasNear = previous.has(spec.id);
+      const near = wasNear
+        ? distance < PAINTING_UNLOAD_DISTANCE
+        : distance < PAINTING_LOAD_DISTANCE;
+      if (near) next.add(spec.id);
+      if (near !== wasNear) changed = true;
+    }
+    if (changed) {
+      nearRef.current = next;
+      setNearIds(next);
+    }
   });
 
   const frameMaterial = useMemo(
@@ -255,9 +296,11 @@ export default function WallPaintings() {
       <mesh geometry={merged.fixtureGeometry} material={fixtureMaterial} castShadow />
       <mesh geometry={merged.lensGeometry} material={lensMaterial} />
 
-      {paintings.map((spec) => (
-        <PaintingCanvas key={spec.id} spec={spec} registry={canvasMaterials} />
-      ))}
+      {paintings.map((spec) =>
+        nearIds && !nearIds.has(spec.id) ? null : (
+          <PaintingCanvas key={spec.id} spec={spec} registry={canvasMaterials} />
+        )
+      )}
     </group>
   );
 }

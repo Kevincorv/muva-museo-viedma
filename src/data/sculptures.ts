@@ -1,4 +1,5 @@
 ﻿import { t, type Locale } from "../i18n/translations";
+import { isConstrainedDevice } from "../lib/capabilities";
 
 export interface SculptureAudio {
   es?: string;
@@ -851,3 +852,35 @@ export const museumSculptures: MuseumSculpture[] = [
     room: "sala-4",
   },
 ];
+
+/**
+ * Modelos pesados con variante ligera `-mobile.glb` (texturas a 1024 px y
+ * malla simplificada, generada con gltf-transform). En dispositivos con poca
+ * RAM o pantalla chica, cargar los originales agota la memoria del tab y el
+ * navegador termina recargando la página en bucle.
+ */
+const MOBILE_VARIANTS: Record<string, string> = {
+  "/models/sculptures/obra-06-san-miguel-arcangel_nuevo.glb":
+    "/models/sculptures/obra-06-san-miguel-arcangel_nuevo-mobile.glb",
+  "/models/sculptures/La Pasionaria y San Ignacio.glb":
+    "/models/sculptures/La Pasionaria y San Ignacio-mobile.glb",
+  "/models/sculptures/Cristo Resucitado.glb":
+    "/models/sculptures/Cristo Resucitado-mobile.glb",
+  "/models/sculptures/la Virgen María.glb":
+    "/models/sculptures/la Virgen María-mobile.glb",
+  "/models/sculptures/SANTA ANA.glb":
+    "/models/sculptures/SANTA ANA-mobile.glb",
+  "/models/sculptures/San Alonso Rodriguez.glb":
+    "/models/sculptures/San Alonso Rodriguez-mobile.glb",
+  "/models/sculptures/San Ignacio de Loyola.glb":
+    "/models/sculptures/San Ignacio de Loyola-mobile.glb",
+  "/models/sculptures/Virgen del Rosario.glb":
+    "/models/sculptures/Virgen del Rosario-mobile.glb",
+};
+
+/** Variante reducida del .glb si el dispositivo no da abasto. */
+export function modelForDevice(model: string): string {
+  if (!model) return model;
+  if (!isConstrainedDevice()) return model;
+  return MOBILE_VARIANTS[model] ?? model;
+}
