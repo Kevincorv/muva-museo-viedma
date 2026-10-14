@@ -178,7 +178,10 @@ function SculptureModel({
   }, [cloned, height, scale]);
 
   return (
-    <group position={[0, PEDESTAL_TOP, 0]}>
+    <group
+      position={[0, PEDESTAL_TOP, 0]}
+      rotation={[0, sculpture.rotation?.[1] ?? 0, 0]}
+    >
       <group ref={fitRef}>
         <primitive object={cloned} />
       </group>
